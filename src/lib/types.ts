@@ -114,6 +114,7 @@ export interface Profile extends Partial<Intake> {
   onboarded: boolean;
   tier: "free" | "starter" | "pro" | "elite";
   subscription_status: string | null;
-  stripe_customer_id: string | null;
+  paddle_customer_id: string | null;
+  paddle_subscription_id: string | null;
   weekly_email: boolean;
 }

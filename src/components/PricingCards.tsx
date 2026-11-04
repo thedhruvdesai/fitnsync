@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { openCheckout } from "@/lib/paddle-client";
 import { formatMoney, type Region } from "@/lib/regions";
 import { PLANS, TIER_RANK, TRIAL_DAYS, type Tier } from "@/lib/tiers";
 
@@ -11,13 +12,16 @@ export function PricingCards({ current, mode, highlight, trialEligible = true, r
   async function choose(tier: Tier) {
     setBusy(tier);
     setErr(null);
-    const res = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tier, currency: region.currency }) });
-    const j = await res.json();
-    if (j.url) window.location.href = j.url;
-    else {
-      setErr(j.error || "Couldn't start checkout");
-      setBusy(null);
+    try {
+      const res = await fetch("/api/paddle/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tier, country: region.id }) });
+      const j = await res.json();
+      if (j.switched) return window.location.assign("/app/billing?success=1");
+      if (!j.checkout) throw new Error(j.error || "Couldn't start checkout");
+      await openCheckout(j.checkout);
+    } catch (e) {
+      setErr((e as Error).message);
     }
+    setBusy(null);
   }
 
   return (
@@ -55,7 +59,7 @@ export function PricingCards({ current, mode, highlight, trialEligible = true, r
         })}
       </div>
       {err && <p className="mt-4 text-center text-sm text-blood-400">{err}</p>}
-      <p className="mt-6 text-center text-xs text-bone-mute">{TRIAL_DAYS > 0 && trialEligible ? `Free for ${TRIAL_DAYS} days, then billed monthly in ${region.currency.toUpperCase()}${region.id === "AU" && process.env.NEXT_PUBLIC_GST_REGISTERED === "true" ? " (GST inclusive)" : ""}. Cancel before the trial ends and you will not be charged.` : `Billed monthly in ${region.currency.toUpperCase()}. Cancel anytime from your account.`}</p>
+      <p className="mt-6 text-center text-xs text-bone-mute">{TRIAL_DAYS > 0 && trialEligible ? `Free for ${TRIAL_DAYS} days, then billed monthly in ${region.currency.toUpperCase()}. Price includes local taxes. Cancel before the trial ends and you will not be charged.` : `Billed monthly in ${region.currency.toUpperCase()}, local taxes included. Cancel anytime from your account.`}</p>
     </>
   );
 }

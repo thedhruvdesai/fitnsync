@@ -9,7 +9,7 @@ A production-ready Next.js 14 app with:
 - **Reports (Pro)**: weekly consistency score, adherence, day-by-day table, PDF via print
 - **Fit&Sync Coach (Elite)**: Claude writes an expert-voice weekly review plus up to 8 on-demand check-ins a month, clearly labelled as AI
 - **Weekly email every Monday** (Resend); depth depends on tier, and Elite gets the coach review inline
-- **Stripe subscriptions**: Starter $9.99, Pro $19.99, Elite $39 (AUD/month), each with a 7-day free trial for first-time subscribers, plus a customer portal for upgrades and cancellations
+- **Paddle subscriptions** (merchant of record, handles worldwide tax): Starter $9.99, Pro $19.99, Elite $39 AUD/month, with local prices in 10+ regions, a 7-day free trial, and a customer portal
 
 ## Tier features
 
@@ -22,7 +22,7 @@ A production-ready Next.js 14 app with:
 | Reports & PDF | | | ✓ | ✓ |
 | AI coach weekly review + 8 check-ins/mo | | | | ✓ |
 
-Edit features, prices and `TRIAL_DAYS` in `src/lib/tiers.ts`. For a founding-member discount, create a coupon and promotion code in Stripe (e.g. `FOUNDING50`); checkout already accepts promo codes.
+Edit features, prices and `TRIAL_DAYS` in `src/lib/tiers.ts`. For a founding-member deal, create a discount code in Paddle (Catalog → Discounts, e.g. `FOUNDING50`); customers can enter it at checkout.
 
 ---
 
@@ -46,18 +46,22 @@ npm run dev                  # http://localhost:3000
    - *Magic link*: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=magiclink&next=/app`
 6. Optional: **Authentication → Emails → SMTP** → plug in Resend's SMTP so confirmation emails come from your domain.
 
-### 3. Stripe (payments, in every currency)
-1. **Developers → API keys**: copy the secret key into `STRIPE_SECRET_KEY`. Also set `CRON_SECRET` to any long random text.
-2. Redeploy, then open this link once in your browser:
-   `https://YOURDOMAIN/api/admin/stripe-setup?secret=YOUR_CRON_SECRET`
-   It creates Starter, Pro and Elite monthly prices in **every currency** listed in `src/lib/regions.ts`. You don't need any `STRIPE_PRICE_*` variables. Run the link again whenever you change prices.
-3. **Settings → Billing → Customer portal**: turn on switching plans, cancelling and updating the payment method.
-4. **Developers → Webhooks → Add destination** `https://YOURDOMAIN/api/stripe/webhook` with events
-   `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`. Copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
-5. Turn on **Tax** for the regions where you're registered (GST in Australia first).
+### 3. Paddle (payments + worldwide tax)
+Paddle is the **merchant of record**: it's the legal seller, so it collects and pays VAT, GST and sales tax in every country. You get paid out by Paddle. A sole trader ABN is fine. Fee: 5% + 50¢ per transaction, no monthly fee.
+
+1. Sign up at **paddle.com** and open a **Sandbox** account for testing (sandbox-vendors.paddle.com). Use the live account once Paddle approves your website.
+2. **Checkout → Checkout settings → Default payment link**: set it to your site URL (e.g. `https://syncnfit.netlify.app`).
+3. **Developer tools → Authentication**: create a **client-side token** for `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` and an **API key** for `PADDLE_API_KEY`.
+4. **Developer tools → Notifications → New destination**: URL `https://YOURDOMAIN/api/paddle/webhook`, type webhook, and select the `subscription.*` events (created, updated, activated, canceled, past_due, paused, resumed, trialing). Copy the secret key into `PADDLE_WEBHOOK_SECRET`.
+5. Set `CRON_SECRET`, redeploy, then open once:
+   `https://YOURDOMAIN/api/admin/paddle-setup?secret=YOUR_CRON_SECRET`
+   This creates Starter, Pro and Elite with a 7-day trial and a local price for every region.
+6. In Supabase, run `supabase/paddle.sql` once (adds the Paddle columns).
+7. Test with card `4242 4242 4242 4242`, any future date, CVC `100`.
+8. Before going live, Paddle reviews your website. Make sure the Terms, Privacy, pricing and a refund policy are visible, then switch `NEXT_PUBLIC_PADDLE_ENV=production` and use your live keys.
 
 #### Regional pricing
-Visitors see prices in their own currency. The country comes from Netlify's geo header, with the browser language as a fallback. First-time visitors get a "Looks like you're in India. Show prices in INR?" prompt, and the 🌐 picker in the nav lets anyone change country. Checkout charges the same currency the visitor saw.
+Visitors see prices in their own currency. The country comes from Netlify's geo header, with the browser language as a fallback. First-time visitors get a "Looks like you're in India. Show prices in INR?" prompt, and the 🌐 picker in the nav lets anyone change country. Paddle charges in the customer's local currency, based on where they actually are.
 
 | Region | Currency | Starter | Pro | Elite |
 |---|---|---|---|---|
@@ -69,11 +73,11 @@ Visitors see prices in their own currency. The country comes from Netlify's geo 
 | Eurozone | EUR | 6.99 | 12.99 | 22.99 |
 | India | INR | 199 | 399 | 799 |
 | Singapore | SGD | 8.99 | 16.99 | 32.99 |
-| UAE | AED | 24.99 | 44.99 | 89 |
+| UAE | USD | 6.99 | 12.99 | 24.99 |
 | South Africa | ZAR | 79 | 149 | 299 |
 | Rest of world | USD | 6.99 | 12.99 | 24.99 |
 
-Edit them in `src/lib/regions.ts`, push, then rerun the setup link.
+Edit them in `src/lib/regions.ts`, push, then rerun the setup link. Note that Paddle's fee is 5% + 50¢, so the 50¢ part is a big share of very cheap plans (e.g. India).
 
 ### 4. Resend (weekly emails)
 Create an API key → `RESEND_API_KEY`. Verify your domain and set `EMAIL_FROM`.
@@ -92,7 +96,7 @@ Create a key at console.anthropic.com → `ANTHROPIC_API_KEY`. Default model is 
 
 ### 8. Test the full flow
 1. Sign up → confirm email → finish intake → see targets.
-2. Upgrade with Stripe test card `4242 4242 4242 4242` → tier updates to Elite.
+2. Upgrade with Paddle's test card `4242 4242 4242 4242` → tier updates to Elite.
 3. Log a few days → Coach → **Get feedback**.
 4. Run the weekly workflow → check your inbox.
 
@@ -117,7 +121,7 @@ src/lib/report.ts      weekly summary / consistency score
 src/lib/email.ts       weekly email HTML
 src/lib/tiers.ts       plans, prices, feature gating
 src/app/               pages: landing, auth, onboarding, /app/*
-src/app/api/           onboarding, coach, stripe (checkout/portal/webhook), cron/weekly
+src/app/api/           onboarding, coach, paddle (checkout/portal/webhook), admin/paddle-setup, cron/weekly
 supabase/schema.sql    tables, RLS, billing-column protection, auto profile
 ```
 

@@ -28,8 +28,8 @@ create table if not exists public.profiles (
   onboarded boolean default false,
   -- billing
   tier text default 'free' check (tier in ('free','starter','pro','elite')),
-  stripe_customer_id text unique,
-  stripe_subscription_id text,
+  paddle_customer_id text,
+  paddle_subscription_id text,
   subscription_status text,
   weekly_email boolean default true,
   created_at timestamptz default now(),
@@ -102,8 +102,8 @@ begin
   -- only block end users (API roles); service role, SQL Editor and Table Editor can change billing
   if current_user in ('authenticated', 'anon') then
     new.tier := old.tier;
-    new.stripe_customer_id := old.stripe_customer_id;
-    new.stripe_subscription_id := old.stripe_subscription_id;
+    new.paddle_customer_id := old.paddle_customer_id;
+    new.paddle_subscription_id := old.paddle_subscription_id;
     new.subscription_status := old.subscription_status;
   end if;
   new.updated_at := now();

@@ -3,7 +3,7 @@ import { Resend } from "resend";
 import { generateFeedback } from "@/lib/coach";
 import { weeklyEmailHtml } from "@/lib/email";
 import { addDays, isoDate, summarizeWeek, weekStart } from "@/lib/report";
-import { siteUrl } from "@/lib/stripe";
+import { siteUrl } from "@/lib/site";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { DailyLog, Profile } from "@/lib/types";
 

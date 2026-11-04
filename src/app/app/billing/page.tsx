@@ -21,8 +21,8 @@ export default async function BillingPage({ searchParams }: { searchParams: { su
           <strong>You&apos;re in.</strong> <span className="text-bone-dim">Your subscription is active (including any free trial days). It can take a few seconds to show here, so refresh if it hasn&apos;t updated.</span>
         </div>
       )}
-      <PricingCards current={profile.tier} mode="app" highlight={searchParams.plan} trialEligible={!(profile as { stripe_subscription_id?: string | null }).stripe_subscription_id} region={region} />
-      <AccountActions hasCustomer={!!profile.stripe_customer_id} weeklyEmail={profile.weekly_email} />
+      <PricingCards current={profile.tier} mode="app" highlight={searchParams.plan} trialEligible={!profile.paddle_subscription_id} region={region} />
+      <AccountActions hasCustomer={!!profile.paddle_customer_id} weeklyEmail={profile.weekly_email} />
     </div>
   );
 }

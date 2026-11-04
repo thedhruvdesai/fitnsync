@@ -4,7 +4,7 @@ import { useState } from "react";
 export function AccountActions({ hasCustomer, weeklyEmail }: { hasCustomer: boolean; weeklyEmail: boolean }) {
   const [email, setEmail] = useState(weeklyEmail);
   async function portal() {
-    const res = await fetch("/api/stripe/portal", { method: "POST" });
+    const res = await fetch("/api/paddle/portal", { method: "POST" });
     const j = await res.json();
     if (j.url) window.location.href = j.url;
   }

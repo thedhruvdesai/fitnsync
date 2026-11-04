@@ -6,7 +6,7 @@ export interface Region {
   id: string;
   label: string;
   flag: string;
-  currency: string; // ISO, lowercase for Stripe
+  currency: string; // ISO 4217, lowercase
   locale: string;
   prices: Record<Paid, number>; // monthly, in major units
 }
@@ -59,9 +59,3 @@ export function formatMoney(amount: number, region: Region) {
 
 /** Countries that make up the "EU" region (eurozone). */
 export const EURO_COUNTRIES = EURO;
-
-export const LOOKUP_KEY: Record<Paid, string> = {
-  starter: "fitsync_starter_monthly",
-  pro: "fitsync_pro_monthly",
-  elite: "fitsync_elite_monthly",
-};

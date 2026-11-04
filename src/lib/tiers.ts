@@ -53,22 +53,3 @@ export const PLANS = [
 export function hasTier(userTier: string | null | undefined, needed: Tier) {
   return TIER_RANK[(userTier as Tier) ?? "free"] >= TIER_RANK[needed];
 }
-
-export function priceIdFor(tier: Tier) {
-  if (tier === "starter") return process.env.STRIPE_PRICE_STARTER;
-  if (tier === "pro") return process.env.STRIPE_PRICE_PRO;
-  if (tier === "elite") return process.env.STRIPE_PRICE_ELITE;
-  return undefined;
-}
-
-export function tierForPrice(priceId: string | null | undefined, lookupKey?: string | null): Tier {
-  if (lookupKey?.startsWith("fitsync_")) {
-    const t = lookupKey.split("_")[1] as Tier;
-    if (t === "starter" || t === "pro" || t === "elite") return t;
-  }
-  if (!priceId) return "free";
-  if (priceId === process.env.STRIPE_PRICE_ELITE) return "elite";
-  if (priceId === process.env.STRIPE_PRICE_PRO) return "pro";
-  if (priceId === process.env.STRIPE_PRICE_STARTER) return "starter";
-  return "free";
-}

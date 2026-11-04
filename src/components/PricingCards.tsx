@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { PLANS, TIER_RANK, type Tier } from "@/lib/tiers";
+import { PLANS, TIER_RANK, TRIAL_DAYS, fmtPrice, type Tier } from "@/lib/tiers";
 
-export function PricingCards({ current, mode, highlight }: { current?: Tier; mode: "public" | "app"; highlight?: string }) {
+export function PricingCards({ current, mode, highlight, trialEligible = true }: { current?: Tier; mode: "public" | "app"; highlight?: string; trialEligible?: boolean }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -31,21 +31,22 @@ export function PricingCards({ current, mode, highlight }: { current?: Tier; mod
               <h3 className="h-display text-2xl">{p.name}</h3>
               <p className="mt-1 text-sm text-bone-dim">{p.tagline}</p>
               <div className="mt-6 flex items-baseline gap-1">
-                <span className="h-display text-5xl">${p.price}</span>
+                <span className="h-display text-5xl">{fmtPrice(p.price)}</span>
                 <span className="text-bone-mute">AUD / month</span>
               </div>
+              {TRIAL_DAYS > 0 && trialEligible && <div className="mt-2 text-xs font-semibold uppercase tracking-widest text-blood">{TRIAL_DAYS}-day free trial</div>}
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {p.features.map((f) => (
                   <li key={f} className="flex gap-2.5"><span className="mt-0.5 text-blood">✓</span><span className="text-bone-dim">{f}</span></li>
                 ))}
               </ul>
               {mode === "public" ? (
-                <Link href="/signup" className={`${featured ? "btn-red" : "btn-ghost"} mt-8`}>Start with {p.name}</Link>
+                <Link href="/signup" className={`${featured ? "btn-red" : "btn-ghost"} mt-8`}>{TRIAL_DAYS > 0 ? `Try ${p.name} free` : `Start with ${p.name}`}</Link>
               ) : isCurrent ? (
                 <div className="btn-ghost mt-8 cursor-default opacity-70">Current plan</div>
               ) : (
                 <button className={`${featured ? "btn-red" : "btn-ghost"} mt-8`} disabled={!!busy} onClick={() => choose(p.id)}>
-                  {busy === p.id ? "Opening checkout…" : current && current !== "free" ? (TIER_RANK[p.id] > TIER_RANK[current] ? `Upgrade to ${p.name}` : `Switch to ${p.name}`) : `Choose ${p.name}`}
+                  {busy === p.id ? "Opening checkout…" : current && current !== "free" ? (TIER_RANK[p.id] > TIER_RANK[current] ? `Upgrade to ${p.name}` : `Switch to ${p.name}`) : TRIAL_DAYS > 0 && trialEligible ? `Start ${TRIAL_DAYS}-day free trial` : `Choose ${p.name}`}
                 </button>
               )}
             </div>
@@ -53,7 +54,7 @@ export function PricingCards({ current, mode, highlight }: { current?: Tier; mod
         })}
       </div>
       {err && <p className="mt-4 text-center text-sm text-blood-400">{err}</p>}
-      <p className="mt-6 text-center text-xs text-bone-mute">Billed monthly in AUD, GST inclusive. Cancel anytime from your account.</p>
+      <p className="mt-6 text-center text-xs text-bone-mute">{TRIAL_DAYS > 0 && trialEligible ? `Free for ${TRIAL_DAYS} days, then billed monthly in AUD (GST inclusive). Cancel before the trial ends and you will not be charged.` : "Billed monthly in AUD, GST inclusive. Cancel anytime from your account."}</p>
     </>
   );
 }

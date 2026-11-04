@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { siteUrl, stripe } from "@/lib/stripe";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { priceIdFor, type Tier } from "@/lib/tiers";
+import { priceIdFor, TRIAL_DAYS, type Tier } from "@/lib/tiers";
 
 export async function POST(req: Request) {
   const supabase = createClient();
@@ -34,7 +34,11 @@ export async function POST(req: Request) {
     line_items: [{ price, quantity: 1 }],
     allow_promotion_codes: true,
     client_reference_id: user.id,
-    subscription_data: { metadata: { user_id: user.id } },
+    // only a first-ever subscription gets the free trial
+    subscription_data: {
+      metadata: { user_id: user.id },
+      ...(TRIAL_DAYS > 0 && !profile?.stripe_subscription_id ? { trial_period_days: TRIAL_DAYS } : {}),
+    },
     success_url: `${siteUrl()}/app/billing?success=1`,
     cancel_url: `${siteUrl()}/app/billing`,
   });

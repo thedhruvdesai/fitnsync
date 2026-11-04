@@ -1,12 +1,17 @@
 export type Tier = "free" | "starter" | "pro" | "elite";
 
+/** Free trial for first-time subscribers (set to 0 to turn off). */
+export const TRIAL_DAYS = 7;
+
+export const fmtPrice = (n: number) => (Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`);
+
 export const TIER_RANK: Record<Tier, number> = { free: 0, starter: 1, pro: 2, elite: 3 };
 
 export const PLANS = [
   {
     id: "starter" as const,
     name: "Starter",
-    price: 25,
+    price: 9.99,
     tagline: "Your plan, built around you.",
     features: [
       "Personal calorie, protein & macro targets",
@@ -19,7 +24,7 @@ export const PLANS = [
   {
     id: "pro" as const,
     name: "Pro",
-    price: 50,
+    price: 19.99,
     tagline: "Reports that show what's working.",
     highlight: true,
     features: [
@@ -33,7 +38,7 @@ export const PLANS = [
   {
     id: "elite" as const,
     name: "Elite",
-    price: 100,
+    price: 39,
     tagline: "A coach in your corner every week.",
     features: [
       "Everything in Pro",

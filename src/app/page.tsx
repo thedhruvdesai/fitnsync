@@ -14,6 +14,7 @@ const STEPS = [
 const FAQ = [
   { q: "Who writes the coach feedback?", a: "Fit&Sync Coach is an AI coach. It reads your logs, notes and targets each week and writes specific, honest feedback the way an experienced coach would. We tell you it's AI because you deserve to know." },
   { q: "Does it work for vegetarians and vegans?", a: "Yes. Choose vegetarian, vegan, vegetarian + eggs, pescatarian or everything. Your meal plan, protein targets and quick-add foods follow your choice, and you can exclude foods you don't eat." },
+  { q: "How does the free trial work?", a: "Every plan starts with 7 days free. Cancel before day 7 and you pay nothing. Otherwise your plan starts automatically and renews monthly." },
   { q: "Can I cancel anytime?", a: "Yes. Manage or cancel from your account in two clicks. You keep access until the end of your billing month." },
   { q: "Is this medical advice?", a: "No. Fit&Sync gives general fitness and nutrition guidance. If you have a medical condition, are pregnant, or have a history of disordered eating, please speak with your GP or an Accredited Practising Dietitian first." },
 ];
@@ -122,7 +123,7 @@ export default function Home() {
               <Magnetic><Link href="/signup" className="btn-red !px-8 !py-4 text-base">Build my plan, free →</Link></Magnetic>
               <a href="#pricing" className="btn-ghost !px-8 !py-4 text-base">See plans</a>
             </div>
-            <p className="fade-up mt-5 text-xs text-bone-mute" style={{ animationDelay: "950ms" }}>Free intake &amp; targets · Plans from $25/mo · Cancel anytime</p>
+            <p className="fade-up mt-5 text-xs text-bone-mute" style={{ animationDelay: "950ms" }}>Free intake &amp; targets · 7-day free trial · From $9.99/mo</p>
           </div>
           <div className="fade-up relative" style={{ animationDelay: "500ms" }}><PhoneMock /></div>
           <Ecg className="pointer-events-none absolute bottom-6 left-0 h-14 w-full opacity-60" />

@@ -9,11 +9,11 @@ A production-ready Next.js 14 app with:
 - **Reports (Pro)**: weekly consistency score, adherence, day-by-day table, PDF via print
 - **Fit&Sync Coach (Elite)**: Claude writes an expert-voice weekly review plus up to 8 on-demand check-ins a month, clearly labelled as AI
 - **Weekly email every Monday** (Resend); depth depends on tier, and Elite gets the coach review inline
-- **Stripe subscriptions**: Starter $25, Pro $50, Elite $100 (AUD/month), plus a customer portal for upgrades and cancellations
+- **Stripe subscriptions**: Starter $9.99, Pro $19.99, Elite $39 (AUD/month), each with a 7-day free trial for first-time subscribers, plus a customer portal for upgrades and cancellations
 
 ## Tier features
 
-| | Free | Starter $25 | Pro $50 | Elite $100 |
+| | Free | Starter $9.99 | Pro $19.99 | Elite $39 |
 |---|---|---|---|---|
 | Intake + targets + daily logging | ✓ | ✓ | ✓ | ✓ |
 | Meal plan + training program | | ✓ | ✓ | ✓ |
@@ -22,7 +22,7 @@ A production-ready Next.js 14 app with:
 | Reports & PDF | | | ✓ | ✓ |
 | AI coach weekly review + 8 check-ins/mo | | | | ✓ |
 
-Edit features and prices in `src/lib/tiers.ts`.
+Edit features, prices and `TRIAL_DAYS` in `src/lib/tiers.ts`. For a founding-member discount, create a coupon and promotion code in Stripe (e.g. `FOUNDING50`); checkout already accepts promo codes.
 
 ---
 
@@ -47,7 +47,7 @@ npm run dev                  # http://localhost:3000
 6. Optional: **Authentication → Emails → SMTP** → plug in Resend's SMTP so confirmation emails come from your domain.
 
 ### 3. Stripe (payments)
-1. **Product catalogue → Add product** three times: Starter $25, Pro $50, Elite $100. Each is **Recurring, monthly, AUD**. Copy each `price_...` ID into `STRIPE_PRICE_STARTER/PRO/ELITE`.
+1. **Product catalogue → Add product** three times: Starter $9.99, Pro $19.99, Elite $39. Each is **Recurring, monthly, AUD**. The app adds the 7-day trial at checkout, so don't add a trial to the Stripe price. Copy each `price_...` ID into `STRIPE_PRICE_STARTER/PRO/ELITE`.
 2. **Developers → API keys** → `STRIPE_SECRET_KEY`.
 3. **Settings → Billing → Customer portal** → turn on: switch plans (add all 3 prices), cancel, update payment method.
 4. **Developers → Webhooks → Add endpoint** `https://YOURDOMAIN/api/stripe/webhook` with events:
@@ -59,7 +59,7 @@ npm run dev                  # http://localhost:3000
 Create an API key → `RESEND_API_KEY`. Verify your domain and set `EMAIL_FROM`.
 
 ### 5. Anthropic (AI coach)
-Create a key at console.anthropic.com → `ANTHROPIC_API_KEY`. Default model is `claude-sonnet-5-5` (override with `ANTHROPIC_MODEL`). Cost is roughly a few cents per review. Even 8 check-ins plus 4 weekly reviews a month is a tiny fraction of the $100 Elite price.
+Create a key at console.anthropic.com → `ANTHROPIC_API_KEY`. Default model is `claude-sonnet-5-5` (override with `ANTHROPIC_MODEL`). Cost is roughly a few cents per review. Even 8 check-ins plus 4 weekly reviews a month is a tiny fraction of the $39 Elite price.
 
 ### 6. Deploy (Netlify or Vercel)
 - Push this folder to a **new private GitHub repo**, then import it in Netlify (or Vercel). `netlify.toml` is included.

@@ -55,7 +55,7 @@ export function PricingCards({ current, mode, highlight, trialEligible = true, r
         })}
       </div>
       {err && <p className="mt-4 text-center text-sm text-blood-400">{err}</p>}
-      <p className="mt-6 text-center text-xs text-bone-mute">{TRIAL_DAYS > 0 && trialEligible ? `Free for ${TRIAL_DAYS} days, then billed monthly in ${region.currency.toUpperCase()}${region.id === "AU" ? " (GST inclusive)" : ""}. Cancel before the trial ends and you will not be charged.` : `Billed monthly in ${region.currency.toUpperCase()}. Cancel anytime from your account.`}</p>
+      <p className="mt-6 text-center text-xs text-bone-mute">{TRIAL_DAYS > 0 && trialEligible ? `Free for ${TRIAL_DAYS} days, then billed monthly in ${region.currency.toUpperCase()}${region.id === "AU" && process.env.NEXT_PUBLIC_GST_REGISTERED === "true" ? " (GST inclusive)" : ""}. Cancel before the trial ends and you will not be charged.` : `Billed monthly in ${region.currency.toUpperCase()}. Cancel anytime from your account.`}</p>
     </>
   );
 }

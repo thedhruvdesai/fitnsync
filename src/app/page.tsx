@@ -3,6 +3,9 @@ import { Backdrop } from "@/components/Backdrop";
 import { Logo } from "@/components/Logo";
 import { Counter, Cursor, Magnetic, Reveal, RotatingWord } from "@/components/Motion";
 import { PricingCards } from "@/components/PricingCards";
+import { RegionBanner, RegionPicker } from "@/components/RegionPicker";
+import { currentRegion } from "@/lib/region.server";
+import { formatMoney } from "@/lib/regions";
 
 const STEPS = [
   { n: "01", t: "Tell us about you", d: "Two minutes: body, goal, schedule, diet, equipment, injuries. No generic templates." },
@@ -83,6 +86,7 @@ function PhoneMock() {
 }
 
 export default function Home() {
+  const { region, chosen, detected } = currentRegion();
   return (
     <>
       <Backdrop />
@@ -98,6 +102,7 @@ export default function Home() {
               </span>
             </div>
             <nav className="flex items-center gap-1 text-sm">
+              <div className="mr-1"><RegionPicker region={region} /></div>
               <a href="#features" className="hidden px-3 text-bone-dim hover:text-bone md:block">Features</a>
               <a href="#coach" className="hidden px-3 text-bone-dim hover:text-bone md:block">Coach</a>
               <a href="#pricing" className="hidden px-3 text-bone-dim hover:text-bone sm:block">Pricing</a>
@@ -123,7 +128,7 @@ export default function Home() {
               <Magnetic><Link href="/signup" className="btn-red !px-8 !py-4 text-base">Build my plan, free →</Link></Magnetic>
               <a href="#pricing" className="btn-ghost !px-8 !py-4 text-base">See plans</a>
             </div>
-            <p className="fade-up mt-5 text-xs text-bone-mute" style={{ animationDelay: "950ms" }}>Free intake &amp; targets · 7-day free trial · From $9.99/mo</p>
+            <p className="fade-up mt-5 text-xs text-bone-mute" style={{ animationDelay: "950ms" }}>Free intake &amp; targets · 7-day free trial · From {formatMoney(region.prices.starter, region)}/mo</p>
           </div>
           <div className="fade-up relative" style={{ animationDelay: "500ms" }}><PhoneMock /></div>
           <Ecg className="pointer-events-none absolute bottom-6 left-0 h-14 w-full opacity-60" />
@@ -273,7 +278,7 @@ export default function Home() {
             <p className="eyebrow">Pricing</p>
             <h2 className="h-display mt-3 text-5xl md:text-7xl">Pick your level of <span className="text-outline">support.</span></h2>
           </Reveal>
-          <Reveal delay={100} className="mt-14"><PricingCards mode="public" /></Reveal>
+          <Reveal delay={100} className="mt-14"><PricingCards mode="public" region={region} /></Reveal>
         </section>
 
         {/* faq */}
@@ -313,6 +318,7 @@ export default function Home() {
           </div>
         </footer>
       </main>
+      {!chosen && <RegionBanner detected={detected} />}
     </>
   );
 }

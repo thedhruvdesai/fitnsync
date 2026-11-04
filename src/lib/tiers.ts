@@ -61,7 +61,11 @@ export function priceIdFor(tier: Tier) {
   return undefined;
 }
 
-export function tierForPrice(priceId: string | null | undefined): Tier {
+export function tierForPrice(priceId: string | null | undefined, lookupKey?: string | null): Tier {
+  if (lookupKey?.startsWith("fitsync_")) {
+    const t = lookupKey.split("_")[1] as Tier;
+    if (t === "starter" || t === "pro" || t === "elite") return t;
+  }
   if (!priceId) return "free";
   if (priceId === process.env.STRIPE_PRICE_ELITE) return "elite";
   if (priceId === process.env.STRIPE_PRICE_PRO) return "pro";

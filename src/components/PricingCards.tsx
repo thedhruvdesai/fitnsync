@@ -1,16 +1,17 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { PLANS, TIER_RANK, TRIAL_DAYS, fmtPrice, type Tier } from "@/lib/tiers";
+import { formatMoney, type Region } from "@/lib/regions";
+import { PLANS, TIER_RANK, TRIAL_DAYS, type Tier } from "@/lib/tiers";
 
-export function PricingCards({ current, mode, highlight, trialEligible = true }: { current?: Tier; mode: "public" | "app"; highlight?: string; trialEligible?: boolean }) {
+export function PricingCards({ current, mode, highlight, trialEligible = true, region }: { current?: Tier; mode: "public" | "app"; highlight?: string; trialEligible?: boolean; region: Region }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   async function choose(tier: Tier) {
     setBusy(tier);
     setErr(null);
-    const res = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tier }) });
+    const res = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tier, currency: region.currency }) });
     const j = await res.json();
     if (j.url) window.location.href = j.url;
     else {
@@ -31,8 +32,8 @@ export function PricingCards({ current, mode, highlight, trialEligible = true }:
               <h3 className="h-display text-2xl">{p.name}</h3>
               <p className="mt-1 text-sm text-bone-dim">{p.tagline}</p>
               <div className="mt-6 flex items-baseline gap-1">
-                <span className="h-display text-5xl">{fmtPrice(p.price)}</span>
-                <span className="text-bone-mute">AUD / month</span>
+                <span className="h-display text-5xl">{formatMoney(region.prices[p.id], region)}</span>
+                <span className="text-bone-mute">{region.currency.toUpperCase()} / month</span>
               </div>
               {TRIAL_DAYS > 0 && trialEligible && <div className="mt-2 text-xs font-semibold uppercase tracking-widest text-blood">{TRIAL_DAYS}-day free trial</div>}
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
@@ -54,7 +55,7 @@ export function PricingCards({ current, mode, highlight, trialEligible = true }:
         })}
       </div>
       {err && <p className="mt-4 text-center text-sm text-blood-400">{err}</p>}
-      <p className="mt-6 text-center text-xs text-bone-mute">{TRIAL_DAYS > 0 && trialEligible ? `Free for ${TRIAL_DAYS} days, then billed monthly in AUD (GST inclusive). Cancel before the trial ends and you will not be charged.` : "Billed monthly in AUD, GST inclusive. Cancel anytime from your account."}</p>
+      <p className="mt-6 text-center text-xs text-bone-mute">{TRIAL_DAYS > 0 && trialEligible ? `Free for ${TRIAL_DAYS} days, then billed monthly in ${region.currency.toUpperCase()}${region.id === "AU" ? " (GST inclusive)" : ""}. Cancel before the trial ends and you will not be charged.` : `Billed monthly in ${region.currency.toUpperCase()}. Cancel anytime from your account.`}</p>
     </>
   );
 }

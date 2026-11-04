@@ -46,14 +46,34 @@ npm run dev                  # http://localhost:3000
    - *Magic link*: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=magiclink&next=/app`
 6. Optional: **Authentication → Emails → SMTP** → plug in Resend's SMTP so confirmation emails come from your domain.
 
-### 3. Stripe (payments)
-1. **Product catalogue → Add product** three times: Starter $9.99, Pro $19.99, Elite $39. Each is **Recurring, monthly, AUD**. The app adds the 7-day trial at checkout, so don't add a trial to the Stripe price. Copy each `price_...` ID into `STRIPE_PRICE_STARTER/PRO/ELITE`.
-2. **Developers → API keys** → `STRIPE_SECRET_KEY`.
-3. **Settings → Billing → Customer portal** → turn on: switch plans (add all 3 prices), cancel, update payment method.
-4. **Developers → Webhooks → Add endpoint** `https://YOURDOMAIN/api/stripe/webhook` with events:
-   `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted` → copy the signing secret to `STRIPE_WEBHOOK_SECRET`.
-   - Local testing: `stripe listen --forward-to localhost:3000/api/stripe/webhook`
-5. Turn on **Tax → Australian GST** if you're GST-registered.
+### 3. Stripe (payments, in every currency)
+1. **Developers → API keys**: copy the secret key into `STRIPE_SECRET_KEY`. Also set `CRON_SECRET` to any long random text.
+2. Redeploy, then open this link once in your browser:
+   `https://YOURDOMAIN/api/admin/stripe-setup?secret=YOUR_CRON_SECRET`
+   It creates Starter, Pro and Elite monthly prices in **every currency** listed in `src/lib/regions.ts`. You don't need any `STRIPE_PRICE_*` variables. Run the link again whenever you change prices.
+3. **Settings → Billing → Customer portal**: turn on switching plans, cancelling and updating the payment method.
+4. **Developers → Webhooks → Add destination** `https://YOURDOMAIN/api/stripe/webhook` with events
+   `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`. Copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
+5. Turn on **Tax** for the regions where you're registered (GST in Australia first).
+
+#### Regional pricing
+Visitors see prices in their own currency. The country comes from Netlify's geo header, with the browser language as a fallback. First-time visitors get a "Looks like you're in India. Show prices in INR?" prompt, and the 🌐 picker in the nav lets anyone change country. Checkout charges the same currency the visitor saw.
+
+| Region | Currency | Starter | Pro | Elite |
+|---|---|---|---|---|
+| Australia | AUD | 9.99 | 19.99 | 39 |
+| New Zealand | NZD | 10.99 | 21.99 | 42.99 |
+| United States | USD | 6.99 | 12.99 | 24.99 |
+| Canada | CAD | 8.99 | 17.99 | 34.99 |
+| United Kingdom | GBP | 5.99 | 10.99 | 19.99 |
+| Eurozone | EUR | 6.99 | 12.99 | 22.99 |
+| India | INR | 199 | 399 | 799 |
+| Singapore | SGD | 8.99 | 16.99 | 32.99 |
+| UAE | AED | 24.99 | 44.99 | 89 |
+| South Africa | ZAR | 79 | 149 | 299 |
+| Rest of world | USD | 6.99 | 12.99 | 24.99 |
+
+Edit them in `src/lib/regions.ts`, push, then rerun the setup link.
 
 ### 4. Resend (weekly emails)
 Create an API key → `RESEND_API_KEY`. Verify your domain and set `EMAIL_FROM`.

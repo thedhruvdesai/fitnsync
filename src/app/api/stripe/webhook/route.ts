@@ -10,7 +10,8 @@ async function syncSubscription(sub: Stripe.Subscription) {
   const admin = createAdminClient();
   const customer = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
   const active = ["active", "trialing", "past_due"].includes(sub.status);
-  const tier = active ? tierForPrice(sub.items.data[0]?.price.id) : "free";
+  const p = sub.items.data[0]?.price;
+  const tier = active ? tierForPrice(p?.id, p?.lookup_key) : "free";
   const update = { tier, stripe_subscription_id: sub.id, subscription_status: sub.status, stripe_customer_id: customer };
 
   const userId = sub.metadata?.user_id;

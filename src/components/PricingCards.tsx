@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { openCheckout } from "@/lib/paddle-client";
+import { useRouter } from "next/navigation";
 import { formatMoney, type Region } from "@/lib/regions";
 import { PLANS, TIER_RANK, TRIAL_DAYS, type Tier } from "@/lib/tiers";
 
 export function PricingCards({ current, mode, highlight, trialEligible = true, region }: { current?: Tier; mode: "public" | "app"; highlight?: string; trialEligible?: boolean; region: Region }) {
+  const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -17,7 +18,7 @@ export function PricingCards({ current, mode, highlight, trialEligible = true, r
       const j = await res.json();
       if (j.switched) return window.location.assign("/app/billing?success=1");
       if (!j.checkout) throw new Error(j.error || "Couldn't start checkout");
-      await openCheckout(j.checkout);
+      return router.push(`/app/checkout?plan=${tier}`);
     } catch (e) {
       setErr((e as Error).message);
     }

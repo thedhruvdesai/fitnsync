@@ -75,6 +75,7 @@ export async function openInlineCheckout(c: CheckoutInfo, frameTarget: string) {
       frameStyle: "width: 100%; min-width: 300px; background-color: transparent; border: none;",
       allowLogout: false,
       showAddDiscounts: true,
+      showAddTaxId: false, // hide "Add ABN / VAT number" (consumer app)
     },
   });
 }

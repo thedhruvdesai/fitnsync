@@ -86,3 +86,40 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
   .orb, .marquee, .float, .ecg path, .pulse-dot { animation: none !important; }
   .reveal, .line-mask > span, .fade-up { opacity: 1 !important; transform: none !important; animation: none !important; }
 }
+
+/* ===================== Checkout ===================== */
+@property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.glow-border { position: relative; isolation: isolate; }
+.glow-border::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; z-index: 0; pointer-events: none;
+  background: conic-gradient(from var(--angle), transparent 0deg, rgba(225,29,46,.9) 60deg, transparent 140deg, transparent 220deg, rgba(255,59,76,.6) 280deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: spin-angle 6s linear infinite;
+}
+@keyframes spin-angle { to { --angle: 360deg; } }
+
+.stagger > * { opacity: 0; transform: translateY(14px); animation: fadeup .7s cubic-bezier(.2,.8,.1,1) forwards; }
+.stagger > *:nth-child(1) { animation-delay: .35s } .stagger > *:nth-child(2) { animation-delay: .42s }
+.stagger > *:nth-child(3) { animation-delay: .49s } .stagger > *:nth-child(4) { animation-delay: .56s }
+.stagger > *:nth-child(5) { animation-delay: .63s } .stagger > *:nth-child(6) { animation-delay: .7s }
+
+.tilt-3d { transform-style: preserve-3d; transition: transform .25s ease-out; will-change: transform; }
+.tilt-3d .pop { transform: translateZ(40px); }
+
+.sheen { position: relative; overflow: hidden; }
+.sheen::after { content: ""; position: absolute; inset: -50%; background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.07) 50%, transparent 60%); animation: sheen 5s ease-in-out infinite; }
+@keyframes sheen { 0%, 60% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
+
+.step-dot-active { animation: pulse 1.6s ease-out infinite; }
+
+.check-ring { stroke-dasharray: 302; stroke-dashoffset: 302; animation: draw .9s cubic-bezier(.65,0,.35,1) .1s forwards; }
+.check-tick { stroke-dasharray: 60; stroke-dashoffset: 60; animation: draw .5s cubic-bezier(.65,0,.35,1) .85s forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.burst span { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; border-radius: 2px; background: #E11D2E; opacity: 0; animation: burst 1.1s cubic-bezier(.2,.7,.2,1) .7s forwards; }
+@keyframes burst { 0% { opacity: 1; transform: translate(-50%,-50%) rotate(0) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r)) scale(.4); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-border::before, .sheen::after, .step-dot-active { animation: none !important; }
+  .stagger > * { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .check-ring, .check-tick { stroke-dashoffset: 0 !important; animation: none !important; }
+}

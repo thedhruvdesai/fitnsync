@@ -82,6 +82,8 @@ alter table public.email_log enable row level security;
 -- Profiles: users read/update their own row. Billing columns are protected by trigger below.
 drop policy if exists "profiles self read" on public.profiles;
 create policy "profiles self read" on public.profiles for select using (auth.uid() = id);
+drop policy if exists "profiles self insert" on public.profiles;
+create policy "profiles self insert" on public.profiles for insert with check (auth.uid() = id and coalesce(tier, 'free') = 'free');
 drop policy if exists "profiles self update" on public.profiles;
 create policy "profiles self update" on public.profiles for update using (auth.uid() = id);
 
@@ -124,3 +126,8 @@ end $$;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- Backfill profiles for anyone who signed up before this script was run
+insert into public.profiles (id, email, full_name)
+select id, email, coalesce(raw_user_meta_data->>'full_name', '') from auth.users
+on conflict (id) do nothing;

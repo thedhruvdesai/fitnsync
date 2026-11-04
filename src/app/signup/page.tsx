@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AuthShell } from "@/components/AuthShell";
+import { friendlyAuthError, supabaseConfigured } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
@@ -20,13 +21,15 @@ export default function SignupPage() {
     setError(null);
     const site = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
     const { data, error } = await createClient().auth.signUp({
-      email,
+      email: email.trim().toLowerCase(),
       password,
       options: { data: { full_name: name }, emailRedirectTo: `${site}/auth/callback?next=/onboarding` },
     });
     setBusy(false);
-    if (error) return setError(error.message);
-    if (data.session) window.location.href = "/onboarding";
+    if (error) return setError(friendlyAuthError(error.message));
+    // Supabase returns a user with no identities when the email is already registered
+    if (data.user && (data.user.identities?.length ?? 0) === 0) return setError("An account with this email already exists. Sign in instead.");
+    if (data.session) window.location.assign("/onboarding");
     else setSent(true);
   }
 
@@ -34,6 +37,13 @@ export default function SignupPage() {
     return (
       <AuthShell title="Check your inbox." sub={`We sent a confirmation link to ${email}. Tap it to start building your plan.`}>
         <Link href="/login" className="btn-ghost">Back to sign in</Link>
+      </AuthShell>
+    );
+
+  if (!supabaseConfigured())
+    return (
+      <AuthShell title="Start your plan." sub="">
+        <p className="rounded-xl border border-blood/40 bg-blood/10 p-4 text-sm">Sign-up isn&apos;t connected yet: add the Supabase keys in Netlify → Environment variables, then redeploy.</p>
       </AuthShell>
     );
 

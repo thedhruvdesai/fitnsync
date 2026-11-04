@@ -40,7 +40,11 @@ npm run dev                  # http://localhost:3000
 2. **SQL Editor → New query** → paste `supabase/schema.sql` → **Run**.
 3. **Project Settings → API**: copy the URL, the anon/publishable key and the service-role key into `.env.local`.
 4. **Authentication → URL Configuration**: set Site URL to your domain and add `https://YOURDOMAIN/auth/callback` (plus `http://localhost:3000/auth/callback`) to Redirect URLs.
-5. Optional: **Authentication → Emails → SMTP** → plug in Resend's SMTP so confirmation emails come from your domain.
+5. **Authentication → Emails → Templates** (this makes confirmation links work even when opened on another phone or browser):
+   - *Confirm signup*: change the link to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/onboarding`
+   - *Reset password*: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset`
+   - *Magic link*: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=magiclink&next=/app`
+6. Optional: **Authentication → Emails → SMTP** → plug in Resend's SMTP so confirmation emails come from your domain.
 
 ### 3. Stripe (payments)
 1. **Product catalogue → Add product** three times: Starter $25, Pro $50, Elite $100. Each is **Recurring, monthly, AUD**. Copy each `price_...` ID into `STRIPE_PRICE_STARTER/PRO/ELITE`.
@@ -73,6 +77,16 @@ Create a key at console.anthropic.com → `ANTHROPIC_API_KEY`. Default model is 
 4. Run the weekly workflow → check your inbox.
 
 ---
+
+## Sign-in troubleshooting
+| Symptom | Fix |
+|---|---|
+| "Login isn't connected yet" banner | Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Netlify, then **Deploys → Trigger deploy → Clear cache and deploy**. `NEXT_PUBLIC_` values are baked in at build time. |
+| Confirmation link goes to localhost | Supabase → Authentication → URL Configuration → set **Site URL** to the live domain. Set `NEXT_PUBLIC_SITE_URL` to it as well. |
+| Link opens but you're still logged out | Update the email templates (step 2.5). The old link only works in the same browser you signed up in. |
+| "Email not confirmed" | Use the **Resend confirmation email** button on the sign-in page, or for testing turn off Authentication → Providers → Email → *Confirm email*. |
+| Page keeps reloading or bounces after login | Run `supabase/fix-auth.sql` once. It creates missing profile rows. |
+| No emails arrive | Supabase's built-in mailer allows only a few emails an hour. Add Resend SMTP (step 2.6). |
 
 ## Project map
 ```

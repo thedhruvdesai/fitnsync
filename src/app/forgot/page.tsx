@@ -9,7 +9,7 @@ export default function ForgotPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const site = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-    await createClient().auth.resetPasswordForEmail(email, { redirectTo: `${site}/auth/callback?next=/reset` });
+    await createClient().auth.resetPasswordForEmail(email.trim().toLowerCase(), { redirectTo: `${site}/auth/callback?next=/reset` });
     setDone(true);
   }
   return (

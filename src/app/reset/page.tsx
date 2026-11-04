@@ -9,8 +9,8 @@ export default function ResetPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const { error } = await createClient().auth.updateUser({ password });
-    if (error) return setMsg(error.message);
-    window.location.href = "/app";
+    if (error) return setMsg(error.message.toLowerCase().includes("session") ? "This reset link has expired. Request a new one from Forgot password." : error.message);
+    window.location.assign("/app");
   }
   return (
     <AuthShell title="New password." sub="Choose something you'll remember.">

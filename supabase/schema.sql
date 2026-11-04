@@ -99,7 +99,8 @@ create policy "feedback self read" on public.coach_feedback for select using (au
 create or replace function public.protect_billing_columns()
 returns trigger language plpgsql as $$
 begin
-  if coalesce(current_setting('request.jwt.claims', true)::jsonb->>'role', '') <> 'service_role' then
+  -- only block end users (API roles); service role, SQL Editor and Table Editor can change billing
+  if current_user in ('authenticated', 'anon') then
     new.tier := old.tier;
     new.stripe_customer_id := old.stripe_customer_id;
     new.stripe_subscription_id := old.stripe_subscription_id;

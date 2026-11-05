@@ -233,7 +233,7 @@ export function generatePlan(i: Intake): Plan {
   const notes: string[] = [];
   if (i.goal === "lose_fat") notes.push(`Aim for ~${Math.abs(targets.weekly_change_kg)} kg loss a week. If you lose faster than 1% of body weight weekly for 2+ weeks, add 150 kcal.`);
   if (i.goal === "build_muscle") notes.push("Aim to gain 0.25–0.5% of body weight per week. If the scale isn't moving after 3 weeks, add 150 kcal.");
-  if (i.diet === "vegan" || i.diet === "vegetarian") notes.push("Plant-protein tip: combine legumes with grains across the day, and consider B12 (and vitamin D if you get little sun). Check with a GP before starting supplements.");
+  if (i.diet === "vegan" || i.diet === "vegetarian") notes.push("Plant-protein tip: combine legumes with grains across the day, and ask your GP about B12 (and vitamin D if you get little sun) before starting supplements.");
   notes.push(`Spread protein over ${i.meals_per_day} meals, roughly ${Math.round(targets.protein_g / Math.max(2, i.meals_per_day))} g each.`);
   if (i.constraints?.trim()) notes.push(`You noted: "${i.constraints.trim()}". Swap any exercise that aggravates it, and get it checked by a physio if pain persists.`);
 

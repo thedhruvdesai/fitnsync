@@ -21,11 +21,11 @@ const ACTIVITY: Opt<Intake["activity"]>[] = [
   { v: "very_active", label: "Athlete", sub: "Hard physical work + training" },
 ];
 const DIETS: Opt<Intake["diet"]>[] = [
-  { v: "vegetarian", label: "Vegetarian" },
-  { v: "vegan", label: "Vegan" },
+  { v: "non_veg", label: "I eat everything", sub: "Meat, fish, eggs, dairy, plants" },
+  { v: "pescatarian", label: "Pescatarian", sub: "Fish & seafood, no meat" },
   { v: "eggetarian", label: "Vegetarian + eggs" },
-  { v: "pescatarian", label: "Pescatarian" },
-  { v: "non_veg", label: "Everything" },
+  { v: "vegetarian", label: "Vegetarian" },
+  { v: "vegan", label: "Vegan", sub: "Fully plant-based" },
 ];
 const EQUIP: Opt<Intake["equipment"]>[] = [
   { v: "gym", label: "Full gym" },

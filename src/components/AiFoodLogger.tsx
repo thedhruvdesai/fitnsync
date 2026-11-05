@@ -117,7 +117,7 @@ export function AiFoodLogger({ onAdd }: { onAdd: (items: AiItem[]) => void }) {
 
           <textarea
             className="input mt-3 min-h-[70px] !py-2.5 text-sm"
-            placeholder={photo ? "Optional: add details, e.g. 'cooked in 1 tsp ghee, 2 rotis'" : "e.g. 2 rotis, 1 bowl dal, a bit of rice and salad"}
+            placeholder={photo ? "Optional: add details, e.g. 'cooked in olive oil, large portion'" : "e.g. chicken burrito bowl with guac, or 2 eggs on toast and a latte"}
             value={text}
             onChange={(e) => setText(e.target.value)}
           />

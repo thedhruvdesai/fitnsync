@@ -16,7 +16,7 @@ const STEPS = [
 
 const FAQ = [
   { q: "Who writes the coach feedback?", a: "Fit&Sync Coach is an AI coach. It reads your logs, notes and targets each week and writes specific, honest feedback the way an experienced coach would. We tell you it's AI because you deserve to know." },
-  { q: "Does it work for vegetarians and vegans?", a: "Yes. Choose vegetarian, vegan, vegetarian + eggs, pescatarian or everything. Your meal plan, protein targets and quick-add foods follow your choice, and you can exclude foods you don't eat." },
+  { q: "Does it work with my diet?", a: "Yes. Eat everything, or choose pescatarian, vegetarian, vegetarian with eggs or vegan, and exclude any foods you don't eat. Your meal plan, protein targets and quick-add foods follow your choices, and the AI food log recognises meals from any cuisine." },
   { q: "How does the free trial work?", a: "Every plan starts with 7 days free. Cancel before day 7 and you pay nothing. Otherwise your plan starts automatically and renews monthly." },
   { q: "Can I cancel anytime?", a: "Yes. Manage or cancel from your account in two clicks. You keep access until the end of your billing month." },
   { q: "Is this medical advice?", a: "No. Fit&Sync gives general fitness and nutrition guidance. If you have a medical condition, are pregnant, or have a history of disordered eating, please speak with your GP or an Accredited Practising Dietitian first." },
@@ -122,7 +122,7 @@ export default function Home() {
               <span className="line-mask"><span className="text-blood" style={{ animationDelay: "410ms" }}>Sync.</span></span>
             </h1>
             <p className="fade-up mt-8 max-w-lg text-lg text-bone-dim md:text-xl" style={{ animationDelay: "700ms" }}>
-              A plan built from your body, your goal and the way you actually eat. Made for <RotatingWord words={["lifters", "vegetarians", "shift workers", "busy parents", "beginners", "athletes"]} />.
+              A plan built from your body, your goal and the way you actually eat. Made for <RotatingWord words={["lifters", "runners", "shift workers", "busy parents", "beginners", "athletes"]} />.
             </p>
             <div className="fade-up mt-10 flex flex-wrap items-center gap-4" style={{ animationDelay: "850ms" }}>
               <Magnetic><Link href="/signup" className="btn-red !px-8 !py-4 text-base">Build my plan, free →</Link></Magnetic>
@@ -147,7 +147,7 @@ export default function Home() {
         <section className="relative rotate-1 border-b border-white/5 bg-ink-2 py-4">
           <div className="marquee marquee-rev">
             {Array.from({ length: 4 }).flatMap((_, k) =>
-              ["Veg · Vegan · Everything", "Gym · Home · Bodyweight", "Shift-work friendly", "Weekly AI coach"].map((w, i) => (
+              ["Any diet · Any cuisine", "Gym · Home · Bodyweight", "Shift-work friendly", "Weekly AI coach"].map((w, i) => (
                 <span key={`${k}-${i}`} className="flex items-center gap-8 px-8 text-sm uppercase tracking-[0.3em] text-bone-dim">
                   {w} <span className="text-blood">●</span>
                 </span>
@@ -161,7 +161,7 @@ export default function Home() {
           {[
             { v: 2, s: " min", l: "to your first plan" },
             { v: 7, s: "-day", l: "meal plan, rebuilt for you" },
-            { v: 5, s: " diets", l: "veg to everything" },
+            { v: 5, s: " diet styles", l: "eat everything to plant-based" },
             { v: 52, s: "", l: "coach reviews a year" },
           ].map((x, i) => (
             <Reveal key={x.l} delay={i * 100} className="border-l border-white/10 px-5 py-4">
@@ -195,7 +195,7 @@ export default function Home() {
             <Reveal className="md:col-span-2" delay={100}>
               <div className="card tilt shine relative h-full overflow-hidden !p-8">
                 <p className="eyebrow">Meal plans</p>
-                <h3 className="h-display mt-3 text-3xl">Paneer, tofu, chicken, you choose.</h3>
+                <h3 className="h-display mt-3 text-3xl">Chicken, fish, eggs or plants. Your call.</h3>
                 <div className="h-display absolute -bottom-6 -right-2 text-[120px] leading-none text-white/[0.04]">7d</div>
               </div>
             </Reveal>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Paywall } from "@/components/Paywall";
 import { requireProfile } from "@/lib/session";
 import { hasTier } from "@/lib/tiers";
+import { SessionCards } from "./SessionCards";
 
 export default async function PlanPage() {
   const { profile } = await requireProfile();
@@ -68,28 +69,7 @@ export default async function PlanPage() {
 
       <section>
         <h2 className="h-display text-2xl">{plan.training.split}</h2>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {plan.training.sessions.map((s, i) => (
-            <div key={i} className="card">
-              <div className="flex items-baseline justify-between">
-                <h3 className="h-display text-xl">{s.day} · {s.title}</h3>
-                <span className="text-xs text-bone-mute">~{s.minutes} min</span>
-              </div>
-              <p className="text-sm text-bone-dim">{s.focus}</p>
-              <table className="mt-3 w-full text-sm">
-                <tbody>
-                  {s.exercises.map((e) => (
-                    <tr key={e.name} className="border-t border-white/5">
-                      <td className="py-2 pr-2">{e.name}</td>
-                      <td className="py-2 text-right text-bone-dim">{e.sets}×{e.reps}</td>
-                      <td className="py-2 pl-3 text-right text-bone-mute">{e.rest}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
-        </div>
+        <SessionCards sessions={plan.training.sessions} />
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <div className="card text-sm"><div className="label">Cardio</div><p className="text-bone-dim">{plan.training.cardio}</p></div>
           <div className="card text-sm"><div className="label">How to progress</div><p className="text-bone-dim">{plan.training.progression}</p></div>

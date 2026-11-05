@@ -123,3 +123,8 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
   .stagger > * { opacity: 1 !important; transform: none !important; animation: none !important; }
   .check-ring, .check-tick { stroke-dashoffset: 0 !important; animation: none !important; }
 }
+
+/* exercise sheet */
+.sheet-in { animation: sheetin .45s cubic-bezier(.2,.8,.1,1); }
+@keyframes sheetin { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sheet-in { animation: none; } }

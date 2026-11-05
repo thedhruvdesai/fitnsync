@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { QUICK_FOODS } from "@/lib/foods";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
 import { AiFoodLogger } from "@/components/AiFoodLogger";
+import { ExerciseSheet, ExerciseThumb, type SetRow } from "@/components/ExerciseSheet";
 import { Ring } from "@/components/Ring";
 import type { DailyLog, LoggedMeal, LoggedWorkout, Plan } from "@/lib/types";
 
@@ -19,6 +20,7 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
   const [saved, setSaved] = useState<"idle" | "saving" | "saved">("idle");
   const [adding, setAdding] = useState(false);
   const [other, setOther] = useState("");
+  const [sheet, setSheet] = useState<number | null>(null);
   const [custom, setCustom] = useState({ name: "", kcal: "", protein: "", carbs: "", fat: "" });
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const t = plan.targets;
@@ -187,23 +189,54 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
             <p className="mt-3 text-sm text-bone-dim">Your personalised program unlocks with Starter. You can still log a session below.</p>
           ) : session ? (
             <>
-              <p className="mt-1 text-sm text-bone-dim">{session.title} · {session.focus} · ~{session.minutes} min</p>
+              <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-bone-dim">{session.title} · {session.focus} · ~{session.minutes} min</p>
+                <button className="btn-red !px-4 !py-2" onClick={() => setSheet(Math.max(0, session.exercises.findIndex((e) => !log.workouts.some((w) => w.name === e.name))))}>
+                  ▶ {log.workouts.some((w) => session.exercises.some((e) => e.name === w.name)) ? "Continue" : "Start"} workout
+                </button>
+              </div>
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-gradient-to-r from-blood to-blood-400 transition-all duration-700" style={{ width: `${(session.exercises.filter((e) => log.workouts.some((w) => w.name === e.name)).length / session.exercises.length) * 100}%` }} />
+              </div>
               <ul className="mt-4 space-y-2">
-                {session.exercises.map((e) => {
+                {session.exercises.map((e, i) => {
                   const done = !!log.workouts.find((w) => w.name === e.name);
+                  const logged = log.workouts.find((w) => w.name === e.name);
                   return (
-                    <li key={e.name}>
-                      <button onClick={() => toggleExercise(e.name, e.sets)} className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${done ? "border-blood/60 bg-blood/10" : "border-white/10 hover:border-white/25"}`}>
-                        <span>
-                          <span className="font-medium">{e.name}</span>
-                          <span className="block text-xs text-bone-mute">{e.sets} × {e.reps} · rest {e.rest}</span>
+                    <li key={e.name} className={`flex items-center gap-3 rounded-2xl border p-2 pr-3 transition ${done ? "border-blood/60 bg-blood/10" : "border-white/10 hover:border-white/25"}`}>
+                      <button onClick={() => setSheet(i)} className="flex min-w-0 flex-1 items-center gap-3 text-left" aria-label={`Open ${e.name}`}>
+                        <ExerciseThumb name={e.name} />
+                        <span className="min-w-0">
+                          <span className="block truncate font-medium">{e.name}</span>
+                          <span className="block text-xs text-bone-mute">
+                            {e.sets} × {e.reps} · rest {e.rest}
+                            {logged?.weight ? ` · ${logged.weight} kg` : ""}
+                          </span>
+                          <span className="mt-0.5 block text-[11px] text-blood-400">Tap for demo & tracker →</span>
                         </span>
-                        <span className={`grid h-6 w-6 place-items-center rounded-full border text-xs ${done ? "border-blood bg-blood text-white" : "border-white/20"}`}>{done ? "✓" : ""}</span>
                       </button>
+                      <button onClick={() => toggleExercise(e.name, e.sets)} aria-label={done ? `Undo ${e.name}` : `Mark ${e.name} done`} className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border text-xs transition active:scale-90 ${done ? "border-blood bg-blood text-white" : "border-white/20"}`}>{done ? "✓" : ""}</button>
                     </li>
                   );
                 })}
               </ul>
+              {sheet != null && (
+                <ExerciseSheet
+                  exercises={session.exercises}
+                  index={sheet}
+                  onIndex={setSheet}
+                  onClose={() => setSheet(null)}
+                  mode="log"
+                  done={new Set(log.workouts.map((w) => w.name))}
+                  onComplete={(ex, sets: SetRow[]) => {
+                    const weights = sets.map((r) => Number(r.weight)).filter((n) => n > 0);
+                    const reps = sets.map((r) => Number(r.reps)).filter((n) => n > 0);
+                    const entry = { id: uid(), name: ex.name, sets: sets.filter((r) => r.done).length, reps: reps.length ? Math.max(...reps) : undefined, weight: weights.length ? Math.max(...weights) : undefined };
+                    persist({ ...log, workouts: [...log.workouts.filter((w) => w.name !== ex.name), entry] });
+                  }}
+                  onUndo={(ex) => persist({ ...log, workouts: log.workouts.filter((w) => w.name !== ex.name) })}
+                />
+              )}
             </>
           ) : (
             <p className="mt-3 text-sm text-bone-dim">Rest day. Aim for {t.steps.toLocaleString()} steps and some mobility work.</p>

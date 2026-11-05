@@ -41,6 +41,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ ...result, remaining: Math.max(0, limit - (count ?? 0) - 1) });
   } catch (e) {
     console.error("food analyze", e);
-    return NextResponse.json({ error: "Couldn't read that meal. Try a clearer photo or add a short description." }, { status: 502 });
+    const detail = (e as Error).message || "";
+    const isSetup = /Gemini|Anthropic|API key|model|40[0-4]|permission|quota|429/i.test(detail);
+    return NextResponse.json(
+      { error: isSetup ? `AI service problem: ${detail.slice(0, 220)}` : "Couldn't read that meal. Try a clearer photo or add a short description." },
+      { status: 502 }
+    );
   }
 }

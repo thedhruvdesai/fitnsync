@@ -34,8 +34,14 @@ export async function analyzeFood(input: { text?: string; image?: { data: string
     json: true,
     maxTokens: 900,
   });
-  const json = raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
-  const parsed = JSON.parse(json) as { items?: Partial<FoodItem>[]; note?: string };
+  const cleaned = raw.replace(/```(?:json)?/g, "");
+  const json = cleaned.slice(cleaned.indexOf("{"), cleaned.lastIndexOf("}") + 1);
+  let parsed: { items?: Partial<FoodItem>[]; note?: string };
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error("Couldn't parse the AI reply");
+  }
   const num = (v: unknown) => Math.max(0, Math.round(Number(v) || 0));
   const items: FoodItem[] = (parsed.items ?? []).slice(0, 15).map((i) => ({
     name: String(i.name ?? "Food").slice(0, 80),

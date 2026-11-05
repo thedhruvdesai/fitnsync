@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { generateFeedback } from "@/lib/coach";
 import { weeklyEmailHtml } from "@/lib/email";
+import { aiConfigured } from "@/lib/llm";
 import { addDays, isoDate, summarizeWeek, weekStart } from "@/lib/report";
 import { siteUrl } from "@/lib/site";
 import { createAdminClient } from "@/lib/supabase/server";
@@ -41,7 +42,7 @@ export async function GET(req: Request) {
       const s = summarizeWeek((logs ?? []) as DailyLog[], u.plan!.targets, start, u.plan!.training.sessions.length);
 
       let coach: string | undefined;
-      if (u.tier === "elite" && process.env.ANTHROPIC_API_KEY) {
+      if (u.tier === "elite" && aiConfigured()) {
         coach = (await generateFeedback(admin, u, "weekly")).content;
       }
 

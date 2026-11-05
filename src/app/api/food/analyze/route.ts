@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { analyzeFood, DAILY_SCANS } from "@/lib/food-ai";
+import { aiConfigured } from "@/lib/llm";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import type { Tier } from "@/lib/tiers";
 
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
-  if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: "AI food scan isn't switched on yet (ANTHROPIC_API_KEY missing)." }, { status: 503 });
+  if (!aiConfigured()) return NextResponse.json({ error: "AI food scan isn't switched on yet (add GEMINI_API_KEY)." }, { status: 503 });
 
   const body = (await req.json().catch(() => ({}))) as { text?: string; image?: string };
   let image: { data: string; mediaType: string } | undefined;

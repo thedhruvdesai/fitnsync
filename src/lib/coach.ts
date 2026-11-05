@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { generate } from "./llm";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { addDays, isoDate, summarizeWeek, weekStart, type WeekSummary } from "./report";
 import type { DailyLog, Profile } from "./types";
@@ -72,21 +72,11 @@ export async function generateFeedback(admin: SupabaseClient, profile: Profile, 
   const s = summarizeWeek(thisWeek, profile.plan!.targets, start, planned);
   const prev = lastWeek.length ? summarizeWeek(lastWeek, profile.plan!.targets, addDays(start, -7), planned) : null;
 
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const user =
     describe(profile, s, prev, thisWeek) +
     (question?.trim() ? `\n\nTHE CLIENT IS ASKING YOU DIRECTLY: "${question.trim().slice(0, 600)}"\nAnswer this first under a "## Your question" heading, then give the weekly-style feedback more briefly.` : "");
 
-  const msg = await anthropic.messages.create({
-    model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
-    max_tokens: 1200,
-    system: SYSTEM,
-    messages: [{ role: "user", content: user }],
-  });
-  const content = msg.content
-    .map((b) => (b.type === "text" ? b.text : ""))
-    .join("")
-    .trim();
+  const content = await generate({ system: SYSTEM, text: user, maxTokens: 1400 });
 
   await admin.from("coach_feedback").insert({ user_id: profile.id, week_start: start, kind, content });
   return { content, summary: s };

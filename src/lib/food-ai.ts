@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { generate } from "./llm";
 import type { Tier } from "./tiers";
 
 export const DAILY_SCANS: Record<Tier, number> = { free: 3, starter: 15, pro: 25, elite: 50 };
@@ -27,25 +27,13 @@ Rules:
 The note is one short, friendly sentence (e.g. a tip or what you assumed), or "".`;
 
 export async function analyzeFood(input: { text?: string; image?: { data: string; mediaType: string } }) {
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const content: Anthropic.Messages.ContentBlockParam[] = [];
-  if (input.image) {
-    content.push({ type: "image", source: { type: "base64", media_type: input.image.mediaType as "image/jpeg", data: input.image.data } });
-  }
-  content.push({
-    type: "text",
-    text: input.text?.trim()
-      ? `What I ate: ${input.text.trim().slice(0, 800)}`
-      : "Estimate everything on this plate.",
-  });
-
-  const msg = await anthropic.messages.create({
-    model: process.env.ANTHROPIC_FOOD_MODEL || process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
-    max_tokens: 900,
+  const raw = await generate({
     system: SYSTEM,
-    messages: [{ role: "user", content }],
+    text: input.text?.trim() ? `What I ate: ${input.text.trim().slice(0, 800)}` : "Estimate everything on this plate.",
+    image: input.image,
+    json: true,
+    maxTokens: 900,
   });
-  const raw = msg.content.map((b) => (b.type === "text" ? b.text : "")).join("").trim();
   const json = raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
   const parsed = JSON.parse(json) as { items?: Partial<FoodItem>[]; note?: string };
   const num = (v: unknown) => Math.max(0, Math.round(Number(v) || 0));

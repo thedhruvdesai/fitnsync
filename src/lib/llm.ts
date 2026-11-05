@@ -5,6 +5,14 @@ import Anthropic from "@anthropic-ai/sdk";
  * - GEMINI_API_KEY set → Google Gemini (has a free tier in Google AI Studio)
  * - else ANTHROPIC_API_KEY → Claude
  */
+/** All AI models were busy or out of free quota. Temporary; ask the user to retry shortly. */
+export class AiBusyError extends Error {
+  constructor(detail: string) {
+    super(`AI busy: ${detail}`);
+    this.name = "AiBusyError";
+  }
+}
+
 export function aiConfigured() {
   return !!(process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY);
 }
@@ -24,8 +32,9 @@ export async function generate(opts: { system: string; text: string; image?: { d
     if (opts.image) parts.push({ inline_data: { mime_type: opts.image.mediaType, data: opts.image.data } });
     parts.push({ text: opts.text });
     // try the configured model first, then common fallbacks (model names change over time)
-    const models = [process.env.GEMINI_MODEL, "gemini-flash-latest", "gemini-2.5-flash", "gemini-2.0-flash"].filter(Boolean) as string[];
+    const models = [process.env.GEMINI_MODEL, "gemini-flash-latest", "gemini-flash-lite-latest", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash"].filter(Boolean) as string[];
     let lastErr = "";
+    let busy = false;
     for (const model of Array.from(new Set(models))) {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
         method: "POST",
@@ -38,8 +47,10 @@ export async function generate(opts: { system: string; text: string; image?: { d
         }),
       });
       const j = await res.json().catch(() => ({}));
-      if (res.status === 404) {
-        lastErr = `model ${model} not found`;
+      // not found, busy (503), overloaded (500) or out of free quota for this model (429): try the next model
+      if ([404, 429, 500, 503].includes(res.status)) {
+        lastErr = res.status === 404 ? `model ${model} not found` : `${res.status} ${j?.error?.message ?? ""}`.trim();
+        busy = busy || res.status !== 404;
         continue;
       }
       if (!res.ok) throw new Error(`Gemini ${res.status}: ${j?.error?.message ?? res.statusText}`);
@@ -52,6 +63,7 @@ export async function generate(opts: { system: string; text: string; image?: { d
       if (!text) throw new Error(`Gemini returned no text (finish: ${cand?.finishReason ?? j?.promptFeedback?.blockReason ?? "unknown"})`);
       return text;
     }
+    if (busy) throw new AiBusyError(lastErr);
     throw new Error(`Gemini: ${lastErr || "no model available"}. Set GEMINI_MODEL in Netlify.`);
   }
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { analyzeFood, DAILY_SCANS } from "@/lib/food-ai";
-import { aiConfigured } from "@/lib/llm";
+import { AiBusyError, aiConfigured } from "@/lib/llm";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import type { Tier } from "@/lib/tiers";
 
@@ -41,6 +41,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ...result, remaining: Math.max(0, limit - (count ?? 0) - 1) });
   } catch (e) {
     console.error("food analyze", e);
+    if (e instanceof AiBusyError) {
+      return NextResponse.json({ error: "Our AI is very busy right now. Please try again in a minute. This scan didn't count towards your daily limit." }, { status: 503 });
+    }
     const detail = (e as Error).message || "";
     const isSetup = /Gemini|Anthropic|API key|model|40[0-4]|permission|quota|429/i.test(detail);
     return NextResponse.json(

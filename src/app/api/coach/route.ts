@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateFeedback, MONTHLY_CHECKINS } from "@/lib/coach";
+import { AiBusyError } from "@/lib/llm";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { hasTier } from "@/lib/tiers";
 import type { Profile } from "@/lib/types";
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ content });
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ error: "Coach is busy right now. Try again in a minute." }, { status: 502 });
+    if (e instanceof AiBusyError) return NextResponse.json({ error: "Coach is very busy right now. Try again in a minute; this didn't use a check-in." }, { status: 503 });
+    return NextResponse.json({ error: `Coach couldn't reply: ${(e as Error).message.slice(0, 160)}` }, { status: 502 });
   }
 }

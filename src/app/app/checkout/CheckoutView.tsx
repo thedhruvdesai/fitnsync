@@ -92,6 +92,7 @@ export default function CheckoutView(props: {
   const region = getRegion(props.regionId)!;
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [today, setToday] = useState<string | null>(null);
   const [recurring, setRecurring] = useState<string>(formatMoney(region.prices[props.planId], region));
@@ -117,7 +118,15 @@ export default function CheckoutView(props: {
         window.scrollTo({ top: 0, behavior: "smooth" });
         setTimeout(() => window.location.assign("/app/billing?success=1"), 4600);
       }
-      if (e.name === "checkout.error") setError("Something went wrong with the payment form. Please try again.");
+      // Recoverable problems (e.g. an invalid discount code) arrive as checkout.error/warning while the
+      // form stays usable, so show a small notice and keep the form instead of replacing it.
+      if (e.name === "checkout.error" || e.name === "checkout.warning") {
+        const err = (e as { error?: { detail?: string; errors?: { message?: string }[] } }).error;
+        const msg = err?.errors?.[0]?.message || err?.detail || "Please check your details and try again.";
+        console.warn("Paddle checkout", e);
+        setNotice(msg);
+        if (!loaded) setLoaded(true);
+      }
     });
     if (!started.current) {
       started.current = true;
@@ -270,6 +279,12 @@ export default function CheckoutView(props: {
                     ))}
                     <div className="sheen h-14 rounded-full bg-blood/40" />
                     <p className="pt-1 text-center text-xs text-bone-mute">Loading secure payment form…</p>
+                  </div>
+                )}
+                {notice && (
+                  <div className="mb-4 flex items-start justify-between gap-3 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-bone">
+                    <span>{notice}</span>
+                    <button className="text-bone-mute hover:text-bone" onClick={() => setNotice(null)} aria-label="Dismiss">✕</button>
                   </div>
                 )}
                 <div className={`${FRAME} transition-opacity duration-700 ${loaded ? "opacity-100" : "h-0 overflow-hidden opacity-0"}`} />

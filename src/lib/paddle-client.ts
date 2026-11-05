@@ -10,6 +10,7 @@ declare global {
 export interface PaddleEvent {
   name?: string;
   data?: any;
+  error?: any;
 }
 
 let ready: Promise<any> | null = null;

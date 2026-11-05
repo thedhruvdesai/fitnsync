@@ -40,7 +40,7 @@ export async function analyzeFood(input: { text?: string; image?: { data: string
   try {
     parsed = JSON.parse(json);
   } catch {
-    throw new Error("Couldn't parse the AI reply");
+    throw new Error(`Couldn't parse the AI reply: ${raw.slice(0, 120)}`);
   }
   const num = (v: unknown) => Math.max(0, Math.round(Number(v) || 0));
   const items: FoodItem[] = (parsed.items ?? []).slice(0, 15).map((i) => ({

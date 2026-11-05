@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     const detail = (e as Error).message || "";
     const isSetup = /Gemini|Anthropic|API key|model|40[0-4]|permission|quota|429/i.test(detail);
     return NextResponse.json(
-      { error: isSetup ? `AI service problem: ${detail.slice(0, 220)}` : "Couldn't read that meal. Try a clearer photo or add a short description." },
+      { error: isSetup ? `AI service problem: ${detail.slice(0, 220)}` : `Couldn't read that meal. Try a clearer photo or add a short description. (${detail.slice(0, 160)})` },
       { status: 502 }
     );
   }

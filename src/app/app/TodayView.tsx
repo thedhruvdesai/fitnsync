@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { QUICK_FOODS } from "@/lib/foods";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
+import { AiFoodLogger } from "@/components/AiFoodLogger";
 import { Ring } from "@/components/Ring";
 import type { DailyLog, LoggedMeal, LoggedWorkout, Plan } from "@/lib/types";
 
@@ -111,11 +112,22 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
         <section className="card">
           <div className="flex items-center justify-between">
             <h2 className="h-display text-2xl">Food</h2>
-            <button className="btn-red !px-4 !py-2" onClick={() => setAdding(!adding)}>{adding ? "Close" : "+ Add"}</button>
+            <button className="btn-red !px-4 !py-2" onClick={() => setAdding(!adding)}>{adding ? "Close" : "📷 + Add food"}</button>
           </div>
 
           {adding && (
             <div className="mt-4 space-y-4 rounded-xl bg-ink-3 p-4">
+              <AiFoodLogger
+                onAdd={(items) =>
+                  persist({
+                    ...log,
+                    meals: [
+                      ...log.meals,
+                      ...items.map((it) => ({ id: uid(), name: it.portion ? `${it.name} (${it.portion})` : it.name, slot: "ai", kcal: it.kcal, protein: it.protein, carbs: it.carbs, fat: it.fat })),
+                    ],
+                  })
+                }
+              />
               {plannedDay && !locked && (
                 <div>
                   <div className="label">From today&apos;s plan</div>

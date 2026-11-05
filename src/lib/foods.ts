@@ -56,6 +56,41 @@ export const MEALS: MealTemplate[] = [
   { name: "Tandoori chicken & salad", slot: "dinner", tag: "meat", items: ["180g tandoori chicken", "1 roti", "kachumber salad", "mint raita"], kcal: 520, protein: 52, carbs: 30, fat: 19, keywords: ["chicken", "roti", "dairy"] },
   { name: "Steak, sweet potato & greens", slot: "dinner", tag: "meat", items: ["170g lean steak", "200g sweet potato", "green beans"], kcal: 600, protein: 46, carbs: 44, fat: 24, keywords: ["beef", "steak", "sweet potato"] },
 
+  // ---------- Non-veg & egg additions ----------
+  // breakfast
+  { name: "Chicken sausage & egg muffin", slot: "breakfast", tag: "meat", items: ["1 wholemeal English muffin", "2 chicken chipolatas", "1 egg", "spinach"], kcal: 430, protein: 33, carbs: 30, fat: 19, keywords: ["chicken", "sausage", "egg", "bread"] },
+  { name: "Smoked salmon & scrambled eggs", slot: "breakfast", tag: "fish", items: ["2 eggs + 60ml egg whites", "60g smoked salmon", "1 slice rye toast", "chives"], kcal: 410, protein: 36, carbs: 17, fat: 21, keywords: ["salmon", "fish", "egg", "bread"] },
+  { name: "Turkey & avocado breakfast wrap", slot: "breakfast", tag: "meat", items: ["1 wholemeal wrap", "80g sliced turkey", "2 egg whites", "¼ avocado", "salsa"], kcal: 400, protein: 34, carbs: 31, fat: 15, keywords: ["turkey", "avocado", "wrap"] },
+  { name: "Egg bhurji & paratha (light)", slot: "breakfast", tag: "egg", items: ["3 eggs scrambled with onion, tomato, chilli", "1 small wholemeal paratha"], kcal: 450, protein: 24, carbs: 30, fat: 25, keywords: ["egg", "paratha"] },
+  { name: "Chicken keema on toast", slot: "breakfast", tag: "meat", items: ["120g lean chicken mince keema", "2 slices sourdough", "coriander"], kcal: 440, protein: 36, carbs: 38, fat: 14, keywords: ["chicken", "mince", "bread"] },
+
+  // lunch
+  { name: "Chicken tikka rice bowl", slot: "lunch", tag: "meat", items: ["160g chicken tikka", "150g basmati rice", "kachumber salad", "mint yoghurt"], kcal: 620, protein: 50, carbs: 66, fat: 14, keywords: ["chicken", "rice", "yoghurt", "dairy"] },
+  { name: "Greek chicken souvlaki plate", slot: "lunch", tag: "meat", items: ["160g grilled chicken", "1 pita", "tzatziki", "tomato, cucumber, red onion"], kcal: 580, protein: 48, carbs: 50, fat: 18, keywords: ["chicken", "pita", "bread", "dairy"] },
+  { name: "Tuna poke bowl", slot: "lunch", tag: "fish", items: ["130g sashimi tuna (or tinned)", "130g sushi rice", "edamame, cucumber, avocado", "soy & sesame"], kcal: 560, protein: 40, carbs: 62, fat: 15, keywords: ["tuna", "fish", "rice", "soy"] },
+  { name: "Lamb kofta & tabbouleh", slot: "lunch", tag: "meat", items: ["150g lean lamb kofta", "bulgur tabbouleh", "hummus"], kcal: 640, protein: 40, carbs: 48, fat: 30, keywords: ["lamb", "bulgur", "hummus"] },
+  { name: "Chicken caesar wrap (light)", slot: "lunch", tag: "meat", items: ["150g grilled chicken", "1 wholemeal wrap", "cos lettuce", "light caesar, parmesan"], kcal: 540, protein: 47, carbs: 38, fat: 20, keywords: ["chicken", "wrap", "cheese", "dairy"] },
+  { name: "Prawn & mango rice paper rolls", slot: "lunch", tag: "fish", items: ["150g prawns", "4 rice paper rolls with vermicelli, mango, herbs", "peanut dipping sauce"], kcal: 500, protein: 34, carbs: 64, fat: 11, keywords: ["prawn", "seafood", "peanut", "noodles"] },
+  { name: "Turkey mince taco bowl", slot: "lunch", tag: "meat", items: ["150g lean turkey mince", "120g rice", "black beans, corn, salsa", "30g cheese"], kcal: 610, protein: 45, carbs: 60, fat: 19, keywords: ["turkey", "mince", "rice", "beans", "cheese"] },
+  { name: "Egg curry & rice", slot: "lunch", tag: "egg", items: ["3 boiled eggs in tomato-onion curry", "130g basmati rice"], kcal: 560, protein: 26, carbs: 58, fat: 24, keywords: ["egg", "curry", "rice"] },
+
+  // dinner
+  { name: "Butter chicken (lighter) & rice", slot: "dinner", tag: "meat", items: ["170g chicken in light butter-tomato gravy", "130g basmati rice", "salad"], kcal: 640, protein: 48, carbs: 58, fat: 22, keywords: ["chicken", "rice", "dairy"] },
+  { name: "Baked barramundi & veg", slot: "dinner", tag: "fish", items: ["180g barramundi", "200g roast potatoes & pumpkin", "greens", "lemon"], kcal: 520, protein: 42, carbs: 48, fat: 15, keywords: ["barramundi", "fish", "potato"] },
+  { name: "Chicken stir-fry & noodles", slot: "dinner", tag: "meat", items: ["170g chicken breast", "150g cooked egg noodles", "stir-fry vegetables", "soy, ginger, garlic"], kcal: 590, protein: 48, carbs: 60, fat: 15, keywords: ["chicken", "noodles", "soy"] },
+  { name: "Lamb rogan josh & roti", slot: "dinner", tag: "meat", items: ["150g lean lamb rogan josh", "2 rotis", "cucumber raita"], kcal: 620, protein: 40, carbs: 52, fat: 26, keywords: ["lamb", "roti", "dairy"] },
+  { name: "Salmon teriyaki & greens", slot: "dinner", tag: "fish", items: ["160g salmon", "teriyaki glaze", "120g jasmine rice", "broccolini"], kcal: 630, protein: 40, carbs: 55, fat: 26, keywords: ["salmon", "fish", "rice", "soy"] },
+  { name: "Beef & vegetable chilli", slot: "dinner", tag: "meat", items: ["150g lean beef mince", "kidney beans, tomato, capsicum", "100g rice or 1 wrap"], kcal: 600, protein: 45, carbs: 55, fat: 20, keywords: ["beef", "mince", "beans", "rice"] },
+  { name: "Grilled chicken, sweet potato & slaw", slot: "dinner", tag: "meat", items: ["180g chicken thigh (skinless)", "200g sweet potato wedges", "slaw with yoghurt dressing"], kcal: 580, protein: 46, carbs: 48, fat: 20, keywords: ["chicken", "sweet potato", "dairy"] },
+  { name: "Fish curry (Goan style) & rice", slot: "dinner", tag: "fish", items: ["170g white fish in light coconut curry", "130g rice"], kcal: 560, protein: 38, carbs: 56, fat: 19, keywords: ["fish", "coconut", "rice"] },
+  { name: "Egg fried cauliflower rice & chicken", slot: "dinner", tag: "meat", items: ["130g chicken breast", "2 eggs", "300g cauliflower rice with veg", "soy"], kcal: 470, protein: 50, carbs: 18, fat: 21, keywords: ["chicken", "egg", "cauliflower", "soy"] },
+
+  // snacks
+  { name: "Chicken & hummus snack box", slot: "snack", tag: "meat", items: ["80g shredded chicken", "40g hummus", "carrot & cucumber sticks"], kcal: 230, protein: 24, carbs: 10, fat: 10, keywords: ["chicken", "hummus"] },
+  { name: "Beef jerky & apple", slot: "snack", tag: "meat", items: ["30g lean beef jerky", "1 apple"], kcal: 190, protein: 15, carbs: 28, fat: 2, keywords: ["beef", "jerky", "apple"] },
+  { name: "Tuna & crackers", slot: "snack", tag: "fish", items: ["95g tuna in springwater", "6 wholegrain crackers"], kcal: 210, protein: 23, carbs: 18, fat: 5, keywords: ["tuna", "fish", "crackers"] },
+  { name: "Egg muffins (2)", slot: "snack", tag: "egg", items: ["2 baked egg & veg muffins"], kcal: 180, protein: 14, carbs: 4, fat: 12, keywords: ["egg"] },
+
   // ---------- Snacks ----------
   { name: "Roasted chana & fruit", slot: "snack", tag: "vegan", items: ["40g roasted chana", "1 apple"], kcal: 230, protein: 9, carbs: 38, fat: 4, keywords: ["chana", "chickpea", "apple"] },
   { name: "Protein shake & banana", slot: "snack", tag: "veg", items: ["1 scoop whey in water", "1 banana"], kcal: 230, protein: 26, carbs: 30, fat: 2, keywords: ["whey", "dairy", "banana"] },
@@ -88,6 +123,12 @@ export const QUICK_FOODS = [
   { name: "Greek yogurt (200g)", kcal: 190, protein: 20, carbs: 8, fat: 8 },
   { name: "Eggs (2)", kcal: 140, protein: 12, carbs: 1, fat: 10 },
   { name: "Chicken breast (150g)", kcal: 245, protein: 46, carbs: 0, fat: 5 },
+  { name: "Salmon fillet (150g)", kcal: 310, protein: 32, carbs: 0, fat: 20 },
+  { name: "Tuna tin (95g)", kcal: 100, protein: 23, carbs: 0, fat: 1 },
+  { name: "Lean beef mince (150g)", kcal: 285, protein: 39, carbs: 0, fat: 14 },
+  { name: "Prawns (150g)", kcal: 150, protein: 33, carbs: 0, fat: 2 },
+  { name: "Lamb (lean, 150g)", kcal: 300, protein: 38, carbs: 0, fat: 16 },
+  { name: "Turkey slices (100g)", kcal: 110, protein: 22, carbs: 2, fat: 2 },
   { name: "Whey shake", kcal: 120, protein: 24, carbs: 3, fat: 1 },
   { name: "Banana", kcal: 105, protein: 1, carbs: 27, fat: 0 },
   { name: "Apple", kcal: 95, protein: 0, carbs: 25, fat: 0 },

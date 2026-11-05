@@ -64,6 +64,14 @@ function scaleMeal(m: MealTemplate, targetKcal: number): PlannedMeal {
   };
 }
 
+const SIGNATURE: Record<Intake["diet"], string[]> = {
+  non_veg: ["meat", "fish", "egg"],
+  pescatarian: ["fish", "egg"],
+  eggetarian: ["egg"],
+  vegetarian: [],
+  vegan: [],
+};
+
 export function buildMealPlan(i: Intake, t: Targets): PlannedDay[] {
   const pool = mealsFor(i.diet, i.dislikes || "");
   const slots = slotsFor(i.meals_per_day);
@@ -77,7 +85,12 @@ export function buildMealPlan(i: Intake, t: Targets): PlannedDay[] {
       if (!options.length) options = pool; // extremely restrictive dislikes
       // prefer higher-protein options; rotate through the week
       options = [...options].sort((a, b) => b.protein / b.kcal - a.protein / a.kcal);
-      const pick = options[(d * 3 + k * 2) % options.length];
+      // people who eat meat/fish/eggs should mostly see those dishes (about 3 in 4 meals), with veg dishes mixed in
+      const signature = SIGNATURE[i.diet];
+      const preferred = signature.length ? options.filter((m) => signature.includes(m.tag)) : [];
+      const usePreferred = preferred.length > 0 && (d * 3 + k) % 4 !== 3;
+      const list = usePreferred ? preferred : options;
+      const pick = list[(d * 3 + k * 2) % list.length];
       return scaleMeal(pick, (t.kcal * share[slot]) / totalShare);
     });
     // Protein top-up: if whole foods fall short, add a shake and trim the other meals to keep calories on target

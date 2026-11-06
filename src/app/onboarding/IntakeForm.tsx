@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
+import { ConvertedInput, cmToFtIn, ftInToCm, kgTo, round, toKg, UnitToggle, useUnits } from "@/lib/units";
 import type { Intake, Plan } from "@/lib/types";
 
 type Opt<T> = { v: T; label: string; sub?: string };
@@ -70,6 +71,26 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
     ...Object.fromEntries(Object.entries(initial).filter(([, v]) => v !== null && v !== undefined)),
   });
   const set = <K extends keyof Intake>(k: K, v: Intake[K]) => setF((p) => ({ ...p, [k]: v }));
+  const [units, setUnits] = useUnits();
+  const [hUnit, setHUnitRaw] = useState<"cm" | "ft">("cm");
+  const [ftIn, setFtIn] = useState<{ ft: string; inch: string }>({ ft: "", inch: "" });
+  const setHUnit = (u: "cm" | "ft") => {
+    setHUnitRaw(u);
+    setUnits({ l: u === "ft" ? "in" : "cm" });
+    if (u === "ft" && f.height_cm) {
+      const { ft, inch } = cmToFtIn(f.height_cm);
+      setFtIn({ ft: String(ft), inch: String(inch) });
+    }
+  };
+  useEffect(() => {
+    if (units.l === "in" && hUnit === "cm") setHUnit("ft");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [units.l]);
+  const setHeightFt = (ft: string, inch: string) => {
+    setFtIn({ ft, inch });
+    const cm = ftInToCm(Number(ft) || 0, Number(inch) || 0);
+    set("height_cm", cm > 0 ? round(cm, 1) : (undefined as never));
+  };
 
   const steps = [
     { title: "About you", ok: !!(f.full_name && f.sex && f.birth_year && f.height_cm && f.weight_kg) },
@@ -139,19 +160,39 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
               <label className="label">Sex (for energy maths)</label>
               <Choice cols={2} opts={[{ v: "male", label: "Male" }, { v: "female", label: "Female" }]} value={f.sex} onChange={(v) => set("sex", v)} />
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="label">Birth year</label>
-                <input className="input" inputMode="numeric" value={f.birth_year ?? ""} onChange={(e) => set("birth_year", Number(e.target.value) || (undefined as never))} placeholder="1998" />
+            <div>
+              <label className="label">Birth year</label>
+              <input className="input" inputMode="numeric" value={f.birth_year ?? ""} onChange={(e) => set("birth_year", Number(e.target.value) || (undefined as never))} placeholder="1998" />
+            </div>
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="label !mb-0">Height</label>
+                <UnitToggle label="Height unit" value={hUnit} onChange={setHUnit} options={[{ v: "cm", label: "cm" }, { v: "ft", label: "ft / in" }]} />
               </div>
-              <div>
-                <label className="label">Height cm</label>
-                <input className="input" inputMode="decimal" value={f.height_cm ?? ""} onChange={(e) => set("height_cm", Number(e.target.value) || (undefined as never))} placeholder="175" />
+              {hUnit === "cm" ? (
+                <input className="input" inputMode="decimal" value={f.height_cm ? round(f.height_cm) : ""} onChange={(e) => set("height_cm", Number(e.target.value) || (undefined as never))} placeholder="175" />
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="input flex items-center gap-2">
+                    <input className="w-full bg-transparent outline-none" inputMode="numeric" value={ftIn.ft} placeholder="5" onChange={(e) => setHeightFt(e.target.value, ftIn.inch)} />
+                    <span className="text-sm text-bone-mute">ft</span>
+                  </label>
+                  <label className="input flex items-center gap-2">
+                    <input className="w-full bg-transparent outline-none" inputMode="numeric" value={ftIn.inch} placeholder="9" onChange={(e) => setHeightFt(ftIn.ft, e.target.value)} />
+                    <span className="text-sm text-bone-mute">in</span>
+                  </label>
+                </div>
+              )}
+            </div>
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="label !mb-0">Weight</label>
+                <UnitToggle label="Weight unit" value={units.w} onChange={(w) => setUnits({ w })} options={[{ v: "kg", label: "kg" }, { v: "lb", label: "lb" }]} />
               </div>
-              <div>
-                <label className="label">Weight kg</label>
-                <input className="input" inputMode="decimal" value={f.weight_kg ?? ""} onChange={(e) => set("weight_kg", Number(e.target.value) || (undefined as never))} placeholder="72" />
-              </div>
+              <label className="input flex items-center gap-2">
+                <ConvertedInput value={f.weight_kg} unitKey={units.w} show={(v) => kgTo(v, units.w)} store={(v) => toKg(v, units.w)} onChange={(v) => set("weight_kg", v as never)} placeholder={units.w === "kg" ? "72" : "160"} />
+                <span className="text-sm text-bone-mute">{units.w}</span>
+              </label>
             </div>
           </>
         )}
@@ -159,8 +200,14 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
           <>
             <Choice opts={GOALS} value={f.goal} onChange={(v) => set("goal", v)} />
             <div>
-              <label className="label">Goal weight kg</label>
-              <input className="input" inputMode="decimal" value={f.goal_weight_kg ?? ""} onChange={(e) => set("goal_weight_kg", Number(e.target.value) || (undefined as never))} placeholder={String(f.weight_kg ?? 70)} />
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="label !mb-0">Goal weight</label>
+                <UnitToggle label="Weight unit" value={units.w} onChange={(w) => setUnits({ w })} options={[{ v: "kg", label: "kg" }, { v: "lb", label: "lb" }]} />
+              </div>
+              <label className="input flex items-center gap-2">
+                <ConvertedInput value={f.goal_weight_kg} unitKey={units.w} show={(v) => kgTo(v, units.w)} store={(v) => toKg(v, units.w)} onChange={(v) => set("goal_weight_kg", v as never)} placeholder={String(kgTo(f.weight_kg ?? 70, units.w))} />
+                <span className="text-sm text-bone-mute">{units.w}</span>
+              </label>
             </div>
           </>
         )}

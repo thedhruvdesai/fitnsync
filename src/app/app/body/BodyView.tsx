@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LineChart } from "@/components/Charts";
 import { createClient } from "@/lib/supabase/client";
 import { isoDate } from "@/lib/report";
+import { cmTo, kgTo, toCm, toKg, UnitToggle, useUnits, type Units } from "@/lib/units";
 
 export type Pose = "front" | "side" | "back";
 export interface Checkin {
@@ -20,15 +21,21 @@ export interface Checkin {
 }
 
 const POSES: Pose[] = ["front", "side", "back"];
-const MEASURES: { k: keyof Checkin; label: string; unit: string }[] = [
-  { k: "weight_kg", label: "Weight", unit: "kg" },
-  { k: "body_fat", label: "Body fat", unit: "%" },
-  { k: "waist_cm", label: "Waist", unit: "cm" },
-  { k: "chest_cm", label: "Chest", unit: "cm" },
-  { k: "hips_cm", label: "Hips", unit: "cm" },
-  { k: "arm_cm", label: "Arm", unit: "cm" },
-  { k: "thigh_cm", label: "Thigh", unit: "cm" },
+type Kind = "w" | "l" | "pct";
+const MEASURES: { k: keyof Checkin; label: string; kind: Kind }[] = [
+  { k: "weight_kg", label: "Weight", kind: "w" },
+  { k: "body_fat", label: "Body fat", kind: "pct" },
+  { k: "waist_cm", label: "Waist", kind: "l" },
+  { k: "chest_cm", label: "Chest", kind: "l" },
+  { k: "hips_cm", label: "Hips", kind: "l" },
+  { k: "arm_cm", label: "Arm", kind: "l" },
+  { k: "thigh_cm", label: "Thigh", kind: "l" },
 ];
+/** Stored values are always kg / cm; these convert for display and input. */
+const unitOf = (kind: Kind, u: Units) => (kind === "w" ? u.w : kind === "l" ? u.l : "%");
+const show = (kind: Kind, v: number, u: Units) => (kind === "w" ? kgTo(v, u.w) : kind === "l" ? cmTo(v, u.l) : v);
+const store = (kind: Kind, v: number, u: Units) => (kind === "w" ? toKg(v, u.w) : kind === "l" ? toCm(v, u.l) : v);
+const fmt = (kind: Kind, v: number, u: Units) => `${show(kind, v, u)}${kind === "pct" ? "%" : ` ${unitOf(kind, u)}`}`;
 const BUCKET = "progress-photos";
 const short = (d: string) => new Date(d + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" });
 const long = (d: string) => new Date(d + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
@@ -66,6 +73,19 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId:
   const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null);
   const [chart, setChart] = useState<keyof Checkin>("weight_kg");
   const inputs = useRef<Partial<Record<Pose, HTMLInputElement | null>>>({});
+  const [units, setUnits] = useUnits();
+  // text being typed, so converting units never fights the keyboard
+  const [draft, setDraft] = useState<Partial<Record<keyof Checkin, string>>>({});
+  useEffect(() => {
+    const d: Partial<Record<keyof Checkin, string>> = {};
+    for (const m of MEASURES) {
+      const v = form[m.k] as number | null;
+      d[m.k] = v == null ? "" : String(show(m.kind, v, units));
+    }
+    setDraft(d);
+    // re-sync when switching day or units, not on every keystroke
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.checkin_date, form.id, units.w, units.l]);
 
   // signed URLs for private photos
   useEffect(() => {
@@ -148,7 +168,7 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId:
     return a != null && b != null && asc.length > 1 ? Math.round((b - a) * 10) / 10 : null;
   };
   const chartMeta = MEASURES.find((m) => m.k === chart)!;
-  const points = asc.filter((c) => c[chart] != null).map((c) => ({ label: short(c.checkin_date), value: Number(c[chart]) }));
+  const points = asc.filter((c) => c[chart] != null).map((c) => ({ label: short(c.checkin_date), value: show(chartMeta.kind, Number(c[chart]), units) }));
 
   if (setupNeeded)
     return (
@@ -176,7 +196,7 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId:
             return (
               <div key={k} className="card !p-3">
                 <div className="text-[11px] uppercase tracking-widest text-bone-mute">{m.label}</div>
-                <div className="h-display mt-1 text-xl">{d == null ? "—" : `${d > 0 ? "+" : ""}${d} ${m.unit}`}</div>
+                <div className="h-display mt-1 text-xl">{d == null ? "—" : `${d > 0 ? "+" : ""}${m.kind === "pct" ? d : show(m.kind, d, units)}${m.kind === "pct" ? "%" : ` ${unitOf(m.kind, units)}`}`}</div>
                 <div className="text-[10px] text-bone-mute">since {first ? short(first.checkin_date) : ""}</div>
               </div>
             );
@@ -214,20 +234,36 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId:
             <p className="mt-1.5 text-[11px] text-bone-mute">Tip: fitted clothes, arms relaxed, phone at chest height.</p>
           </div>
 
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="label !mb-0">Measurements</div>
+            <div className="flex gap-2">
+              <UnitToggle label="Weight unit" value={units.w} onChange={(w) => setUnits({ w })} options={[{ v: "kg", label: "kg" }, { v: "lb", label: "lb" }]} />
+              <UnitToggle label="Length unit" value={units.l} onChange={(l) => setUnits({ l })} options={[{ v: "cm", label: "cm" }, { v: "in", label: "inches" }]} />
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {MEASURES.map((m) => (
               <label key={m.k} className="rounded-xl bg-ink-3 px-3 py-2">
-                <span className="block text-[10px] uppercase tracking-wider text-bone-mute">{m.label} ({m.unit})</span>
-                <input
-                  inputMode="decimal"
-                  className="w-full bg-transparent outline-none"
-                  value={(form[m.k] as number | null) ?? ""}
-                  placeholder="—"
-                  onChange={(e) => setForm({ ...form, [m.k]: e.target.value === "" ? null : Number(e.target.value.replace(",", ".")) })}
-                />
+                <span className="block text-[10px] uppercase tracking-wider text-bone-mute">{m.label}</span>
+                <span className="flex items-baseline gap-1">
+                  <input
+                    inputMode="decimal"
+                    className="w-full min-w-0 bg-transparent text-lg outline-none"
+                    value={draft[m.k] ?? ""}
+                    placeholder="—"
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(",", ".");
+                      setDraft({ ...draft, [m.k]: raw });
+                      const n = Number(raw);
+                      setForm({ ...form, [m.k]: raw === "" || !Number.isFinite(n) ? null : Math.round(store(m.kind, n, units) * 100) / 100 });
+                    }}
+                  />
+                  <span className="text-xs text-bone-mute">{unitOf(m.kind, units) === "in" ? "in" : unitOf(m.kind, units)}</span>
+                </span>
               </label>
             ))}
           </div>
+          {units.l === "in" && <p className="-mt-2 text-[11px] text-bone-mute">Measure around the widest part, tape snug but not tight.</p>}
           <textarea className="input min-h-[60px] text-sm" placeholder="Notes (how you feel, clothes fit, energy…)" value={form.notes ?? ""} onChange={(e) => setForm({ ...form, notes: e.target.value || null })} />
           {msg && <p className={`text-sm ${msg.ok ? "text-emerald-300" : "text-blood-400"}`}>{msg.t}</p>}
           <button className="btn-red w-full !py-3" disabled={saving} onClick={save}>{saving ? "Saving…" : "Save check-in"}</button>
@@ -238,10 +274,10 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId:
           <section className="card">
             <div className="flex items-baseline justify-between">
               <h2 className="h-display text-xl">{chartMeta.label} trend</h2>
-              {last?.[chart] != null && <span className="text-sm text-bone-dim">{String(last[chart])} {chartMeta.unit}</span>}
+              {last?.[chart] != null && <span className="text-sm text-bone-dim">{fmt(chartMeta.kind, Number(last[chart]), units)}</span>}
             </div>
             <div className="mt-2">
-              <LineChart points={points} unit={` ${chartMeta.unit}`} target={chart === "weight_kg" ? goalWeight ?? undefined : undefined} />
+              <LineChart points={points} unit={chartMeta.kind === "pct" ? "%" : ` ${unitOf(chartMeta.kind, units)}`} target={chart === "weight_kg" && goalWeight != null ? kgTo(goalWeight, units.w) : undefined} />
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {MEASURES.map((m) => (
@@ -268,7 +304,7 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId:
                 <button className="min-w-0 flex-1 text-left" onClick={() => { loadDate(c.checkin_date); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
                   <div className="text-sm font-medium">{long(c.checkin_date)}</div>
                   <div className="truncate text-xs text-bone-mute">
-                    {MEASURES.filter((m) => c[m.k] != null).map((m) => `${m.label} ${c[m.k]}${m.unit === "%" ? "%" : ` ${m.unit}`}`).join(" · ") || "Photos only"}
+                    {MEASURES.filter((m) => c[m.k] != null).map((m) => `${m.label} ${fmt(m.kind, Number(c[m.k]), units)}`).join(" · ") || "Photos only"}
                   </div>
                 </button>
                 <button onClick={() => remove(c)} className="grid h-8 w-8 place-items-center text-bone-mute hover:text-blood" aria-label="Delete check-in">✕</button>

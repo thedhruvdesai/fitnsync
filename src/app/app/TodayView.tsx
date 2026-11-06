@@ -167,7 +167,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
   }, [supabase]);
 
   const rowOf = useCallback(
-    (l: DailyLog) => ({ user_id: userId, log_date: l.log_date, meals: l.meals, workouts: l.workouts, water_ml: l.water_ml, weight_kg: l.weight_kg, sleep_hours: l.sleep_hours, energy: l.energy, notes: l.notes, updated_at: new Date().toISOString() }),
+    (l: DailyLog) => ({ user_id: userId, log_date: l.log_date, meals: l.meals, workouts: l.workouts, water_ml: l.water_ml, weight_kg: l.weight_kg, sleep_hours: Number.isFinite(l.sleep_hours as number) ? l.sleep_hours : null, energy: l.energy, notes: l.notes, updated_at: new Date().toISOString() }),
     [userId]
   );
 
@@ -585,7 +585,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
           </div>
           <div>
             <div className="label">Sleep hours</div>
-            <input className="input !py-2" aria-label="Sleep hours" inputMode="decimal" value={log.sleep_hours ?? ""} onChange={(e) => persist({ ...log, sleep_hours: e.target.value ? Number(e.target.value) : null })} />
+            <SleepInput key={`${date}-${loading}`} value={log.sleep_hours} onChange={(v) => persist({ ...log, sleep_hours: v })} />
           </div>
           <div>
             <div className="label">Energy</div>
@@ -601,6 +601,64 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
           <textarea className="input min-h-[80px]" aria-label="Notes for your coach" placeholder="How did today feel? Cravings, soreness, stress…" value={log.notes ?? ""} onChange={(e) => persist({ ...log, notes: e.target.value })} />
         </div>
       </section>
+    </div>
+  );
+}
+
+/** Reads "7", "7.5", "7,5", "7:30", "7h 30m", "7h", "30m". Returns null if empty or not understood. */
+function parseSleep(raw: string): number | null {
+  const s = raw.trim().toLowerCase().replace(",", ".");
+  if (!s) return null;
+  let h: number;
+  const clock = s.match(/^(\d{1,2})\s*[:.]\s*(\d{2})$/);
+  const hm = s.match(/^(?:(\d+(?:\.\d+)?)\s*h(?:rs?|ours?)?)?\s*(?:(\d+)\s*m(?:in)?s?)?$/);
+  if (clock && s.includes(":")) h = Number(clock[1]) + Number(clock[2]) / 60;
+  else if (/^\d*\.?\d+$|^\d+\.$/.test(s)) h = Number(s);
+  else if (hm && (hm[1] || hm[2])) h = Number(hm[1] ?? 0) + Number(hm[2] ?? 0) / 60;
+  else return null;
+  if (!Number.isFinite(h) || h < 0 || h > 24) return null;
+  return Math.round(h * 4) / 4;
+}
+
+function fmtSleep(v: number | null | undefined) {
+  return v != null && Number.isFinite(v) ? String(v) : "";
+}
+
+function SleepInput({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
+  const [text, setText] = useState(fmtSleep(value));
+  const [bad, setBad] = useState(false);
+  const step = (d: number) => {
+    const base = value != null && Number.isFinite(value) ? value : 7;
+    const next = Math.min(24, Math.max(0, base + d));
+    setText(String(next));
+    setBad(false);
+    onChange(next);
+  };
+  return (
+    <div>
+      <div className="flex gap-1">
+        <button type="button" className="chip !px-3 !py-2" aria-label="Half an hour less sleep" onClick={() => step(-0.5)}>−</button>
+        <input
+          className={`input !py-2 text-center ${bad ? "!border-blood-400" : ""}`}
+          aria-label="Sleep hours"
+          aria-invalid={bad}
+          inputMode="decimal"
+          placeholder="e.g. 7.5"
+          value={text}
+          onChange={(e) => {
+            const t = e.target.value;
+            setText(t);
+            if (!t.trim()) { setBad(false); onChange(null); return; }
+            const v = parseSleep(t);
+            if (v == null) { setBad(true); return; }
+            setBad(false);
+            onChange(v);
+          }}
+          onBlur={() => { if (!bad) setText(fmtSleep(value)); }}
+        />
+        <button type="button" className="chip !px-3 !py-2" aria-label="Half an hour more sleep" onClick={() => step(0.5)}>+</button>
+      </div>
+      {bad && <p className="mt-1 text-xs text-blood-400">Enter hours like 7.5 or 7:30 (0–24).</p>}
     </div>
   );
 }

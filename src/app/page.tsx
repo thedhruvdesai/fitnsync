@@ -11,7 +11,7 @@ const STEPS = [
   { n: "01", t: "Tell us about you", d: "Two minutes: body, goal, schedule, diet, equipment, injuries. No generic templates." },
   { n: "02", t: "Get your plan", d: "Calorie and protein targets, a 7-day meal plan for how you eat, and a program for where you train." },
   { n: "03", t: "Log in seconds", d: "Tap planned meals, tick off sets, add water. Built for one thumb, on the go." },
-  { n: "04", t: "Get coached", d: "Weekly reports in your inbox, plus a detailed review from Fit&Sync Coach." },
+  { n: "04", t: "Get coached", d: "Weekly reports in your inbox, and Elite members get a detailed review from Fit&Sync Coach." },
 ];
 
 const FAQ = [
@@ -219,7 +219,7 @@ export default async function Home() {
             </Reveal>
             <Reveal className="md:col-span-2" delay={200}>
               <div className="card tilt shine h-full !border-blood/40 bg-gradient-to-br from-blood/25 to-ink-2 !p-8">
-                <p className="eyebrow !text-bone">AI coach</p>
+                <p className="eyebrow !text-bone">Elite · AI coach</p>
                 <h3 className="h-display mt-3 text-3xl">Three fixes a week, written for you.</h3>
                 <a href="#coach" className="mt-6 inline-block text-sm text-bone underline underline-offset-4">Read a sample →</a>
               </div>
@@ -249,7 +249,7 @@ export default async function Home() {
         {/* coach */}
         <section id="coach" className="mx-auto grid max-w-7xl gap-12 px-6 pb-28 lg:grid-cols-2 lg:items-center">
           <Reveal>
-            <p className="eyebrow">Fit&amp;Sync Coach</p>
+            <p className="eyebrow">Elite · Fit&amp;Sync Coach</p>
             <h2 className="h-display mt-3 text-5xl leading-[0.92] md:text-6xl">Feedback that sounds like it came from someone who&apos;s <span className="text-blood-400">seen it all.</span></h2>
             <p className="mt-6 max-w-lg text-lg text-bone-dim">
               Every Monday, our AI coach reviews your food, training, sleep and notes, then tells you what&apos;s working, the three things to fix, and how to adjust your plan. Ask for a check-in any time.

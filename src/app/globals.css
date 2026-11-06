@@ -128,3 +128,22 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 .sheet-in { animation: sheetin .45s cubic-bezier(.2,.8,.1,1); }
 @keyframes sheetin { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sheet-in { animation: none; } }
+
+/* ---- exercise photo demos: crossfade start ↔ finish like a rep ---- */
+@keyframes rep {
+  0%, 30% { opacity: 0; }
+  45%, 80% { opacity: 1; }
+  95%, 100% { opacity: 0; }
+}
+@keyframes rep-bar {
+  0%, 30% { transform: scaleX(0); }
+  45%, 80% { transform: scaleX(1); }
+  95%, 100% { transform: scaleX(0); }
+}
+.rep-b { animation: rep var(--rep, 2.8s) ease-in-out infinite; }
+.rep-bar { animation: rep-bar var(--rep, 2.8s) ease-in-out infinite; transform-origin: left; }
+.rep-paused .rep-b, .rep-paused .rep-bar { animation-play-state: paused; }
+.demo-photo { filter: saturate(.9) contrast(1.05); }
+@media (prefers-reduced-motion: reduce) { .rep-b, .rep-bar { animation-duration: 6s; } }
+@keyframes pr-pop { 0% { transform: scale(.4) rotate(-20deg); opacity: 0; } 70% { transform: scale(1.12) rotate(4deg); opacity: 1; } 100% { transform: scale(1) rotate(0); } }
+.pr-pop { animation: pr-pop .7s cubic-bezier(.2,.9,.3,1.3) both; }

@@ -1,4 +1,5 @@
 "use client";
+import { findExercise } from "@/lib/library";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { QUICK_FOODS } from "@/lib/foods";
@@ -231,7 +232,8 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
                   onComplete={(ex, sets: SetRow[]) => {
                     const weights = sets.map((r) => Number(r.weight)).filter((n) => n > 0);
                     const reps = sets.map((r) => Number(r.reps)).filter((n) => n > 0);
-                    const entry = { id: uid(), name: ex.name, sets: sets.filter((r) => r.done).length, reps: reps.length ? Math.max(...reps) : undefined, weight: weights.length ? Math.max(...weights) : undefined };
+                    const set_list = sets.filter((r) => r.done && Number(r.reps) > 0).map((r) => ({ w: Number(r.weight) || 0, r: Number(r.reps) }));
+                    const entry = { id: uid(), name: ex.name, ex: findExercise(ex.name)?.id, set_list, sets: sets.filter((r) => r.done).length, reps: reps.length ? Math.max(...reps) : undefined, weight: weights.length ? Math.max(...weights) : undefined };
                     persist({ ...log, workouts: [...log.workouts.filter((w) => w.name !== ex.name), entry] });
                   }}
                   onUndo={(ex) => persist({ ...log, workouts: log.workouts.filter((w) => w.name !== ex.name) })}

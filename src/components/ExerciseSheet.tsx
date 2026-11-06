@@ -1,7 +1,10 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { ExerciseFigure } from "./ExerciseFigure";
+import { ExerciseAvatar, ExerciseDemo } from "./ExerciseDemo";
 import { moveFor, repTarget, restSeconds } from "@/lib/exercises";
+import { findExercise } from "@/lib/library";
 import type { Exercise } from "@/lib/types";
 
 export interface SetRow {
@@ -78,6 +81,7 @@ export function ExerciseSheet({
 }) {
   const ex = exercises[index];
   const move = useMemo(() => moveFor(ex.name), [ex.name]);
+  const lib = useMemo(() => findExercise(ex.name), [ex.name]);
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState(1);
   const [logs, setLogs] = useState<Record<string, SetRow[]>>({});
@@ -139,6 +143,9 @@ export function ExerciseSheet({
 
         <div ref={scroller} className="flex-1 overflow-y-auto px-5 pb-6">
           {/* demo */}
+          {lib ? (
+            <ExerciseDemo key={lib.id} ex={lib} className="mt-4" />
+          ) : (
           <div className="relative mt-4 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-blood/10 to-ink">
             <div aria-hidden className="h-display text-outline pointer-events-none absolute inset-x-0 top-2 select-none text-center text-[64px] uppercase leading-none opacity-20">{move.title.split(" ")[0]}</div>
             <ExerciseFigure key={ex.name} move={move} speed={speed} playing={playing} className="relative mx-auto h-60 w-full max-w-sm md:h-72" />
@@ -155,6 +162,7 @@ export function ExerciseSheet({
               </div>
             </div>
           </div>
+          )}
 
           {/* title */}
           <div className="mt-5 flex items-start justify-between gap-3">
@@ -167,7 +175,7 @@ export function ExerciseSheet({
             {isDone && <span className="rounded-full bg-blood px-3 py-1 text-xs font-semibold text-white">✓ Done</span>}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            {move.muscles.map((m, i) => (
+            {(lib ? [...lib.primary, ...lib.secondary.slice(0, 3), lib.equipment] : move.muscles).map((m, i) => (
               <span key={m} className={`rounded-full border px-3 py-1 text-xs ${i === 0 ? "border-blood/60 bg-blood/15 text-bone" : "border-white/10 text-bone-dim"}`}>{m}</span>
             ))}
           </div>
@@ -208,9 +216,9 @@ export function ExerciseSheet({
           {/* how to */}
           <div className="mt-6 grid gap-4 md:grid-cols-[1.4fr_1fr]">
             <div>
-              <h3 className="label">How to do it</h3>
+              <h3 className="label">Step by step</h3>
               <ol className="space-y-2.5">
-                {move.cues.map((c, i) => (
+                {(lib?.steps ?? move.cues).map((c, i) => (
                   <li key={c} className="flex gap-3 text-sm text-bone-dim">
                     <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-blood/20 text-xs font-semibold text-blood-400">{i + 1}</span>
                     <span className="pt-0.5">{c}</span>
@@ -218,10 +226,23 @@ export function ExerciseSheet({
                 ))}
               </ol>
             </div>
+            <div className="space-y-3">
+            {lib && (
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <h3 className="label">Coach cues</h3>
+                <ul className="space-y-1.5 text-sm text-bone-dim">
+                  {move.cues.map((c) => <li key={c}>• {c}</li>)}
+                </ul>
+              </div>
+            )}
             <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-4">
               <h3 className="label !text-amber-300">Avoid</h3>
               <p className="text-sm text-bone-dim">{move.mistake}</p>
               <p className="mt-3 text-[11px] text-bone-mute">Stop if you feel sharp pain. Swap the exercise and check with a physio if it persists.</p>
+            </div>
+            {lib && (
+              <Link href={`/app/exercises/${lib.id}`} className="btn-ghost w-full !py-2.5 text-xs">📈 Your history &amp; PRs</Link>
+            )}
             </div>
           </div>
         </div>
@@ -247,6 +268,8 @@ export function ExerciseSheet({
 /** Small looping thumbnail for lists. */
 export function ExerciseThumb({ name, className = "h-14 w-14" }: { name: string; className?: string }) {
   const move = useMemo(() => moveFor(name), [name]);
+  const lib = useMemo(() => findExercise(name), [name]);
+  if (lib) return <ExerciseAvatar id={lib.id} name={lib.name} className={className} />;
   return (
     <div className={`shrink-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-blood/10 to-ink ${className}`}>
       <ExerciseFigure move={move} showGround={false} className="h-full w-full" />

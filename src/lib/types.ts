@@ -94,6 +94,10 @@ export interface LoggedWorkout {
   reps?: number;
   weight?: number;
   minutes?: number;
+  /** library id (src/data/exercises.json) */
+  ex?: string;
+  /** every completed set: weight kg + reps */
+  set_list?: { w: number; r: number }[];
 }
 
 export interface DailyLog {

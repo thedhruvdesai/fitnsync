@@ -131,3 +131,17 @@ supabase/schema.sql    tables, RLS, billing-column protection, auto profile
 - **Health data**: you're storing health information. Have the Terms and Privacy templates reviewed, and add a contact email for privacy requests.
 - **Age**: the terms require users to be 18+.
 - The coach prompt already includes safety rules: no calorie targets below the floor, referral to a GP or physio for pain, and Butterfly Foundation info if notes suggest disordered eating.
+
+## Exercise library
+
+`/app/exercises` lists 161 common gym and home exercises with real start/finish photos (crossfaded as a rep), step-by-step instructions, coach cues, and per-exercise PR charts (heaviest weight, estimated 1RM, best volume, reps — Starter tier and up).
+
+Source: [yuhonas/free-exercise-db](https://github.com/yuhonas/free-exercise-db), public domain (Unlicense), so it's fine for commercial use. To change the list, edit `PICK` in `scripts/build-exercise-library.py`, then:
+
+```bash
+git clone --depth 1 https://github.com/yuhonas/free-exercise-db /tmp/fedb
+pip install pillow
+python3 scripts/build-exercise-library.py /tmp/fedb   # writes src/data/exercises.json + public/ex/*.webp
+```
+
+Workout sets are stored per set in `daily_logs.workouts[].set_list` (`{w, r}`), with `ex` = library id.

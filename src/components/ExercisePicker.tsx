@@ -1,4 +1,5 @@
 "use client";
+import { Portal } from "./Portal";
 import { useEffect, useMemo, useState } from "react";
 import { ExerciseAvatar } from "./ExerciseDemo";
 import { GROUPS, LIBRARY, type Group, type LibExercise } from "@/lib/library";
@@ -47,7 +48,8 @@ export function ExercisePicker({
   }, [q, group, home, exclude]);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center md:items-center" role="dialog" aria-modal="true" aria-label={title}>
+    <Portal>
+      <div className="fixed inset-0 z-[60] flex items-end justify-center md:items-center" role="dialog" aria-modal="true" aria-label={title}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="sheet-in relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-t-[28px] bg-ink-2 md:rounded-[28px]">
         <div className="space-y-3 border-b border-white/5 px-5 pb-3 pt-4">
@@ -81,5 +83,6 @@ export function ExercisePicker({
         </ul>
       </div>
     </div>
+    </Portal>
   );
 }

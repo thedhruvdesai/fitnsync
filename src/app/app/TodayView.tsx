@@ -6,7 +6,7 @@ import { QUICK_FOODS } from "@/lib/foods";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
 import dynamic from "next/dynamic";
 import type { AiItem, Slot, StartMode } from "@/components/AiFoodLogger";
-import { QuickFoods, Star, useFavorites, type FoodItem } from "@/components/QuickFoods";
+import { QuickFoods, Star, useFavorites, type FoodItem, type MyMeal } from "@/components/QuickFoods";
 import { GettingStarted } from "@/components/GettingStarted";
 import { ExerciseThumb } from "@/components/ExerciseDemo";
 import type { LastSession, SetRow } from "@/components/ExerciseSheet";
@@ -21,6 +21,7 @@ import type { DailyLog, LoggedMeal, LoggedWorkout, Plan } from "@/lib/types";
 const SheetLoading = () => <div className="grid h-60 place-items-center"><div className="h-9 w-9 animate-spin rounded-full border-2 border-white/15 border-t-blood" /></div>;
 const AiFoodLogger = dynamic(() => import("@/components/AiFoodLogger").then((m) => m.AiFoodLogger), { ssr: false, loading: SheetLoading });
 const BarcodeScanner = dynamic(() => import("@/components/BarcodeScanner").then((m) => m.BarcodeScanner), { ssr: false, loading: SheetLoading });
+const MealBuilder = dynamic(() => import("@/components/MealBuilder").then((m) => m.MealBuilder), { ssr: false });
 const ExerciseSheet = dynamic(() => import("@/components/ExerciseSheet").then((m) => m.ExerciseSheet), { ssr: false });
 
 const backupKey = (user: string, d: string) => `fs_log_${user}_${d}`;
@@ -235,6 +236,8 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
   );
 
   const fav = useFavorites(supabase);
+  const [builder, setBuilder] = useState<Partial<MyMeal> | null>(null);
+  const [recentFoods, setRecentFoods] = useState<FoodItem[]>([]);
   const nowSlot = (): Slot => {
     const h = new Date().getHours();
     return h < 10 ? "breakfast" : h < 15 ? "lunch" : h >= 17 && h < 22 ? "dinner" : "snack";
@@ -326,6 +329,10 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
       <GettingStarted supabase={supabase} onDemo={() => setScan("demo")} onScan={() => setScan("camera")} />
       {isToday && !locked && <AdaptiveCard onApplied={(p) => setPlan(p)} />}
 
+      {builder && (
+        <MealBuilder initial={builder} suggestions={[...fav.foods, ...recentFoods]} onClose={() => setBuilder(null)} onSave={(m, prev) => fav.saveItem(m, prev)} />
+      )}
+
       {/* scan CTA */}
       <section className="glow-border relative overflow-hidden rounded-3xl bg-gradient-to-br from-blood/25 via-ink-2 to-ink-2 p-5">
         <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood-400">✨ AI food scan</div>
@@ -374,7 +381,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
           </div>
 
           <div className="mt-4">
-            <QuickFoods supabase={supabase} date={date} fav={fav} onAdd={(items) => addItems(items)} />
+            <QuickFoods supabase={supabase} date={date} fav={fav} onAdd={(items) => addItems(items)} onBuildMeal={(m) => setBuilder(m ?? {})} onRecent={setRecentFoods} />
           </div>
 
           {adding && (
@@ -421,6 +428,21 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
             </div>
           )}
 
+          {(["breakfast", "lunch", "dinner", "snack"] as const).some((sl) => log.meals.filter((m) => m.slot === sl).length >= 2) && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {(["breakfast", "lunch", "dinner", "snack"] as const)
+                .filter((sl) => log.meals.filter((m) => m.slot === sl).length >= 2)
+                .map((sl) => (
+                  <button
+                    key={sl}
+                    className="chip !py-1.5 text-xs"
+                    onClick={() => setBuilder({ name: `My ${sl}`, servings: 1, ingredients: log.meals.filter((m) => m.slot === sl).map((m) => fav.pickItem(m)) })}
+                  >
+                    🍱 Save {sl} as a meal
+                  </button>
+                ))}
+            </div>
+          )}
           <ul className="mt-4 divide-y divide-white/5">
             {log.meals.length === 0 && <li className="py-6 text-center text-sm text-bone-mute">Nothing logged yet. Tap 📷 Scan food above.</li>}
             {log.meals.map((m) => (

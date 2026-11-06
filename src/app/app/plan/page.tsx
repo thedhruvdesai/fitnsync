@@ -52,7 +52,10 @@ export default async function PlanPage() {
       </section>
 
       <section>
-        <h2 className="h-display text-2xl">Meal plan</h2>
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="h-display text-2xl">Meal plan</h2>
+          <Link href="/app/recipes" className="text-sm text-blood-400 hover:underline">All recipes →</Link>
+        </div>
         <div tabIndex={0} role="region" aria-label="Meal plan by day, scroll sideways" className="-mx-5 mt-4 flex snap-x gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 xl:grid-cols-3">
           {plan.meals.map((d) => (
             <div key={d.day} className="card min-w-[82%] snap-start md:min-w-0">
@@ -64,7 +67,7 @@ export default async function PlanPage() {
                 {d.meals.map((m, k) => (
                   <li key={k}>
                     <div className="text-[11px] uppercase tracking-widest text-blood-400">{m.slot}</div>
-                    <div className="font-medium">{m.name}</div>
+                    <Link href={`/app/recipes?r=${encodeURIComponent(m.name.replace(/ · [\d.]+× portion$/, ""))}`} className="font-medium underline decoration-white/20 underline-offset-4 hover:decoration-blood">{m.name}</Link>
                     <div className="text-xs text-bone-mute">{m.items.join(" · ")}</div>
                   </li>
                 ))}

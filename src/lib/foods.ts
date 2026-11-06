@@ -99,6 +99,39 @@ export const MEALS: MealTemplate[] = [
   { name: "Skyr & honey", slot: "snack", tag: "veg", items: ["170g skyr/high-protein yogurt", "1 tsp honey"], kcal: 160, protein: 18, carbs: 18, fat: 1, keywords: ["yogurt", "dairy"] },
   { name: "Boiled eggs & cucumber", slot: "snack", tag: "egg", items: ["2 boiled eggs", "cucumber sticks"], kcal: 160, protein: 13, carbs: 3, fat: 10, keywords: ["egg"] },
   { name: "Tuna rice cakes", slot: "snack", tag: "fish", items: ["95g tuna", "2 rice cakes", "light mayo"], kcal: 220, protein: 24, carbs: 16, fat: 6, keywords: ["tuna", "fish"] },
+
+  // ---------- More vegetarian & vegan (recipes library) ----------
+  // breakfast
+  { name: "Besan chilla with paneer", slot: "breakfast", tag: "veg", items: ["60g besan (chickpea flour)", "50g grated paneer", "onion, tomato, coriander", "1 tsp oil"], kcal: 410, protein: 22, carbs: 34, fat: 19, keywords: ["besan", "chickpea", "paneer", "dairy"] },
+  { name: "Overnight oats with whey & berries", slot: "breakfast", tag: "veg", items: ["50g oats", "200ml milk", "1 scoop whey", "100g berries"], kcal: 460, protein: 36, carbs: 56, fat: 9, keywords: ["oats", "milk", "dairy", "whey", "berries"] },
+  { name: "Poha with peanuts & sprouts", slot: "breakfast", tag: "vegan", items: ["60g poha (flattened rice)", "50g moong sprouts", "15g peanuts", "onion, curry leaves, lemon"], kcal: 400, protein: 15, carbs: 62, fat: 10, keywords: ["poha", "rice", "peanut", "sprouts"] },
+  { name: "Chickpea flour omelette (vegan)", slot: "breakfast", tag: "vegan", items: ["70g besan", "100g silken tofu", "spinach, mushroom", "2 slices wholegrain toast"], kcal: 450, protein: 26, carbs: 52, fat: 13, keywords: ["besan", "chickpea", "tofu", "soy", "bread", "mushroom"] },
+  { name: "Peanut butter banana smoothie bowl", slot: "breakfast", tag: "vegan", items: ["1 frozen banana", "250ml soy milk", "1 scoop pea protein", "15g peanut butter", "20g granola"], kcal: 480, protein: 32, carbs: 58, fat: 14, keywords: ["banana", "peanut", "soy", "granola"] },
+  { name: "Idli, sambar & coconut chutney", slot: "breakfast", tag: "vegan", items: ["3 idlis", "1 bowl sambar", "2 tbsp coconut chutney"], kcal: 390, protein: 14, carbs: 68, fat: 7, keywords: ["idli", "rice", "lentil", "coconut"] },
+
+  // lunch
+  { name: "Tempeh & brown rice buddha bowl", slot: "lunch", tag: "vegan", items: ["150g tempeh", "120g cooked brown rice", "roast pumpkin, kale", "tahini dressing"], kcal: 640, protein: 36, carbs: 62, fat: 26, keywords: ["tempeh", "soy", "rice", "tahini", "sesame"] },
+  { name: "Falafel & hummus wrap", slot: "lunch", tag: "vegan", items: ["4 baked falafel", "1 wholemeal wrap", "40g hummus", "lettuce, tomato, pickles"], kcal: 560, protein: 20, carbs: 70, fat: 21, keywords: ["falafel", "chickpea", "hummus", "wrap"] },
+  { name: "Black bean & corn quesadilla", slot: "lunch", tag: "veg", items: ["2 wholemeal tortillas", "120g black beans", "corn, capsicum", "40g cheese", "salsa"], kcal: 590, protein: 27, carbs: 74, fat: 19, keywords: ["beans", "corn", "cheese", "dairy", "tortilla"] },
+  { name: "Halloumi & lentil salad", slot: "lunch", tag: "veg", items: ["80g grilled halloumi", "150g cooked green lentils", "rocket, tomato, red onion", "lemon & olive oil"], kcal: 560, protein: 32, carbs: 38, fat: 30, keywords: ["halloumi", "cheese", "dairy", "lentil"] },
+  { name: "Chole kulcha (home-style)", slot: "lunch", tag: "veg", items: ["200g chole (chickpea curry)", "1 wholemeal kulcha", "onion & lemon"], kcal: 580, protein: 21, carbs: 86, fat: 15, keywords: ["chole", "chickpea", "bread"] },
+
+  // dinner
+  { name: "Tofu tikka masala & rice", slot: "dinner", tag: "vegan", items: ["200g firm tofu", "tomato-cashew masala gravy", "120g basmati rice"], kcal: 600, protein: 32, carbs: 62, fat: 23, keywords: ["tofu", "soy", "cashew", "rice"] },
+  { name: "Mushroom & spinach paneer stir-fry", slot: "dinner", tag: "veg", items: ["120g paneer", "200g mushrooms", "spinach, garlic", "2 rotis"], kcal: 590, protein: 33, carbs: 44, fat: 30, keywords: ["paneer", "dairy", "mushroom", "roti"] },
+  { name: "Vegetable khichdi with curd", slot: "dinner", tag: "veg", items: ["50g rice + 40g moong dal", "mixed vegetables", "1 tsp ghee", "150g curd"], kcal: 520, protein: 23, carbs: 78, fat: 12, keywords: ["khichdi", "rice", "dal", "curd", "dairy"] },
+  { name: "Edamame soba noodle stir-fry", slot: "dinner", tag: "vegan", items: ["80g soba (dry)", "150g edamame", "bok choy, carrot, capsicum", "soy, ginger, sesame"], kcal: 560, protein: 32, carbs: 72, fat: 14, keywords: ["soba", "noodles", "edamame", "soy", "sesame"] },
+  { name: "Stuffed capsicum with quinoa & beans", slot: "dinner", tag: "vegan", items: ["2 capsicums", "120g cooked quinoa", "120g black beans", "tomato, cumin, coriander"], kcal: 480, protein: 21, carbs: 74, fat: 9, keywords: ["capsicum", "quinoa", "beans"] },
+
+  // snacks
+  { name: "Edamame with chilli salt", slot: "snack", tag: "vegan", items: ["150g edamame in pods (100g shelled)", "chilli flakes, sea salt"], kcal: 130, protein: 12, carbs: 9, fat: 5, keywords: ["edamame", "soy"] },
+  { name: "Paneer tikka bites", slot: "snack", tag: "veg", items: ["80g paneer", "yoghurt-spice marinade", "capsicum & onion"], kcal: 250, protein: 16, carbs: 6, fat: 18, keywords: ["paneer", "dairy", "yogurt"] },
+  { name: "Cottage cheese & pineapple", slot: "snack", tag: "veg", items: ["150g cottage cheese", "80g pineapple"], kcal: 180, protein: 19, carbs: 16, fat: 4, keywords: ["cottage cheese", "dairy", "pineapple"] },
+  { name: "Hummus, carrots & roasted chickpeas", slot: "snack", tag: "vegan", items: ["50g hummus", "carrot & capsicum sticks", "20g roasted chickpeas"], kcal: 220, protein: 9, carbs: 22, fat: 11, keywords: ["hummus", "chickpea", "carrot"] },
+
+  // non-veg extras
+  { name: "Chicken & veg soup with sourdough", slot: "dinner", tag: "meat", items: ["150g chicken breast", "carrot, celery, leek broth", "1 slice sourdough"], kcal: 430, protein: 42, carbs: 38, fat: 9, keywords: ["chicken", "soup", "bread"] },
+  { name: "Prawn & avocado sushi bowl", slot: "lunch", tag: "fish", items: ["150g cooked prawns", "130g sushi rice", "½ avocado, cucumber, nori", "soy & sesame"], kcal: 580, protein: 34, carbs: 60, fat: 20, keywords: ["prawn", "seafood", "rice", "avocado", "sesame"] },
 ];
 
 export function mealsFor(diet: Diet, dislikes: string) {

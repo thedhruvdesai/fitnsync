@@ -6,6 +6,15 @@ import type { LoggedMeal } from "@/lib/types";
 
 export type FoodItem = Omit<LoggedMeal, "id" | "slot" | "source">;
 
+/** A saved "My meal": several foods logged together. Stored in food_favorites with kind = "meal"; macros are per serving. */
+export interface MyMeal extends FoodItem {
+  kind: "meal";
+  servings: number;
+  ingredients: FoodItem[];
+  method?: string[];
+}
+export const isMeal = (f: FoodItem): f is MyMeal => (f as MyMeal).kind === "meal";
+
 const pickItem = (m: LoggedMeal): FoodItem => ({
   name: m.name,
   kcal: m.kcal,
@@ -54,7 +63,36 @@ export function useFavorites(supabase: SupabaseClient) {
     [supabase, isFav]
   );
 
-  return { favs, isFav, toggle, ready, pickItem };
+  const saveItem = useCallback(
+    async (item: FoodItem, previousName?: string) => {
+      const { data: auth } = await supabase.auth.getSession();
+      const userId = auth.session?.user.id;
+      if (!userId) return false;
+      if (previousName && previousName !== item.name) await supabase.from("food_favorites").delete().eq("user_id", userId).eq("name", previousName);
+      const { error } = await supabase.from("food_favorites").upsert({ user_id: userId, name: item.name, item }, { onConflict: "user_id,name" });
+      if (error) {
+        setReady("missing");
+        return false;
+      }
+      setFavs((f) => [item, ...f.filter((x) => x.name !== item.name && x.name !== previousName)]);
+      return true;
+    },
+    [supabase]
+  );
+  const removeItem = useCallback(
+    async (name: string) => {
+      const { data: auth } = await supabase.auth.getSession();
+      const userId = auth.session?.user.id;
+      if (!userId) return;
+      setFavs((f) => f.filter((x) => x.name !== name));
+      await supabase.from("food_favorites").delete().eq("user_id", userId).eq("name", name);
+    },
+    [supabase]
+  );
+  const foods = favs.filter((f) => !isMeal(f));
+  const meals = favs.filter(isMeal);
+
+  return { favs, foods, meals, isFav, toggle, ready, pickItem, saveItem, removeItem };
 }
 
 export function Star({ on, onClick }: { on: boolean; onClick: () => void }) {
@@ -71,13 +109,19 @@ export function QuickFoods({
   date,
   onAdd,
   fav,
+  onBuildMeal,
+  onRecent,
 }: {
   supabase: SupabaseClient;
   date: string;
   onAdd: (items: FoodItem[]) => void;
   fav: ReturnType<typeof useFavorites>;
+  /** open the meal builder (new, or editing an existing meal) */
+  onBuildMeal?: (meal?: MyMeal) => void;
+  /** recent foods, for the meal builder's search */
+  onRecent?: (items: FoodItem[]) => void;
 }) {
-  const [tab, setTab] = useState<"recent" | "fav">("recent");
+  const [tab, setTab] = useState<"recent" | "fav" | "meals">("recent");
   const [recent, setRecent] = useState<(FoodItem & { times: number })[]>([]);
   const [yesterday, setYesterday] = useState<LoggedMeal[]>([]);
   const [flash, setFlash] = useState<string | null>(null);
@@ -103,6 +147,7 @@ export function QuickFoods({
             else seen.set(k, { ...pickItem(m), times: 1 });
           }
         setRecent([...seen.values()].slice(0, 20));
+        onRecent?.([...seen.values()].slice(0, 60));
         setYesterday(rows.find((r) => r.log_date === addDays(date, -1))?.meals ?? []);
       });
     return () => {
@@ -116,7 +161,7 @@ export function QuickFoods({
     setTimeout(() => setFlash(null), 1600);
   };
 
-  const list = tab === "recent" ? recent : fav.favs;
+  const list = tab === "recent" ? recent : tab === "fav" ? fav.foods : fav.meals;
   const yKcal = useMemo(() => yesterday.reduce((a, m) => a + (Number(m.kcal) || 0), 0), [yesterday]);
 
   return (
@@ -134,15 +179,21 @@ export function QuickFoods({
       <div className="flex items-center justify-between">
         <div className="flex rounded-full bg-white/5 p-1 text-xs">
           <button type="button" onClick={() => setTab("recent")} className={`rounded-full px-3 py-1.5 ${tab === "recent" ? "bg-bone text-ink" : "text-bone-dim"}`}>Recent</button>
-          <button type="button" onClick={() => setTab("fav")} className={`rounded-full px-3 py-1.5 ${tab === "fav" ? "bg-bone text-ink" : "text-bone-dim"}`}>★ Favourites{fav.favs.length ? ` · ${fav.favs.length}` : ""}</button>
+          <button type="button" onClick={() => setTab("fav")} className={`rounded-full px-3 py-1.5 ${tab === "fav" ? "bg-bone text-ink" : "text-bone-dim"}`}>★ Favs{fav.foods.length ? ` · ${fav.foods.length}` : ""}</button>
+          <button type="button" onClick={() => setTab("meals")} className={`rounded-full px-3 py-1.5 ${tab === "meals" ? "bg-bone text-ink" : "text-bone-dim"}`}>🍱 My meals{fav.meals.length ? ` · ${fav.meals.length}` : ""}</button>
         </div>
         {flash && <span className="text-xs text-emerald-300">✓ {flash}</span>}
       </div>
 
+      {tab === "meals" && onBuildMeal && (
+        <button type="button" onClick={() => onBuildMeal()} className="w-full rounded-xl border border-dashed border-blood/50 bg-blood/5 py-2.5 text-sm text-bone transition hover:bg-blood/10">＋ Create a meal</button>
+      )}
       {list.length === 0 ? (
         <p className="rounded-xl border border-dashed border-white/10 p-4 text-center text-xs text-bone-mute">
           {tab === "recent"
             ? "Foods you log will show up here for one-tap re-logging."
+            : tab === "meals"
+              ? "Save meals you eat often (like your usual breakfast) and log them in one tap."
             : fav.ready === "missing"
               ? "Favourites need a one-time database update (supabase/quick-log-body.sql)."
               : "Tap ☆ on any food to save it as a favourite."}
@@ -154,11 +205,18 @@ export function QuickFoods({
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm">{f.name}</span>
                 <span className="block text-[11px] text-bone-mute">
-                  {f.kcal} kcal · {f.protein} g P{"times" in f && (f as { times: number }).times > 1 ? ` · logged ${(f as { times: number }).times}×` : ""}
+                  {f.kcal} kcal · {f.protein} g P{isMeal(f) ? ` · ${f.ingredients.length} items${f.servings > 1 ? ` · per serve (makes ${f.servings})` : ""}` : ""}{"times" in f && (f as { times: number }).times > 1 ? ` · logged ${(f as { times: number }).times}×` : ""}
                 </span>
               </span>
-              <Star on={fav.isFav(f.name)} onClick={() => fav.toggle(f)} />
-              <button type="button" onClick={() => add([f], `Added ${f.name.split(" (")[0]}`)} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blood text-lg text-white transition active:scale-90" aria-label={`Add ${f.name}`}>+</button>
+              {isMeal(f) ? (
+                <>
+                  <button type="button" onClick={() => onBuildMeal?.(f)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm text-bone-mute hover:text-bone" aria-label={`Edit ${f.name}`}>✏️</button>
+                  <button type="button" onClick={() => confirm(`Delete "${f.name}"?`) && fav.removeItem(f.name)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-bone-mute hover:text-blood-400" aria-label={`Delete ${f.name}`}>🗑</button>
+                </>
+              ) : (
+                <Star on={fav.isFav(f.name)} onClick={() => fav.toggle(f)} />
+              )}
+              <button type="button" onClick={() => add([isMeal(f) ? { name: f.name, kcal: f.kcal, protein: f.protein, carbs: f.carbs, fat: f.fat, ...(f.fibre != null && { fibre: f.fibre }), ...(f.sugar != null && { sugar: f.sugar }), ...(f.sat_fat != null && { sat_fat: f.sat_fat }), ...(f.sodium != null && { sodium: f.sodium }) } : f], `Added ${f.name.split(" (")[0]}`)} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blood text-lg text-white transition active:scale-90" aria-label={`Add ${f.name}`}>+</button>
             </li>
           ))}
         </ul>

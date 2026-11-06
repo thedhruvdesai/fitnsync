@@ -1,4 +1,5 @@
 "use client";
+import { Portal } from "./Portal";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ExerciseFigure } from "./ExerciseFigure";
@@ -156,7 +157,8 @@ export function ExerciseSheet({
   const isLast = index === exercises.length - 1;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center" role="dialog" aria-modal="true" aria-label={ex.name}>
+    <Portal>
+      <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center" role="dialog" aria-modal="true" aria-label={ex.name}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="sheet-in glow-border relative flex max-h-[94vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[28px] bg-ink-2 md:rounded-[28px]">
         {/* header */}
@@ -319,6 +321,7 @@ export function ExerciseSheet({
         {resting && <RestTimer seconds={restSeconds(ex.rest)} onDone={() => setResting(false)} next={completed < rows.length ? `Set ${completed + 1} of ${ex.name}` : exercises[index + 1]?.name} />}
       </div>
     </div>
+    </Portal>
   );
 }
 

@@ -10,6 +10,7 @@ const TODAY: Item = { href: "/app", label: "Today", icon: "M12 3v2m0 14v2m9-9h-2
 const CALENDAR: Item = { href: "/app/calendar", label: "Calendar", icon: "M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm3 10h2m4 0h2" };
 const PLAN: Item = { href: "/app/plan", label: "Plan", icon: "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4" };
 const EXERCISES: Item = { href: "/app/exercises", label: "Exercises", icon: "M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11" };
+const RECIPES: Item = { href: "/app/recipes", label: "Recipes", icon: "M12 3c-3 0-5 2-5 4.5 0 1.6.9 2.8 2 3.5V20h6v-9c1.1-.7 2-1.9 2-3.5C17 5 15 3 12 3Zm-3 13h6" };
 const PROGRESS: Item = { href: "/app/progress", label: "Progress", icon: "M3 17l6-6 4 4 8-8M15 7h6v6" };
 const BODY: Item = { href: "/app/body", label: "Body", icon: "M12 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-5 6h10m-5 0v5m0 0-3 5m3-5 3 5" };
 const REPORTS: Item = { href: "/app/reports", label: "Reports", icon: "M9 17v-6m4 6V7m4 10v-3M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2Z" };
@@ -17,9 +18,9 @@ const COACH: Item = { href: "/app/coach", label: "Coach", icon: "M8 10h8M8 14h5m
 const ACCOUNT: Item = { href: "/app/billing", label: "Plan & account", icon: "M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21a8 8 0 0 1 16 0" };
 
 /** Desktop shows everything; phones get 4 main tabs + More. */
-const DESKTOP = [TODAY, CALENDAR, PLAN, EXERCISES, PROGRESS, BODY, REPORTS, COACH];
+const DESKTOP = [TODAY, CALENDAR, PLAN, RECIPES, EXERCISES, PROGRESS, BODY, REPORTS, COACH];
 const TABS = [TODAY, CALENDAR, PLAN, EXERCISES];
-const MORE = [PROGRESS, BODY, REPORTS, COACH, ACCOUNT];
+const MORE = [RECIPES, PROGRESS, BODY, REPORTS, COACH, ACCOUNT];
 
 function Icon({ d, className = "h-5 w-5" }: { d: string; className?: string }) {
   return (

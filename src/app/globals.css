@@ -147,3 +147,5 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 @media (prefers-reduced-motion: reduce) { .rep-b, .rep-bar { animation-duration: 6s; } }
 @keyframes pr-pop { 0% { transform: scale(.4) rotate(-20deg); opacity: 0; } 70% { transform: scale(1.12) rotate(4deg); opacity: 1; } 100% { transform: scale(1) rotate(0); } }
 .pr-pop { animation: pr-pop .7s cubic-bezier(.2,.9,.3,1.3) both; }
+@keyframes scanline { 0%, 100% { top: 12%; } 50% { top: 85%; } }
+.scanline { animation: scanline 1.8s ease-in-out infinite; }

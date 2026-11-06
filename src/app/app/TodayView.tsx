@@ -5,6 +5,9 @@ import { createClient } from "@/lib/supabase/client";
 import { QUICK_FOODS } from "@/lib/foods";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
 import { AiFoodLogger, type AiItem, type Slot, type StartMode } from "@/components/AiFoodLogger";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { QuickFoods, Star, useFavorites, type FoodItem } from "@/components/QuickFoods";
+import { GettingStarted } from "@/components/GettingStarted";
 import { ExerciseSheet, ExerciseThumb, type SetRow } from "@/components/ExerciseSheet";
 import { Ring } from "@/components/Ring";
 import Link from "next/link";
@@ -23,7 +26,7 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
   const [adding, setAdding] = useState(false);
   const [other, setOther] = useState("");
   const [sheet, setSheet] = useState<number | null>(null);
-  const [scan, setScan] = useState<StartMode | null>(null);
+  const [scan, setScan] = useState<StartMode | "barcode" | null>(null);
   const [custom, setCustom] = useState({ name: "", kcal: "", protein: "", carbs: "", fat: "" });
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const t = plan.targets;
@@ -66,6 +69,13 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
     [supabase, userId]
   );
 
+  const fav = useFavorites(supabase);
+  const nowSlot = (): Slot => {
+    const h = new Date().getHours();
+    return h < 10 ? "breakfast" : h < 15 ? "lunch" : h >= 17 && h < 22 ? "dinner" : "snack";
+  };
+  const addItems = (items: FoodItem[], slot: Slot = nowSlot(), source = "quick") =>
+    persist({ ...log, meals: [...log.meals, ...items.map((it) => ({ ...it, id: uid(), slot, source }))] });
   const totals = dayTotals(log);
   const extra = log.meals.reduce((a, m) => ({ fibre: a.fibre + (m.fibre ?? 0), sugar: a.sugar + (m.sugar ?? 0), sodium: a.sodium + (m.sodium ?? 0) }), { fibre: 0, sugar: 0, sodium: 0 });
   const hasExtra = log.meals.some((m) => m.sodium != null || m.fibre != null);
@@ -148,13 +158,16 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
         </div>
       )}
 
+      <GettingStarted supabase={supabase} onDemo={() => setScan("demo")} onScan={() => setScan("camera")} />
+
       {/* scan CTA */}
       <section className="glow-border relative overflow-hidden rounded-3xl bg-gradient-to-br from-blood/25 via-ink-2 to-ink-2 p-5">
         <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">✨ AI food scan</div>
         <h2 className="h-display mt-1 text-2xl">What did you eat?</h2>
         <p className="mt-1 text-sm text-bone-dim">Snap your plate. Get calories, protein, carbs, fat, fibre, sugar and sodium in seconds.</p>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <button className="btn-red col-span-3 !py-3.5 text-base" onClick={() => setScan("camera")}>📷 Scan food</button>
+          <button className="btn-red col-span-2 !py-3.5 text-base" onClick={() => setScan("camera")}>📷 Scan food</button>
+          <button className="chip !py-3.5 text-sm" onClick={() => setScan("barcode")}>▥ Barcode</button>
           <button className="chip !py-2.5 text-xs" onClick={() => setScan("gallery")}>🖼️ Upload</button>
           <button className="chip !py-2.5 text-xs" onClick={() => setScan("text")}>⌨️ Type it</button>
           <button className="chip !py-2.5 text-xs" onClick={() => setScan("manual")}>✍️ Manual</button>
@@ -170,12 +183,17 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
               <button onClick={() => setScan(null)} className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-bone-dim" aria-label="Close">✕</button>
             </div>
             <div className="px-1 pb-4">
+              {scan === "barcode" ? (
+                <BarcodeScanner dayLabel={isToday ? "today" : "this day"} onAdd={(item, slot) => addItems([item], slot, "barcode")} onFallback={(m) => setScan(m)} />
+              ) : (
               <AiFoodLogger
+                key={scan}
                 start={scan}
                 dayLabel={isToday ? "today" : "this day"}
                 guide={{ kcal: t.kcal, protein: t.protein_g, carbs: t.carbs_g, fat: t.fat_g, fibre: t.fibre_g }}
                 onAdd={logScanned}
               />
+              )}
             </div>
           </div>
         </div>
@@ -186,7 +204,11 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
         <section className="card">
           <div className="flex items-center justify-between">
             <h2 className="h-display text-2xl">Food</h2>
-            <button className="btn-red !px-4 !py-2" onClick={() => setAdding(!adding)}>{adding ? "Close" : "+ Add food"}</button>
+            <button className="btn-red !px-4 !py-2" onClick={() => setAdding(!adding)}>{adding ? "Close" : "+ More"}</button>
+          </div>
+
+          <div className="mt-4">
+            <QuickFoods supabase={supabase} date={date} fav={fav} onAdd={(items) => addItems(items)} />
           </div>
 
           {adding && (
@@ -244,7 +266,10 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
                     {m.kcal} kcal · {m.protein} g P · {m.carbs} g C · {m.fat} g F{m.sodium != null ? ` · ${m.sodium} mg Na` : ""}
                   </div>
                 </div>
-                <button className="text-bone-mute hover:text-blood" onClick={() => removeMeal(m.id)} aria-label="Remove">✕</button>
+                <div className="flex items-center">
+                  <Star on={fav.isFav(m.name)} onClick={() => fav.toggle(fav.pickItem(m))} />
+                  <button className="grid h-8 w-8 place-items-center text-bone-mute hover:text-blood" onClick={() => removeMeal(m.id)} aria-label="Remove">✕</button>
+                </div>
               </li>
             ))}
           </ul>
@@ -344,7 +369,7 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
             </div>
           </div>
           <div>
-            <div className="label">Morning weight kg</div>
+            <div className="label flex justify-between">Morning weight kg <Link href="/app/body" className="normal-case tracking-normal text-blood">📸 Body</Link></div>
             <input className="input !py-2" inputMode="decimal" value={log.weight_kg ?? ""} onChange={(e) => persist({ ...log, weight_kg: e.target.value ? Number(e.target.value) : null })} />
           </div>
           <div>

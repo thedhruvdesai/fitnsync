@@ -145,3 +145,10 @@ python3 scripts/build-exercise-library.py /tmp/fedb   # writes src/data/exercise
 ```
 
 Workout sets are stored per set in `daily_logs.workouts[].set_list` (`{w, r}`), with `ex` = library id.
+
+## Quick logging, barcode & body tracking
+
+Run `supabase/quick-log-body.sql` once in Supabase → SQL Editor. It creates `food_favorites`, `body_checkins` and the private `progress-photos` storage bucket (each user can only read/write their own folder).
+
+- Barcode lookups use [Open Food Facts](https://openfoodfacts.org) (free, ODbL; attribute in the UI) via `/api/food/barcode`. Camera scanning uses the browser BarcodeDetector where available, otherwise ZXing.
+- Recent foods come from the last 30 days of `daily_logs`; "Copy yesterday" duplicates yesterday's meals.

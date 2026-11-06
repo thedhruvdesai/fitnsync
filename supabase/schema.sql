@@ -144,3 +144,5 @@ create index if not exists food_scans_user_time on public.food_scans (user_id, c
 alter table public.food_scans enable row level security;
 drop policy if exists "food scans self read" on public.food_scans;
 create policy "food scans self read" on public.food_scans for select using (auth.uid() = user_id);
+
+-- Favourites + body tracking: see supabase/quick-log-body.sql (also run that file).

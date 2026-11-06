@@ -16,7 +16,8 @@ export interface AiItem {
 }
 
 export type Slot = "breakfast" | "lunch" | "dinner" | "snack";
-export type StartMode = "camera" | "gallery" | "text" | "manual";
+export type StartMode = "camera" | "gallery" | "text" | "manual" | "demo";
+export const DEMO_MEAL = "2 scrambled eggs on sourdough toast with half an avocado, and a regular flat white";
 
 /** Daily guides for the nutrition panel. Sodium: Australian suggested dietary target 2,000 mg. */
 export interface DailyGuide {
@@ -105,6 +106,11 @@ export function AiFoodLogger({
   useEffect(() => {
     if (start === "camera") camera.current?.click();
     if (start === "gallery") gallery.current?.click();
+    if (start === "demo") {
+      setText(DEMO_MEAL);
+      analyze(null, DEMO_MEAL);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [start]);
 
   async function pick(f?: File | null) {
@@ -206,7 +212,7 @@ export function AiFoodLogger({
       <input ref={gallery} type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
 
       <div className="flex items-center justify-between">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">{source === "manual" && items ? "✍️ Manual entry" : "✨ AI food scan"}</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">{source === "manual" && items ? "✍️ Manual entry" : start === "demo" ? "✨ Demo scan" : "✨ AI food scan"}</div>
         {remaining != null && <span className="text-[10px] text-bone-mute">{remaining} scans left today</span>}
       </div>
 

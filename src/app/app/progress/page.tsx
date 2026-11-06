@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Bars, LineChart } from "@/components/Charts";
 import { Paywall } from "@/components/Paywall";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
@@ -11,6 +12,7 @@ export default async function ProgressPage() {
     return (
       <div className="space-y-6">
         <h1 className="h-display text-4xl">Progress</h1>
+        <Link href="/app/body" className="card flex items-center justify-between !p-4 transition hover:border-white/25"><span><span className="block font-medium">📸 Body check-in</span><span className="block text-xs text-bone-mute">Progress photos, waist, chest, arms and body fat</span></span><span className="text-bone-mute">→</span></Link>
         <Paywall need="starter" title="See your weight trend, streaks and adherence." />
       </div>
     );
@@ -44,6 +46,7 @@ export default async function ProgressPage() {
         <p className="eyebrow">Last 30 days</p>
         <h1 className="h-display mt-1 text-4xl md:text-5xl">Progress</h1>
       </div>
+      <Link href="/app/body" className="card flex items-center justify-between !p-4 transition hover:border-white/25"><span><span className="block font-medium">📸 Body check-in</span><span className="block text-xs text-bone-mute">Progress photos, waist, chest, arms and body fat</span></span><span className="text-bone-mute">→</span></Link>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[["Streak", `${streak} days`], ["Sessions", `${sessions}`], ["Weight change", change == null ? "—" : `${change > 0 ? "+" : ""}${change} kg`], ["Days logged", `${logs.length}/30`]].map(([k, v]) => (
           <div key={k} className="card !p-4">

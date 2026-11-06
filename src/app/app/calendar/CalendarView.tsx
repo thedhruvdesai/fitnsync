@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
 import type { DailyLog } from "@/lib/types";
@@ -29,6 +30,11 @@ const shift = (m: string, n: number) => {
 };
 
 export function CalendarView({ month, today, initial, logs, kcalTarget, proteinTarget }: { month: string; today: string; initial?: string; logs: Lite[]; kcalTarget: number; proteinTarget: number }) {
+  const router = useRouter();
+  const goBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1 && document.referrer.startsWith(window.location.origin)) router.back();
+    else router.push("/app");
+  };
   const map = useMemo(() => new Map(logs.map((l) => [l.log_date, l])), [logs]);
   const inMonth = (d?: string) => !!d && ym(d) === ym(month);
   const [pick, setPick] = useState(inMonth(initial) ? initial! : inMonth(today) ? today : month);
@@ -58,6 +64,9 @@ export function CalendarView({ month, today, initial, logs, kcalTarget, proteinT
 
   return (
     <div className="space-y-5">
+      <button onClick={goBack} className="-mb-2 flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-1.5 text-sm text-bone-dim transition hover:border-white/30 hover:text-bone">
+        ← Back
+      </button>
       <div className="flex items-end justify-between gap-3">
         <div>
           <p className="eyebrow">Calendar</p>

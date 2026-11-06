@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "./Logo";
 
 const ITEMS = [
@@ -23,6 +23,14 @@ function Icon({ d }: { d: string }) {
 
 export function AppNav({ tier, name }: { tier: string; name?: string | null }) {
   const path = usePathname();
+  const router = useRouter();
+  /** Tapping the tab you're already on takes you back to Today. */
+  const toggle = (href: string) => (e: React.MouseEvent) => {
+    if (href !== "/app" && path === href) {
+      e.preventDefault();
+      router.push("/app");
+    }
+  };
   const active = (href: string) => (href === "/app" ? path === "/app" : path.startsWith(href));
   return (
     <>
@@ -31,7 +39,7 @@ export function AppNav({ tier, name }: { tier: string; name?: string | null }) {
         <Logo href="/app" />
         <nav className="mt-10 flex flex-col gap-1">
           {ITEMS.map((i) => (
-            <Link key={i.href} href={i.href} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${active(i.href) ? "bg-blood/15 text-bone" : "text-bone-dim hover:bg-white/5 hover:text-bone"}`}>
+            <Link key={i.href} href={i.href} onClick={toggle(i.href)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${active(i.href) ? "bg-blood/15 text-bone" : "text-bone-dim hover:bg-white/5 hover:text-bone"}`}>
               <Icon d={i.icon} /> {i.label}
             </Link>
           ))}
@@ -51,7 +59,7 @@ export function AppNav({ tier, name }: { tier: string; name?: string | null }) {
       {/* mobile tab bar */}
       <nav className="no-print fixed inset-x-0 bottom-0 z-20 grid grid-cols-7 border-t border-white/5 bg-ink/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
         {ITEMS.map((i) => (
-          <Link key={i.href} href={i.href} className={`flex flex-col items-center gap-1 py-2.5 text-[9px] ${active(i.href) ? "text-blood" : "text-bone-mute"}`}>
+          <Link key={i.href} href={i.href} onClick={toggle(i.href)} className={`flex flex-col items-center gap-1 py-2.5 text-[9px] ${active(i.href) ? "text-blood" : "text-bone-mute"}`}>
             <Icon d={i.icon} /> {i.label}
           </Link>
         ))}

@@ -70,7 +70,12 @@ export function AdaptiveCard({ onApplied, always = false }: { onApplied?: (plan:
           <div className="rounded-xl bg-white/[0.04] p-3"><div className="text-xs text-bone-mute">Plan target</div><div className="font-semibold">{rate(adj.targetPerWeek)}</div></div>
         </div>
       )}
-      <p className="mt-3 text-sm text-bone-dim">{done ?? adj.message}</p>
+      <p className="mt-3 text-sm text-bone-dim">
+        {done ??
+          (adj.status === "adjust" && adj.actualPerWeek != null
+            ? `Your trend is ${rate(adj.actualPerWeek)} vs a target of ${rate(adj.targetPerWeek)}. ${adj.delta! < 0 ? "Lower" : "Raise"} calories by ${Math.abs(adj.delta!)} to get back on track.`
+            : adj.message)}
+      </p>
       {adj.status === "adjust" && !done && (
         <>
           <div className="mt-3 flex items-baseline gap-2">

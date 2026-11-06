@@ -14,7 +14,7 @@ export async function Paywall({ need, title, children }: { need: Exclude<Tier, "
       {children && <div className="mx-auto mt-3 max-w-md text-bone-dim">{children}</div>}
       <ul className="mx-auto mt-6 max-w-sm space-y-2 text-left text-sm text-bone-dim">
         {plan.features.map((f) => (
-          <li key={f} className="flex gap-2"><span className="text-blood">●</span>{f}</li>
+          <li key={f} className="flex gap-2"><span className="text-blood-400">●</span>{f}</li>
         ))}
       </ul>
       <Link href={`/app/billing?plan=${need}`} className="btn-red mt-8">{TRIAL_DAYS > 0 ? `Try ${plan.name} free for ${TRIAL_DAYS} days` : `Upgrade to ${plan.name}`}</Link>

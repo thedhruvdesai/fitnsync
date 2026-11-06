@@ -1,3 +1,4 @@
+import { dateInTz } from "./tz";
 import { generate } from "./llm";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { addDays, isoDate, summarizeWeek, weekStart, type WeekSummary } from "./report";
@@ -61,7 +62,7 @@ LAST WEEK: ${prev ? `score ${prev.score}, avg ${prev.avgKcal} kcal, ${prev.avgPr
 }
 
 export async function generateFeedback(admin: SupabaseClient, profile: Profile, kind: "weekly" | "on_demand", question?: string) {
-  const today = isoDate(new Date());
+  const today = dateInTz(profile.timezone);
   // weekly review covers the week just finished; on-demand covers the last 7 days
   const start = kind === "weekly" ? addDays(weekStart(today), -7) : addDays(today, -6);
   const { data } = await admin.from("daily_logs").select("*").eq("user_id", profile.id).gte("log_date", addDays(start, -7)).lte("log_date", addDays(start, 6)).order("log_date");

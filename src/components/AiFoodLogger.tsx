@@ -212,7 +212,7 @@ export function AiFoodLogger({
       <input ref={gallery} type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
 
       <div className="flex items-center justify-between">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">{source === "manual" && items ? "✍️ Manual entry" : start === "demo" ? "✨ Demo scan" : "✨ AI food scan"}</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood-400">{source === "manual" && items ? "✍️ Manual entry" : start === "demo" ? "✨ Demo scan" : "✨ AI food scan"}</div>
         {remaining != null && <span className="text-[10px] text-bone-mute">{remaining} scans left today</span>}
       </div>
 
@@ -281,7 +281,7 @@ export function AiFoodLogger({
               <div className="bg-sky-400" style={{ width: `${(total.fat * 9 * 100) / macroK}%` }} />
             </div>
             <div className="mt-2 flex justify-between text-xs">
-              <span><span className="text-blood">●</span> Protein {total.protein} g</span>
+              <span><span className="text-blood-400">●</span> Protein {total.protein} g</span>
               <span><span className="text-amber-400">●</span> Carbs {total.carbs} g</span>
               <span><span className="text-sky-400">●</span> Fat {total.fat} g</span>
             </div>

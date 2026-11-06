@@ -57,7 +57,8 @@ function Choice<T extends string | number>({ opts, value, onChange, cols = 1 }: 
   );
 }
 
-export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
+export default function IntakeForm({ initial, customTraining = null }: { initial: Partial<Intake>; customTraining?: { days: number; equipment: string } | null }) {
+  const [keepTraining, setKeepTraining] = useState(true);
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -103,7 +104,7 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
   async function submit() {
     setBusy(true);
     setError(null);
-    const res = await fetch("/api/onboarding", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(f) });
+    const res = await fetch("/api/onboarding", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...f, keepTraining, timezone: (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { return undefined; } })() }) });
     const j = await res.json();
     setBusy(false);
     if (!res.ok) return setError(j.error || "Something went wrong");
@@ -116,7 +117,7 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
       <main className="relative z-10 mx-auto max-w-lg px-6 py-10">
         <Logo />
         <p className="eyebrow mt-14">Your plan is ready</p>
-        <h1 className="h-display mt-2 text-5xl leading-[0.95]">{t.kcal.toLocaleString()} kcal<br /><span className="text-blood">{t.protein_g} g</span> protein.</h1>
+        <h1 className="h-display mt-2 text-5xl leading-[0.95]">{t.kcal.toLocaleString()} kcal<br /><span className="text-blood-400">{t.protein_g} g</span> protein.</h1>
         <p className="mt-4 text-bone-dim">
           Your maintenance is about {t.tdee.toLocaleString()} kcal.{" "}
           {t.weekly_change_kg < 0 ? `Expect about ${Math.abs(t.weekly_change_kg)} kg loss a week.` : t.weekly_change_kg > 0 ? `Expect about ${t.weekly_change_kg} kg gain a week.` : "Built for steady recomposition."}
@@ -154,7 +155,7 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
           <>
             <div>
               <label className="label">First name</label>
-              <input className="input" value={f.full_name ?? ""} onChange={(e) => set("full_name", e.target.value)} />
+              <input className="input" aria-label="First name" value={f.full_name ?? ""} onChange={(e) => set("full_name", e.target.value)} />
             </div>
             <div>
               <label className="label">Sex (for energy maths)</label>
@@ -162,7 +163,7 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
             </div>
             <div>
               <label className="label">Birth year</label>
-              <input className="input" inputMode="numeric" value={f.birth_year ?? ""} onChange={(e) => set("birth_year", Number(e.target.value) || (undefined as never))} placeholder="1998" />
+              <input className="input" aria-label="Birth year" inputMode="numeric" value={f.birth_year ?? ""} onChange={(e) => set("birth_year", Number(e.target.value) || (undefined as never))} placeholder="1998" />
             </div>
             <div>
               <div className="mb-1.5 flex items-center justify-between">
@@ -170,15 +171,15 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
                 <UnitToggle label="Height unit" value={hUnit} onChange={setHUnit} options={[{ v: "cm", label: "cm" }, { v: "ft", label: "ft / in" }]} />
               </div>
               {hUnit === "cm" ? (
-                <input className="input" inputMode="decimal" value={f.height_cm ? round(f.height_cm) : ""} onChange={(e) => set("height_cm", Number(e.target.value) || (undefined as never))} placeholder="175" />
+                <input className="input" aria-label="Height in centimetres" inputMode="decimal" value={f.height_cm ? round(f.height_cm) : ""} onChange={(e) => set("height_cm", Number(e.target.value) || (undefined as never))} placeholder="175" />
               ) : (
                 <div className="grid grid-cols-2 gap-2">
                   <label className="input flex items-center gap-2">
-                    <input className="w-full bg-transparent outline-none" inputMode="numeric" value={ftIn.ft} placeholder="5" onChange={(e) => setHeightFt(e.target.value, ftIn.inch)} />
+                    <input className="w-full bg-transparent outline-none" inputMode="numeric" value={ftIn.ft} placeholder="5" aria-label="Height feet" onChange={(e) => setHeightFt(e.target.value, ftIn.inch)} />
                     <span className="text-sm text-bone-mute">ft</span>
                   </label>
                   <label className="input flex items-center gap-2">
-                    <input className="w-full bg-transparent outline-none" inputMode="numeric" value={ftIn.inch} placeholder="9" onChange={(e) => setHeightFt(ftIn.ft, e.target.value)} />
+                    <input className="w-full bg-transparent outline-none" inputMode="numeric" value={ftIn.inch} placeholder="9" aria-label="Height inches" onChange={(e) => setHeightFt(ftIn.ft, e.target.value)} />
                     <span className="text-sm text-bone-mute">in</span>
                   </label>
                 </div>
@@ -190,7 +191,7 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
                 <UnitToggle label="Weight unit" value={units.w} onChange={(w) => setUnits({ w })} options={[{ v: "kg", label: "kg" }, { v: "lb", label: "lb" }]} />
               </div>
               <label className="input flex items-center gap-2">
-                <ConvertedInput value={f.weight_kg} unitKey={units.w} show={(v) => kgTo(v, units.w)} store={(v) => toKg(v, units.w)} onChange={(v) => set("weight_kg", v as never)} placeholder={units.w === "kg" ? "72" : "160"} />
+                <ConvertedInput value={f.weight_kg} unitKey={units.w} show={(v) => kgTo(v, units.w)} store={(v) => toKg(v, units.w)} onChange={(v) => set("weight_kg", v as never)} placeholder={units.w === "kg" ? "72" : "160"} ariaLabel={`Weight in ${units.w}`} />
                 <span className="text-sm text-bone-mute">{units.w}</span>
               </label>
             </div>
@@ -205,7 +206,7 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
                 <UnitToggle label="Weight unit" value={units.w} onChange={(w) => setUnits({ w })} options={[{ v: "kg", label: "kg" }, { v: "lb", label: "lb" }]} />
               </div>
               <label className="input flex items-center gap-2">
-                <ConvertedInput value={f.goal_weight_kg} unitKey={units.w} show={(v) => kgTo(v, units.w)} store={(v) => toKg(v, units.w)} onChange={(v) => set("goal_weight_kg", v as never)} placeholder={String(kgTo(f.weight_kg ?? 70, units.w))} />
+                <ConvertedInput value={f.goal_weight_kg} unitKey={units.w} show={(v) => kgTo(v, units.w)} store={(v) => toKg(v, units.w)} onChange={(v) => set("goal_weight_kg", v as never)} placeholder={String(kgTo(f.weight_kg ?? 70, units.w))} ariaLabel={`Goal weight in ${units.w}`} />
                 <span className="text-sm text-bone-mute">{units.w}</span>
               </label>
             </div>
@@ -251,14 +252,29 @@ export default function IntakeForm({ initial }: { initial: Partial<Intake> }) {
             </div>
             <div>
               <label className="label">Foods you won&apos;t eat (comma separated)</label>
-              <input className="input" value={f.dislikes ?? ""} onChange={(e) => set("dislikes", e.target.value)} placeholder="mushroom, tofu" />
+              <input className="input" aria-label="Foods you dislike" value={f.dislikes ?? ""} onChange={(e) => set("dislikes", e.target.value)} placeholder="mushroom, tofu" />
             </div>
           </>
         )}
         {step === 4 && (
           <div>
             <label className="label">Injuries, schedule or anything else (optional)</label>
-            <textarea className="input min-h-[140px]" value={f.constraints ?? ""} onChange={(e) => set("constraints", e.target.value)} placeholder="e.g. night shifts 3×/week, sore left knee, only 45 min to train" />
+            <textarea className="input min-h-[140px]" aria-label="Injuries, schedule or anything else" value={f.constraints ?? ""} onChange={(e) => set("constraints", e.target.value)} placeholder="e.g. night shifts 3×/week, sore left knee, only 45 min to train" />
+            {customTraining && (
+              customTraining.days === f.training_days && customTraining.equipment === f.equipment ? (
+                <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                  <input type="checkbox" className="mt-1 h-4 w-4 accent-[#E11D2E]" checked={keepTraining} onChange={(e) => setKeepTraining(e.target.checked)} />
+                  <span>
+                    <span className="block text-sm font-medium">Keep my edited workouts</span>
+                    <span className="block text-xs text-bone-mute">You&apos;ve customised your training. Leave this on to keep your exercises; your calories and meals will still update. Untick for a fresh program.</span>
+                  </span>
+                </label>
+              ) : (
+                <p className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-xs text-amber-100">
+                  Heads up: you&apos;ve customised your workouts, but you changed your training days or equipment, so we&apos;ll build a new program to match. You can edit it again on the Plan page.
+                </p>
+              )
+            )}
             <p className="mt-3 text-xs text-bone-mute">Fit&amp;Sync gives general fitness and nutrition guidance. It isn&apos;t medical advice. If you have a medical condition, are pregnant, or have a history of disordered eating, please check with your GP first.</p>
           </div>
         )}

@@ -131,7 +131,7 @@ export function BarcodeScanner({ onAdd, onFallback, dayLabel = "today" }: { onAd
 
   return (
     <div className="space-y-4 p-4">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">▥ Barcode scan</div>
+      <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood-400">▥ Barcode scan</div>
 
       {phase === "scan" && (
         <>

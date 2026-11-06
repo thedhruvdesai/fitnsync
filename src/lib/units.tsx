@@ -71,6 +71,7 @@ export function ConvertedInput({
   onChange,
   placeholder,
   className = "w-full bg-transparent outline-none",
+  ariaLabel,
 }: {
   value: number | null | undefined;
   show: (metric: number) => number;
@@ -79,6 +80,7 @@ export function ConvertedInput({
   onChange: (metric: number | undefined) => void;
   placeholder?: string;
   className?: string;
+  ariaLabel?: string;
 }) {
   const [text, setText] = useState(value != null && value !== 0 ? String(show(value)) : "");
   useEffect(() => {
@@ -89,6 +91,7 @@ export function ConvertedInput({
   return (
     <input
       className={className}
+      aria-label={ariaLabel}
       inputMode="decimal"
       value={text}
       placeholder={placeholder}

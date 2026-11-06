@@ -62,9 +62,8 @@ async function compress(file: File, max = 1280): Promise<Blob> {
 
 const emptyForm = (date: string): Checkin => ({ checkin_date: date, weight_kg: null, body_fat: null, waist_cm: null, chest_cm: null, hips_cm: null, arm_cm: null, thigh_cm: null, photos: {}, notes: null });
 
-export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId: string; initial: Checkin[]; setupNeeded: boolean; goalWeight: number | null }) {
+export function BodyView({ userId, initial, setupNeeded, goalWeight, today }: { userId: string; initial: Checkin[]; setupNeeded: boolean; goalWeight: number | null; today: string }) {
   const supabase = useMemo(() => createClient(), []);
-  const today = isoDate(new Date());
   const [list, setList] = useState<Checkin[]>(initial);
   const [form, setForm] = useState<Checkin>(() => initial.find((c) => c.checkin_date === today) ?? emptyForm(today));
   const [files, setFiles] = useState<Partial<Record<Pose, { blob: Blob; preview: string }>>>({});
@@ -149,6 +148,34 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId:
     }
     setSaving(false);
   }
+
+  const [zipping, setZipping] = useState<string | null>(null);
+  async function downloadPhotos() {
+    const all = list.flatMap((c) => POSES.filter((p) => c.photos?.[p]).map((p) => ({ date: c.checkin_date, pose: p, path: c.photos[p]! })));
+    if (!all.length) return;
+    setZipping("Preparing…");
+    try {
+      const { default: JSZip } = await import("jszip");
+      const zip = new JSZip();
+      let n = 0;
+      for (const f of all) {
+        const { data, error } = await supabase.storage.from(BUCKET).download(f.path);
+        if (error || !data) continue;
+        zip.file(`${f.date}-${f.pose}.jpg`, data);
+        setZipping(`Adding ${++n} of ${all.length}…`);
+      }
+      const blob = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `fitsync-progress-photos-${today}.zip`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+      setZipping(null);
+    } catch (e) {
+      setZipping(`Download failed: ${(e as Error).message}`);
+    }
+  }
+  const photoCount = list.reduce((a, c) => a + POSES.filter((p) => c.photos?.[p]).length, 0);
 
   async function remove(c: Checkin) {
     if (!confirm(`Delete the check-in from ${long(c.checkin_date)}? Photos will be deleted too.`)) return;
@@ -291,7 +318,14 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId:
 
       {list.length > 0 && (
         <section>
-          <h2 className="h-display text-xl">History</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="h-display text-xl">History</h2>
+            {photoCount > 0 && (
+              <button className="btn-ghost !py-2 text-sm" disabled={!!zipping && !zipping.startsWith("Download failed")} onClick={downloadPhotos}>
+                {zipping ?? `⬇ Download all photos (${photoCount})`}
+              </button>
+            )}
+          </div>
           <ul className="mt-3 space-y-2">
             {list.map((c) => (
               <li key={c.checkin_date} className="card flex items-center gap-3 !p-3">
@@ -307,7 +341,7 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight }: { userId:
                     {MEASURES.filter((m) => c[m.k] != null).map((m) => `${m.label} ${fmt(m.kind, Number(c[m.k]), units)}`).join(" · ") || "Photos only"}
                   </div>
                 </button>
-                <button onClick={() => remove(c)} className="grid h-8 w-8 place-items-center text-bone-mute hover:text-blood" aria-label="Delete check-in">✕</button>
+                <button onClick={() => remove(c)} className="grid h-8 w-8 place-items-center text-bone-mute hover:text-blood-400" aria-label="Delete check-in">✕</button>
               </li>
             ))}
           </ul>

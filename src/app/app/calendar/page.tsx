@@ -1,3 +1,4 @@
+import { userToday } from "@/lib/tz.server";
 import { requireProfile } from "@/lib/session";
 import { addDays, isoDate } from "@/lib/report";
 import type { DailyLog } from "@/lib/types";
@@ -8,7 +9,7 @@ export const metadata = { title: "Calendar · Fit&Sync" };
 export default async function CalendarPage(props: { searchParams: Promise<{ m?: string; d?: string }> }) {
   const searchParams = await props.searchParams;
   const { profile, supabase } = await requireProfile();
-  const today = isoDate(new Date());
+  const today = await userToday(profile.timezone);
   const m = /^\d{4}-\d{2}$/.test(searchParams.m ?? "") ? `${searchParams.m}-01` : today.slice(0, 8) + "01";
   const next = new Date(m + "T00:00:00");
   next.setMonth(next.getMonth() + 1, 1);

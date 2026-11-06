@@ -27,8 +27,8 @@ export function LineChart({ points, height = 180, unit = "", target }: { points:
       <path d={area} fill="url(#lg)" />
       <path d={d} fill="none" stroke="#E11D2E" strokeWidth={2.5} strokeLinejoin="round" />
       {coords.map(([a, b], i) => <circle key={i} cx={a} cy={b} r={3} fill="#0A0A0B" stroke="#E11D2E" strokeWidth={2} />)}
-      <text x={20} y={height - 6} fontSize="11" fill="#6B6862">{points[0].label}</text>
-      <text x={W - 20} y={height - 6} fontSize="11" fill="#6B6862" textAnchor="end">{points[points.length - 1].label}</text>
+      <text x={20} y={height - 6} fontSize="11" fill="#948F88">{points[0].label}</text>
+      <text x={W - 20} y={height - 6} fontSize="11" fill="#948F88" textAnchor="end">{points[points.length - 1].label}</text>
       <text x={coords[coords.length - 1][0]} y={coords[coords.length - 1][1] - 10} fontSize="12" fill="#F4F1EC" textAnchor="end">{vals[vals.length - 1]}{unit}</text>
     </svg>
   );
@@ -46,7 +46,7 @@ export function Bars({ data, target, height = 150, unit = "" }: { data: { label:
         return (
           <g key={i}>
             <rect x={20 + i * bw + bw * 0.18} y={y(d.value)} width={bw * 0.64} height={Math.max(0, height - 22 - y(d.value))} rx={3} fill={d.value === 0 ? "#26262A" : hit ? "#E11D2E" : "#7A1520"} />
-            {data.length <= 14 && <text x={20 + i * bw + bw / 2} y={height - 6} fontSize="10" fill="#6B6862" textAnchor="middle">{d.label}</text>}
+            {data.length <= 14 && <text x={20 + i * bw + bw / 2} y={height - 6} fontSize="10" fill="#948F88" textAnchor="middle">{d.label}</text>}
           </g>
         );
       })}

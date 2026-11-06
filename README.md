@@ -152,3 +152,11 @@ Run `supabase/quick-log-body.sql` once in Supabase → SQL Editor. It creates `f
 
 - Barcode lookups use [Open Food Facts](https://openfoodfacts.org) (free, ODbL; attribute in the UI) via `/api/food/barcode`. Camera scanning uses the browser BarcodeDetector where available, otherwise ZXing.
 - Recent foods come from the last 30 days of `daily_logs`; "Copy yesterday" duplicates yesterday's meals.
+
+## Time zones
+
+Every user's "today" is their local date. The app stores the device time zone in a cookie (`fs_tz`) and on the profile (`profiles.timezone`, run `supabase/timezone.sql`). Weekly emails go out at 7am on each user's own Monday: the GitHub Action calls `/api/cron/weekly` hourly through Sunday–Monday UTC.
+
+## Stack notes
+
+Next.js 16 (App Router, Turbopack) + React 19, Node 22 on Netlify. `src/proxy.ts` replaces middleware. Fonts are self-hosted from `src/fonts` (SIL OFL).

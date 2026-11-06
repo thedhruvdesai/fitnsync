@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generatePlan } from "@/lib/plan";
-import type { Intake } from "@/lib/types";
+import { dateInTz, isValidTz } from "@/lib/tz";
+import { userTimeZone } from "@/lib/tz.server";
+import type { Intake, Plan } from "@/lib/types";
 
 const num = (v: unknown, min: number, max: number) => {
   const n = Number(v);
@@ -37,11 +39,23 @@ export async function POST(req: Request) {
   if (missing.length) return NextResponse.json({ error: `Check: ${missing.map(([k]) => k.replace("_", " ")).join(", ")}` }, { status: 400 });
 
   const plan = generatePlan(intake);
+
+  // Rebuilding: keep the user's edited workouts when the schedule still fits, and keep the calorie-change history.
+  const { data: prev } = await supabase.from("profiles").select("plan, training_days, equipment").eq("id", user.id).single();
+  const old = prev?.plan as Plan | null;
+  if (old) {
+    if (b.keepTraining !== false && old.training?.custom && prev!.training_days === intake.training_days && prev!.equipment === intake.equipment) {
+      plan.training = { ...plan.training, sessions: old.training.sessions, custom: true };
+    }
+    if (old.adjustments?.length) plan.adjustments = old.adjustments;
+  }
   const { error } = await supabase.from("profiles").update({ ...intake, plan, onboarded: true }).eq("id", user.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // starting weight goes into today's log
-  const today = new Date().toISOString().slice(0, 10);
+  const tz = isValidTz(b.timezone) ? b.timezone : await userTimeZone();
+  if (tz) await supabase.from("profiles").update({ timezone: tz }).eq("id", user.id);
+  const today = dateInTz(tz);
   await supabase.from("daily_logs").upsert({ user_id: user.id, log_date: today, weight_kg: intake.weight_kg }, { onConflict: "user_id,log_date", ignoreDuplicates: true });
 
   return NextResponse.json({ ok: true, plan });

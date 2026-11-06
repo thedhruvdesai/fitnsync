@@ -47,13 +47,13 @@ export default async function PlanPage() {
           </div>
         )}
         <ul className="mt-4 space-y-2 text-sm text-bone-dim">
-          {plan.notes.map((n) => <li key={n} className="flex gap-2"><span className="text-blood">●</span>{n}</li>)}
+          {plan.notes.map((n) => <li key={n} className="flex gap-2"><span className="text-blood-400">●</span>{n}</li>)}
         </ul>
       </section>
 
       <section>
         <h2 className="h-display text-2xl">Meal plan</h2>
-        <div className="-mx-5 mt-4 flex snap-x gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 xl:grid-cols-3">
+        <div tabIndex={0} role="region" aria-label="Meal plan by day, scroll sideways" className="-mx-5 mt-4 flex snap-x gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 xl:grid-cols-3">
           {plan.meals.map((d) => (
             <div key={d.day} className="card min-w-[82%] snap-start md:min-w-0">
               <div className="flex items-baseline justify-between">
@@ -63,7 +63,7 @@ export default async function PlanPage() {
               <ul className="mt-3 space-y-3">
                 {d.meals.map((m, k) => (
                   <li key={k}>
-                    <div className="text-[11px] uppercase tracking-widest text-blood">{m.slot}</div>
+                    <div className="text-[11px] uppercase tracking-widest text-blood-400">{m.slot}</div>
                     <div className="font-medium">{m.name}</div>
                     <div className="text-xs text-bone-mute">{m.items.join(" · ")}</div>
                   </li>

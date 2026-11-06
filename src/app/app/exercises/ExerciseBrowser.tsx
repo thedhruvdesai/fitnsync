@@ -64,7 +64,7 @@ export function ExerciseBrowser({ initialGroup, initialQuery }: { initialGroup?:
                 <span className="block truncate font-medium">{e.name}</span>
                 <span className="block text-xs text-bone-mute">{e.primary.join(", ")} · {e.equipment}{e.where === "both" ? " · Home OK" : ""}</span>
               </span>
-              <span className="text-bone-mute transition group-hover:translate-x-1 group-hover:text-blood">›</span>
+              <span className="text-bone-mute transition group-hover:translate-x-1 group-hover:text-blood-400">›</span>
             </Link>
           </li>
         ))}

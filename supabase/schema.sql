@@ -146,3 +146,6 @@ drop policy if exists "food scans self read" on public.food_scans;
 create policy "food scans self read" on public.food_scans for select using (auth.uid() = user_id);
 
 -- Favourites + body tracking: see supabase/quick-log-body.sql (also run that file).
+
+-- Time zone per user: see supabase/timezone.sql
+alter table public.profiles add column if not exists timezone text;

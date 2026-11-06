@@ -10,11 +10,12 @@ export default async function OnboardingPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-  const { plan: _p, tier: _t, ...initial } = profile ?? {};
+  const { plan, tier: _t, ...initial } = profile ?? {};
+  const custom = plan?.training?.custom ? { days: profile!.training_days as number, equipment: profile!.equipment as string } : null;
   return (
     <>
       <Backdrop intensity={0.6} />
-      <IntakeForm initial={initial} />
+      <IntakeForm initial={initial} customTraining={custom} />
     </>
   );
 }

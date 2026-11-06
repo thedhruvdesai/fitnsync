@@ -12,7 +12,7 @@ export function Markdown({ text }: { text: string }) {
     if (!list) return;
     const Tag = list.ordered ? "ol" : "ul";
     out.push(
-      <Tag key={out.length} className={`my-2 space-y-1.5 pl-5 ${list.ordered ? "list-decimal" : "list-disc"} marker:text-blood`}>
+      <Tag key={out.length} className={`my-2 space-y-1.5 pl-5 ${list.ordered ? "list-decimal" : "list-disc"} marker:text-blood-400`}>
         {list.items.map((it, i) => <li key={i}>{inline(it)}</li>)}
       </Tag>
     );

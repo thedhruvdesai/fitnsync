@@ -245,3 +245,24 @@ export function generatePlan(i: Intake): Plan {
     notes,
   };
 }
+
+/** Intake fields straight from a profile row (used when rebalancing an existing plan). */
+export function intakeFromProfile(p: Partial<Record<keyof Intake, unknown>>): Intake {
+  return {
+    full_name: String(p.full_name ?? ""),
+    sex: (p.sex as Intake["sex"]) ?? "male",
+    birth_year: Number(p.birth_year) || 1995,
+    height_cm: Number(p.height_cm) || 170,
+    weight_kg: Number(p.weight_kg) || 70,
+    goal_weight_kg: Number(p.goal_weight_kg) || Number(p.weight_kg) || 70,
+    goal: (p.goal as Intake["goal"]) ?? "general_health",
+    activity: (p.activity as Intake["activity"]) ?? "moderate",
+    experience: (p.experience as Intake["experience"]) ?? "beginner",
+    diet: (p.diet as Intake["diet"]) ?? "non_veg",
+    equipment: (p.equipment as Intake["equipment"]) ?? "gym",
+    training_days: Number(p.training_days) || 3,
+    meals_per_day: Number(p.meals_per_day) || 3,
+    dislikes: String(p.dislikes ?? ""),
+    constraints: String(p.constraints ?? ""),
+  };
+}

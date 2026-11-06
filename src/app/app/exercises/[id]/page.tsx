@@ -1,3 +1,4 @@
+import { userToday } from "@/lib/tz.server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExerciseDemo } from "@/components/ExerciseDemo";
@@ -26,7 +27,7 @@ export default async function ExercisePage(props: { params: Promise<{ id: string
 
   let history: SessionStat[] = [];
   if (paid) {
-    const today = isoDate(new Date());
+    const today = await userToday(profile.timezone);
     const { data } = await supabase.from("daily_logs").select("log_date, workouts").gte("log_date", addDays(today, -365)).order("log_date");
     for (const l of (data ?? []) as Pick<DailyLog, "log_date" | "workouts">[]) {
       const sets: SetEntry[] = [];

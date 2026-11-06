@@ -137,7 +137,7 @@ export function CalendarView({ month, today, initial, logs, kcalTarget, proteinT
         <section className="card h-fit lg:sticky lg:top-6">
           <div className="flex items-baseline justify-between">
             <h2 className="h-display text-2xl">{new Date(pick + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "short" })}</h2>
-            {pick === today && <span className="text-xs text-blood">Today</span>}
+            {pick === today && <span className="text-xs text-blood-400">Today</span>}
           </div>
           {!logged(day) && !day?.water_ml && day?.weight_kg == null ? (
             <p className="mt-3 text-sm text-bone-mute">{pick > today ? "This day hasn't happened yet." : "Nothing logged on this day."}</p>

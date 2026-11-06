@@ -40,10 +40,10 @@ export function PricingCards({ current, mode, highlight, trialEligible = true, r
                 <span className="h-display text-5xl">{formatMoney(region.prices[p.id], region)}</span>
                 <span className="text-bone-mute">{region.currency.toUpperCase()} / month</span>
               </div>
-              {TRIAL_DAYS > 0 && trialEligible && <div className="mt-2 text-xs font-semibold uppercase tracking-widest text-blood">{TRIAL_DAYS}-day free trial</div>}
+              {TRIAL_DAYS > 0 && trialEligible && <div className="mt-2 text-xs font-semibold uppercase tracking-widest text-blood-400">{TRIAL_DAYS}-day free trial</div>}
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {p.features.map((f) => (
-                  <li key={f} className="flex gap-2.5"><span className="mt-0.5 text-blood">✓</span><span className="text-bone-dim">{f}</span></li>
+                  <li key={f} className="flex gap-2.5"><span className="mt-0.5 text-blood-400">✓</span><span className="text-bone-dim">{f}</span></li>
                 ))}
               </ul>
               {mode === "public" ? (

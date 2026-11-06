@@ -1,3 +1,4 @@
+import { userToday } from "@/lib/tz.server";
 import Link from "next/link";
 import { Bars } from "@/components/Charts";
 import { W, WeightChart } from "@/components/Units";
@@ -19,7 +20,7 @@ export default async function ProgressPage() {
     );
 
   const t = profile.plan!.targets;
-  const today = isoDate(new Date());
+  const today = await userToday(profile.timezone);
   const from = addDays(today, -29);
   const { data } = await supabase.from("daily_logs").select("*").gte("log_date", from).lte("log_date", today).order("log_date");
   const logs = (data ?? []) as DailyLog[];

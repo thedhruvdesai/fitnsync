@@ -1,18 +1,20 @@
-# Sends Fit&Sync weekly emails every Monday 7:00am Brisbane time (Sunday 21:00 UTC).
+# Sends Fit&Sync weekly emails on each user's own Monday from 7:00am local time.
+# Runs hourly through Sunday and Monday UTC so every time zone (UTC−12 to UTC+14) is covered;
+# the app only emails users whose local Monday 7am has arrived, once each.
 # Add repo secrets: SITE_URL (e.g. https://fitsync.com.au) and CRON_SECRET (same as your app env).
 name: Weekly email
 on:
   schedule:
-    - cron: "0 21 * * 0"
+    - cron: "5 * * * 0,1"
   workflow_dispatch: {}
 jobs:
   send:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 20
     steps:
       - name: Process all users in batches
         run: |
-          for i in $(seq 1 200); do
+          for i in $(seq 1 60); do
             res=$(curl -sf -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ secrets.SITE_URL }}/api/cron/weekly")
             echo "$res"
             echo "$res" | grep -q '"done":true' && exit 0

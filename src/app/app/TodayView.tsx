@@ -23,20 +23,62 @@ const AiFoodLogger = dynamic(() => import("@/components/AiFoodLogger").then((m) 
 const BarcodeScanner = dynamic(() => import("@/components/BarcodeScanner").then((m) => m.BarcodeScanner), { ssr: false, loading: SheetLoading });
 const ExerciseSheet = dynamic(() => import("@/components/ExerciseSheet").then((m) => m.ExerciseSheet), { ssr: false });
 
+const backupKey = (user: string, d: string) => `fs_log_${user}_${d}`;
+function writeBackup(user: string, l: DailyLog) {
+  try {
+    localStorage.setItem(backupKey(user, l.log_date), JSON.stringify({ at: Date.now(), log: l }));
+  } catch {
+    /* storage full or private mode */
+  }
+}
+function readBackup(user: string, d: string): { at: number; log: DailyLog } | null {
+  try {
+    const v = JSON.parse(localStorage.getItem(backupKey(user, d)) ?? "null");
+    return v?.log ? v : null;
+  } catch {
+    return null;
+  }
+}
+function clearBackup(user: string, d: string) {
+  try {
+    localStorage.removeItem(backupKey(user, d));
+  } catch {
+    /* ignore */
+  }
+}
+
 const uid = () => Math.random().toString(36).slice(2, 10);
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const empty = (d: string): DailyLog => ({ log_date: d, meals: [], workouts: [], water_ml: 0, weight_kg: null, sleep_hours: null, energy: null, notes: null });
 
-export default function TodayView({ plan: initialPlan, name, userId, locked, initialDate }: { plan: Plan; name: string; userId: string; locked: boolean; initialDate?: string }) {
+export default function TodayView({ plan: initialPlan, name, userId, locked, initialDate, today: serverToday }: { plan: Plan; name: string; userId: string; locked: boolean; initialDate?: string; today: string }) {
   const [plan, setPlan] = useState(initialPlan);
   const [units] = useUnits();
   const [swapAt, setSwapAt] = useState<number | null>(null);
   const [history, setHistory] = useState<Map<string, LastSession>>(new Map());
   const supabase = useMemo(() => createClient(), []);
-  const [date, setDate] = useState(initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate) && initialDate <= isoDate(new Date()) ? initialDate : isoDate(new Date()));
+  // "today" comes from the server in the user's time zone, then follows this device's clock (e.g. past midnight)
+  const [today, setToday] = useState(serverToday);
+  const [date, setDate] = useState(initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate) && initialDate <= serverToday ? initialDate : serverToday);
+  useEffect(() => {
+    const sync = () => {
+      const local = isoDate(new Date());
+      setToday((prev) => {
+        if (prev !== local) setDate((d) => (d === prev ? local : d));
+        return local;
+      });
+    };
+    sync();
+    const id = setInterval(sync, 60_000);
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, []);
   const [log, setLog] = useState<DailyLog>(empty(date));
   const [loading, setLoading] = useState(true);
-  const [saved, setSaved] = useState<"idle" | "saving" | "saved">("idle");
+  const [saved, setSaved] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [adding, setAdding] = useState(false);
   const [other, setOther] = useState("");
   const [sheet, setSheet] = useState<number | null>(null);
@@ -94,7 +136,18 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
       .maybeSingle()
       .then(({ data }) => {
         if (!live) return;
-        setLog(data ? { ...empty(date), ...data } : empty(date));
+        const server: DailyLog = data ? { ...empty(date), ...data } : empty(date);
+        // an unsaved change from last time (app closed offline / mid-save) wins if it's newer
+        const backup = readBackup(userId, date);
+        const serverAt = data?.updated_at ? Date.parse(data.updated_at) : 0;
+        if (backup && backup.at > serverAt) {
+          setLog(backup.log);
+          pending.current = backup.log;
+          save();
+        } else {
+          if (backup) clearBackup(userId, date);
+          setLog(server);
+        }
         setLoading(false);
       });
     return () => {
@@ -102,20 +155,83 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
     };
   }, [date, supabase]);
 
+  // ---- saving: quick debounce, local backup until confirmed, retry on failure, flush when leaving ----
+  const pending = useRef<DailyLog | null>(null);
+  const token = useRef<string | null>(null);
+  const retry = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => (token.current = data.session?.access_token ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, sess) => (token.current = sess?.access_token ?? null));
+    return () => sub.subscription.unsubscribe();
+  }, [supabase]);
+
+  const rowOf = useCallback(
+    (l: DailyLog) => ({ user_id: userId, log_date: l.log_date, meals: l.meals, workouts: l.workouts, water_ml: l.water_ml, weight_kg: l.weight_kg, sleep_hours: l.sleep_hours, energy: l.energy, notes: l.notes, updated_at: new Date().toISOString() }),
+    [userId]
+  );
+
+  const save = useCallback(async () => {
+    const l = pending.current;
+    if (!l) return;
+    clearTimeout(timer.current);
+    clearTimeout(retry.current);
+    const { error } = await supabase.from("daily_logs").upsert(rowOf(l), { onConflict: "user_id,log_date" });
+    if (error) {
+      setSaved("error");
+      retry.current = setTimeout(() => save(), 5000);
+      return;
+    }
+    if (pending.current === l) {
+      pending.current = null;
+      clearBackup(userId, l.log_date);
+    }
+    setSaved("saved");
+  }, [supabase, rowOf, userId]);
+
+  /** Last-chance save when the app is closed or hidden: a keepalive request survives the page going away. */
+  const flushOnLeave = useCallback(() => {
+    const l = pending.current;
+    if (!l || !token.current) return;
+    try {
+      fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/daily_logs?on_conflict=user_id,log_date`, {
+        method: "POST",
+        keepalive: true,
+        headers: {
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          Authorization: `Bearer ${token.current}`,
+          "Content-Type": "application/json",
+          Prefer: "resolution=merge-duplicates,return=minimal",
+        },
+        body: JSON.stringify(rowOf(l)),
+      });
+    } catch {
+      /* the local backup will be re-sent next time */
+    }
+  }, [rowOf]);
+
+  useEffect(() => {
+    const onHide = () => document.visibilityState === "hidden" && flushOnLeave();
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", flushOnLeave);
+    window.addEventListener("online", save);
+    return () => {
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", flushOnLeave);
+      window.removeEventListener("online", save);
+      save(); // leaving Today (e.g. another tab): save straight away
+    };
+  }, [flushOnLeave, save]);
+
   const persist = useCallback(
     (next: DailyLog) => {
       setLog(next);
+      pending.current = next;
+      writeBackup(userId, next);
       setSaved("saving");
       clearTimeout(timer.current);
-      timer.current = setTimeout(async () => {
-        await supabase.from("daily_logs").upsert(
-          { user_id: userId, log_date: next.log_date, meals: next.meals, workouts: next.workouts, water_ml: next.water_ml, weight_kg: next.weight_kg, sleep_hours: next.sleep_hours, energy: next.energy, notes: next.notes, updated_at: new Date().toISOString() },
-          { onConflict: "user_id,log_date" }
-        );
-        setSaved("saved");
-      }, 500);
+      timer.current = setTimeout(save, 300);
     },
-    [supabase, userId]
+    [save, userId]
   );
 
   const fav = useFavorites(supabase);
@@ -157,7 +273,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
     persist({ ...log, workouts });
   };
 
-  const isToday = date === isoDate(new Date());
+  const isToday = date === today;
   const hour = new Date().getHours();
   const greet = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
 
@@ -165,14 +281,14 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">{isToday ? `${greet}, ${name || "there"}` : "Logging a past day"}</p>
+          <p className="eyebrow">{isToday ? `${greet}, ${name.trim().split(/\s+/)[0] || "there"}` : "Logging a past day"}</p>
           <Link href={`/app/calendar?m=${date.slice(0, 7)}&d=${date}`} className="group block text-left" aria-label="Open calendar">
             <h1 className="h-display mt-1 text-3xl sm:text-4xl md:text-5xl">
               {new Date(date + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "short" })}
-              <span className="ml-2 align-middle text-base text-bone-mute transition group-hover:text-blood">▾</span>
+              <span className="ml-2 align-middle text-base text-bone-mute transition group-hover:text-blood-400">▾</span>
             </h1>
           </Link>
-          {!isToday && <button className="mt-1 text-xs text-blood underline underline-offset-4" onClick={() => setDate(isoDate(new Date()))}>Back to today</button>}
+          {!isToday && <button className="mt-1 text-xs text-blood-400 underline underline-offset-4" onClick={() => setDate(today)}>Back to today</button>}
         </div>
         <div className="flex items-center gap-2">
           <Link href={`/app/calendar?m=${date.slice(0, 7)}&d=${date}`} className="chip" aria-label="Calendar">📅</Link>
@@ -180,7 +296,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
           <button className="chip" disabled={isToday} onClick={() => setDate(addDays(date, 1))} aria-label="Next day">→</button>
         </div>
       </div>
-      <p className="-mt-3 h-4 text-xs text-bone-mute">{loading ? "Loading…" : saved === "saving" ? "Saving…" : saved === "saved" ? "All changes saved" : ""}</p>
+      <p className="-mt-3 h-4 text-xs text-bone-mute">{loading ? "Loading…" : saved === "saving" ? "Saving…" : saved === "saved" ? "All changes saved" : saved === "error" ? "Offline? Changes kept on this phone and will save automatically." : ""}</p>
 
       {/* rings */}
       <div className="card grid grid-cols-3 gap-2 !py-6">
@@ -212,7 +328,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
 
       {/* scan CTA */}
       <section className="glow-border relative overflow-hidden rounded-3xl bg-gradient-to-br from-blood/25 via-ink-2 to-ink-2 p-5">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">✨ AI food scan</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood-400">✨ AI food scan</div>
         <h2 className="h-display mt-1 text-2xl">What did you eat?</h2>
         <p className="mt-1 text-sm text-bone-dim">Snap your plate. Get calories, protein, carbs, fat, fibre, sugar and sodium in seconds.</p>
         <div className="mt-4 grid grid-cols-3 gap-2">
@@ -296,9 +412,9 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
                   setCustom({ name: "", kcal: "", protein: "", carbs: "", fat: "" });
                 }}
               >
-                <input className="input col-span-5 !py-2" placeholder="Custom food" value={custom.name} onChange={(e) => setCustom({ ...custom, name: e.target.value })} />
+                <input className="input col-span-5 !py-2" aria-label="Custom food name" placeholder="Custom food" value={custom.name} onChange={(e) => setCustom({ ...custom, name: e.target.value })} />
                 {(["kcal", "protein", "carbs", "fat"] as const).map((k) => (
-                  <input key={k} className="input !px-2 !py-2 text-sm" inputMode="decimal" placeholder={k === "kcal" ? "kcal" : `${k[0].toUpperCase()} g`} value={custom[k]} onChange={(e) => setCustom({ ...custom, [k]: e.target.value })} />
+                  <input key={k} aria-label={k === "kcal" ? "Calories" : `${k} grams`} className="input !px-2 !py-2 text-sm" inputMode="decimal" placeholder={k === "kcal" ? "kcal" : `${k[0].toUpperCase()} g`} value={custom[k]} onChange={(e) => setCustom({ ...custom, [k]: e.target.value })} />
                 ))}
                 <button className="btn-ghost !px-2 !py-2">Add</button>
               </form>
@@ -318,7 +434,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
                 </div>
                 <div className="flex items-center">
                   <Star on={fav.isFav(m.name)} onClick={() => fav.toggle(fav.pickItem(m))} />
-                  <button className="grid h-8 w-8 place-items-center text-bone-mute hover:text-blood" onClick={() => removeMeal(m.id)} aria-label="Remove">✕</button>
+                  <button className="grid h-8 w-8 place-items-center text-bone-mute hover:text-blood-400" onClick={() => removeMeal(m.id)} aria-label="Remove">✕</button>
                 </div>
               </li>
             ))}
@@ -408,7 +524,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
               setOther("");
             }}
           >
-            <input className="input !py-2" placeholder="Other activity, e.g. 30 min run" value={other} onChange={(e) => setOther(e.target.value)} />
+            <input className="input !py-2" aria-label="Other activity" placeholder="Other activity, e.g. 30 min run" value={other} onChange={(e) => setOther(e.target.value)} />
             <button className="btn-ghost !py-2">Log</button>
           </form>
           {log.workouts.filter((w) => !session?.exercises.some((e) => e.name === w.name)).map((w) => (
@@ -433,7 +549,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
             </div>
           </div>
           <div>
-            <div className="label flex justify-between">Morning weight ({units.w}) <Link href="/app/body" className="normal-case tracking-normal text-blood">📸 Body</Link></div>
+            <div className="label flex justify-between">Morning weight ({units.w}) <Link href="/app/body" className="normal-case tracking-normal text-blood-400">📸 Body</Link></div>
             <ConvertedInput
               key={`${date}-${units.w}-${loading}`}
               className="input !py-2"
@@ -442,11 +558,12 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
               show={(v) => kgTo(v, units.w)}
               store={(v) => toKg(v, units.w)}
               onChange={(v) => persist({ ...log, weight_kg: v ?? null })}
+              ariaLabel={`Morning weight in ${units.w}`}
             />
           </div>
           <div>
             <div className="label">Sleep hours</div>
-            <input className="input !py-2" inputMode="decimal" value={log.sleep_hours ?? ""} onChange={(e) => persist({ ...log, sleep_hours: e.target.value ? Number(e.target.value) : null })} />
+            <input className="input !py-2" aria-label="Sleep hours" inputMode="decimal" value={log.sleep_hours ?? ""} onChange={(e) => persist({ ...log, sleep_hours: e.target.value ? Number(e.target.value) : null })} />
           </div>
           <div>
             <div className="label">Energy</div>
@@ -459,7 +576,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
         </div>
         <div className="mt-5">
           <div className="label">Notes for your coach</div>
-          <textarea className="input min-h-[80px]" placeholder="How did today feel? Cravings, soreness, stress…" value={log.notes ?? ""} onChange={(e) => persist({ ...log, notes: e.target.value })} />
+          <textarea className="input min-h-[80px]" aria-label="Notes for your coach" placeholder="How did today feel? Cravings, soreness, stress…" value={log.notes ?? ""} onChange={(e) => persist({ ...log, notes: e.target.value })} />
         </div>
       </section>
     </div>

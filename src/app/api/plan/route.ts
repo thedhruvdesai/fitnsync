@@ -1,18 +1,21 @@
 import { NextResponse } from "next/server";
 import { applyKcal, weeklyAdjustment, type WeighIn } from "@/lib/adapt";
+import { buildMealPlan, intakeFromProfile } from "@/lib/plan";
 import { getAuthUser } from "@/lib/auth";
-import { isoDate, addDays } from "@/lib/report";
+import { addDays } from "@/lib/report";
 import { createClient } from "@/lib/supabase/server";
-import type { Exercise, Plan, Session } from "@/lib/types";
+import type { Exercise, Plan, Profile, Session } from "@/lib/types";
+import { userToday } from "@/lib/tz.server";
 
 async function load() {
   const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return { error: NextResponse.json({ error: "Not signed in" }, { status: 401 }) } as const;
-  const { data } = await supabase.from("profiles").select("plan").eq("id", user.id).single();
+  const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
   const plan = data?.plan as Plan | null;
+  const profile = data as Profile;
   if (!plan) return { error: NextResponse.json({ error: "No plan yet" }, { status: 400 }) } as const;
-  return { supabase, user, plan } as const;
+  return { supabase, user, plan, profile } as const;
 }
 
 async function weighIns(supabase: Awaited<ReturnType<typeof createClient>>, today: string): Promise<WeighIn[]> {
@@ -31,7 +34,7 @@ async function weighIns(supabase: Awaited<ReturnType<typeof createClient>>, toda
 export async function GET() {
   const ctx = await load();
   if ("error" in ctx) return ctx.error;
-  const today = isoDate(new Date());
+  const today = await userToday(ctx.profile.timezone);
   return NextResponse.json({ ...weeklyAdjustment(ctx.plan, await weighIns(ctx.supabase, today), today), kcal: ctx.plan.targets.kcal });
 }
 
@@ -66,13 +69,15 @@ export async function POST(req: Request) {
   if (body.action === "training") {
     const sessions = clean(body.sessions);
     if (!sessions) return NextResponse.json({ error: "Invalid workout data" }, { status: 400 });
-    plan.training = { ...plan.training, sessions };
+    plan.training = { ...plan.training, sessions, custom: true };
   } else if (body.action === "adjust") {
-    const today = isoDate(new Date());
+    const today = await userToday(ctx.profile.timezone);
     const adj = weeklyAdjustment(plan, await weighIns(ctx.supabase, today), today);
     if (adj.status !== "adjust" || !adj.newKcal) return NextResponse.json({ error: "No adjustment needed right now", adj }, { status: 409 });
     const from = plan.targets.kcal;
     plan.targets = applyKcal(plan.targets, adj.newKcal);
+    // meals are rebuilt so every day adds up to the new calorie and macro targets
+    plan.meals = buildMealPlan(intakeFromProfile(ctx.profile), plan.targets);
     plan.adjustments = [...(plan.adjustments ?? []).slice(-20), { date: today, from, to: adj.newKcal, reason: adj.message }];
   } else {
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });

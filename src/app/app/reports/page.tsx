@@ -1,3 +1,4 @@
+import { userToday } from "@/lib/tz.server";
 import Link from "next/link";
 import { Paywall } from "@/components/Paywall";
 import { addDays, isoDate, summarizeWeek, weekStart } from "@/lib/report";
@@ -21,7 +22,7 @@ export default async function ReportsPage(props: { searchParams: Promise<{ w?: s
       </div>
     );
 
-  const thisWeek = weekStart(isoDate(new Date()));
+  const thisWeek = weekStart(await userToday(profile.timezone));
   const start = searchParams.w && /^\d{4}-\d{2}-\d{2}$/.test(searchParams.w) ? weekStart(searchParams.w) : thisWeek;
   const { data } = await supabase.from("daily_logs").select("*").gte("log_date", start).lte("log_date", addDays(start, 6));
   const plan = profile.plan!;
@@ -45,7 +46,7 @@ export default async function ReportsPage(props: { searchParams: Promise<{ w?: s
       </div>
 
       <section className="card flex flex-col items-start gap-6 md:flex-row md:items-center">
-        <div className="h-display text-7xl text-blood">{s.score}</div>
+        <div className="h-display text-7xl text-blood-400">{s.score}</div>
         <div>
           <div className="text-xs uppercase tracking-widest text-bone-mute">Consistency score</div>
           <p className="mt-1 text-lg">{verdict}</p>
@@ -71,7 +72,7 @@ export default async function ReportsPage(props: { searchParams: Promise<{ w?: s
         ))}
       </div>
 
-      <section className="card overflow-x-auto">
+      <section className="card overflow-x-auto" tabIndex={0} aria-label="Daily breakdown table, scroll sideways">
         <h2 className="h-display text-xl">Day by day</h2>
         <table className="mt-3 w-full min-w-[480px] text-sm">
           <thead className="text-left text-xs uppercase tracking-widest text-bone-mute">
@@ -84,7 +85,7 @@ export default async function ReportsPage(props: { searchParams: Promise<{ w?: s
                 <td className={d.kcal && Math.abs(d.kcal - t.kcal) <= t.kcal * 0.1 ? "text-bone" : "text-bone-dim"}>{d.kcal || "—"}</td>
                 <td className={d.protein >= t.protein_g * 0.9 ? "text-bone" : "text-bone-dim"}>{d.protein ? `${d.protein} g` : "—"}</td>
                 <td className="text-bone-dim">{d.water ? `${(d.water / 1000).toFixed(1)} L` : "—"}</td>
-                <td>{d.workouts ? <span className="text-blood">●</span> : <span className="text-bone-mute">·</span>}</td>
+                <td>{d.workouts ? <span className="text-blood-400">●</span> : <span className="text-bone-mute">·</span>}</td>
                 <td className="text-bone-dim">{d.weight ?? "—"}</td>
               </tr>
             ))}

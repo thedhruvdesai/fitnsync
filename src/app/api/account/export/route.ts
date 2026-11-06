@@ -17,6 +17,14 @@ export async function GET() {
     q("food_favorites", "created_at"),
   ]);
 
+  // private photo links, valid for 7 days
+  const paths = ((body ?? []) as { photos?: Record<string, string> }[]).flatMap((c) => Object.values(c.photos ?? {})).filter(Boolean);
+  const photo_links: Record<string, string> = {};
+  if (paths.length) {
+    const { data: signed } = await supabase.storage.from("progress-photos").createSignedUrls(paths, 60 * 60 * 24 * 7);
+    for (const s of signed ?? []) if (s.path && s.signedUrl) photo_links[s.path] = s.signedUrl;
+  }
+
   const data = {
     exported_at: new Date().toISOString(),
     account: { id: user.id, email: user.email },
@@ -25,7 +33,8 @@ export async function GET() {
     coach_feedback: feedback,
     body_checkins: body,
     food_favorites: favorites,
-    note: "Progress photos are listed by file path in body_checkins.photos; download them from the Body page.",
+    progress_photo_links: photo_links,
+    note: "Progress photo links expire after 7 days. You can also download every photo as a zip from the Body page.",
   };
   return new NextResponse(JSON.stringify(data, null, 2), {
     headers: {

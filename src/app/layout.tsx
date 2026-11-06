@@ -1,5 +1,24 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+
+// Self-hosted (bundled) fonts: no request to Google, preloaded, no layout shift. Both are SIL OFL licensed.
+const bricolage = localFont({
+  src: [
+    { path: "../fonts/bricolage-grotesque-latin-opsz-normal.woff2", weight: "200 800", style: "normal" },
+  ],
+  variable: "--font-bricolage",
+  display: "swap",
+  fallback: ["system-ui", "sans-serif"],
+});
+const interTight = localFont({
+  src: [
+    { path: "../fonts/inter-tight-latin-wght-normal.woff2", weight: "100 900", style: "normal" },
+  ],
+  variable: "--font-inter-tight",
+  display: "swap",
+  fallback: ["system-ui", "-apple-system", "sans-serif"],
+});
 
 export const metadata: Metadata = {
   title: "Fit&Sync: personal fitness & nutrition coaching",
@@ -11,15 +30,7 @@ export const viewport: Viewport = { themeColor: "#0A0A0B", width: "device-width"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-AU">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter+Tight:wght@400;500;600;700&display=swap"
-        />
-      </head>
+    <html lang="en-AU" className={`${bricolage.variable} ${interTight.variable}`}>
       <body className="grain min-h-screen">{children}</body>
     </html>
   );

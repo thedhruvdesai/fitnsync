@@ -49,7 +49,7 @@ export function RotatingWord({ words }: { words: string[] }) {
   }, [words.length]);
   return (
     <span className="relative inline-block overflow-hidden align-bottom">
-      <span key={i} className="word-in inline-block text-blood">{words[i]}</span>
+      <span key={i} className="word-in inline-block text-blood-400">{words[i]}</span>
     </span>
   );
 }

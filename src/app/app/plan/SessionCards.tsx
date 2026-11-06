@@ -79,7 +79,7 @@ export function SessionCards({ sessions: initial, editable = false, homeOnly = f
                       <ExerciseThumb name={e.name} className="h-10 w-10" />
                       <span className="min-w-0 flex-1 truncate text-sm font-medium">{e.name}</span>
                       <button className="shrink-0 rounded-full border border-white/15 px-2.5 py-1 text-xs text-bone-dim hover:text-bone" onClick={() => setPicker({ s: si, i })} aria-label={`Swap ${e.name}`}>⇄ Swap</button>
-                      <button className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-bone-mute hover:text-blood" onClick={() => removeEx(si, i)} aria-label={`Remove ${e.name}`}>✕</button>
+                      <button className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-bone-mute hover:text-blood-400" onClick={() => removeEx(si, i)} aria-label={`Remove ${e.name}`}>✕</button>
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
                       <span className="flex items-center gap-1.5">
@@ -106,7 +106,7 @@ export function SessionCards({ sessions: initial, editable = false, homeOnly = f
                         <span className="block truncate text-sm font-medium">{e.name}</span>
                         <span className="block text-xs text-bone-mute">{e.sets}×{e.reps} · rest {e.rest}</span>
                       </span>
-                      <span className="text-bone-mute transition group-hover:translate-x-1 group-hover:text-blood">→</span>
+                      <span className="text-bone-mute transition group-hover:translate-x-1 group-hover:text-blood-400">→</span>
                     </button>
                   </li>
                 )

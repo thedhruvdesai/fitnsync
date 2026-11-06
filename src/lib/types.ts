@@ -73,7 +73,7 @@ export interface Plan {
   generated_at: string;
   targets: Targets;
   meals: PlannedDay[];
-  training: { split: string; sessions: Session[]; cardio: string; progression: string };
+  training: { split: string; sessions: Session[]; cardio: string; progression: string; custom?: boolean };
   notes: string[];
   /** weekly calorie adjustments made from the user's weight trend */
   adjustments?: { date: string; from: number; to: number; reason: string }[];
@@ -127,6 +127,8 @@ export interface Profile extends Partial<Intake> {
   onboarded: boolean;
   tier: "free" | "starter" | "pro" | "elite";
   subscription_status: string | null;
+  /** IANA zone, e.g. "Australia/Brisbane" */
+  timezone?: string | null;
   paddle_customer_id: string | null;
   paddle_subscription_id: string | null;
   weekly_email: boolean;

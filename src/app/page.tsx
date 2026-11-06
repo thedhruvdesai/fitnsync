@@ -51,7 +51,7 @@ function PhoneMock() {
       {/* orbiting chips */}
       <div className="absolute -left-16 top-24 z-10 hidden rounded-2xl border border-white/10 bg-ink-2/80 px-4 py-3 backdrop-blur md:block">
         <div className="text-[10px] uppercase tracking-widest text-bone-mute">Protein streak</div>
-        <div className="h-display text-2xl">6 <span className="text-blood">days</span></div>
+        <div className="h-display text-2xl">6 <span className="text-blood-400">days</span></div>
       </div>
       <div className="absolute -right-14 bottom-28 z-10 hidden rounded-2xl border border-blood/40 bg-blood/15 px-4 py-3 backdrop-blur md:block">
         <div className="text-[10px] uppercase tracking-widest text-bone-dim">Week score</div>
@@ -59,7 +59,7 @@ function PhoneMock() {
       </div>
       <div className="rounded-[44px] border border-white/10 bg-ink-2 p-3 shadow-[0_40px_120px_-30px_rgba(225,29,46,0.65)]">
         <div className="rounded-[34px] bg-ink px-5 pb-6 pt-8">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-blood">Morning, Priya</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-blood-400">Morning, Priya</div>
           <div className="h-display mt-1 text-2xl">Thursday, 5 Nov</div>
           <div className="mt-5 grid grid-cols-3 rounded-2xl border border-white/5 bg-ink-2 py-4">
             {ring(0.72, "kcal", "1,480")}
@@ -76,7 +76,7 @@ function PhoneMock() {
             ))}
           </div>
           <div className="mt-4 rounded-2xl border border-blood/30 bg-blood/10 p-4 text-[11px] leading-relaxed text-bone-dim">
-            <div className="mb-1 text-[9px] uppercase tracking-widest text-blood">Coach · AI</div>
+            <div className="mb-1 text-[9px] uppercase tracking-widest text-blood-400">Coach · AI</div>
             Protein hit 6 of 7 days. That&apos;s the habit that moves the scale. This week: add a second set to your rows.
           </div>
         </div>
@@ -119,7 +119,7 @@ export default async function Home() {
             <h1 className="h-display mt-6 text-[19vw] uppercase leading-[0.82] sm:text-[120px] lg:text-[150px]">
               <span className="line-mask"><span style={{ animationDelay: "150ms" }}>Train.</span></span>
               <span className="line-mask"><span className="text-outline" style={{ animationDelay: "280ms" }}>Eat.</span></span>
-              <span className="line-mask"><span className="text-blood" style={{ animationDelay: "410ms" }}>Sync.</span></span>
+              <span className="line-mask"><span className="text-blood-400" style={{ animationDelay: "410ms" }}>Sync.</span></span>
             </h1>
             <p className="fade-up mt-8 max-w-lg text-lg text-bone-dim md:text-xl" style={{ animationDelay: "700ms" }}>
               A plan built from your body, your goal and the way you actually eat. Made for <RotatingWord words={["lifters", "runners", "shift workers", "busy parents", "beginners", "athletes"]} />.
@@ -149,7 +149,7 @@ export default async function Home() {
             {Array.from({ length: 4 }).flatMap((_, k) =>
               ["Any diet · Any cuisine", "Gym · Home · Bodyweight", "Shift-work friendly", "Weekly AI coach"].map((w, i) => (
                 <span key={`${k}-${i}`} className="flex items-center gap-8 px-8 text-sm uppercase tracking-[0.3em] text-bone-dim">
-                  {w} <span className="text-blood">●</span>
+                  {w} <span className="text-blood-400">●</span>
                 </span>
               ))
             )}
@@ -231,13 +231,13 @@ export default async function Home() {
         <section className="mx-auto max-w-7xl px-6 pb-28">
           <Reveal>
             <p className="eyebrow">How it works</p>
-            <h2 className="h-display mt-3 text-5xl md:text-7xl">Four steps. <span className="text-blood">Zero guesswork.</span></h2>
+            <h2 className="h-display mt-3 text-5xl md:text-7xl">Four steps. <span className="text-blood-400">Zero guesswork.</span></h2>
           </Reveal>
           <div className="mt-12 border-t border-white/10">
             {STEPS.map((s, i) => (
               <Reveal key={s.n} delay={i * 80}>
                 <div className="group grid items-center gap-4 border-b border-white/10 py-8 transition hover:bg-white/[0.02] md:grid-cols-[140px_1fr_1.2fr]">
-                  <div className="h-display text-5xl text-bone-mute transition group-hover:text-blood">{s.n}</div>
+                  <div className="h-display text-5xl text-bone-mute transition group-hover:text-blood-400">{s.n}</div>
                   <h3 className="h-display text-3xl md:text-4xl">{s.t}</h3>
                   <p className="text-bone-dim md:text-lg">{s.d}</p>
                 </div>
@@ -250,7 +250,7 @@ export default async function Home() {
         <section id="coach" className="mx-auto grid max-w-7xl gap-12 px-6 pb-28 lg:grid-cols-2 lg:items-center">
           <Reveal>
             <p className="eyebrow">Elite · Fit&amp;Sync Coach</p>
-            <h2 className="h-display mt-3 text-5xl leading-[0.92] md:text-6xl">Feedback that sounds like it came from someone who&apos;s <span className="text-blood">seen it all.</span></h2>
+            <h2 className="h-display mt-3 text-5xl leading-[0.92] md:text-6xl">Feedback that sounds like it came from someone who&apos;s <span className="text-blood-400">seen it all.</span></h2>
             <p className="mt-6 max-w-lg text-lg text-bone-dim">
               Every Monday, our AI coach reviews your food, training, sleep and notes, then tells you what&apos;s working, the three things to fix, and how to adjust your plan. Ask for a check-in any time.
             </p>
@@ -260,7 +260,7 @@ export default async function Home() {
               <div className="absolute -inset-4 rounded-[32px] bg-blood/20 blur-3xl" />
               <div className="card relative !rounded-[28px] !p-8 text-[15px] leading-relaxed text-bone-dim">
                 <div className="mb-4 flex items-center justify-between text-xs uppercase tracking-widest">
-                  <span className="text-blood">Weekly review · sample</span>
+                  <span className="text-blood-400">Weekly review · sample</span>
                   <span className="flex items-center gap-2 text-bone-mute"><span className="pulse-dot h-1.5 w-1.5 rounded-full bg-blood" /> AI coach</span>
                 </div>
                 <h3 className="h-display text-3xl text-bone">Protein&apos;s locked in. Now earn the next kilo.</h3>
@@ -289,7 +289,7 @@ export default async function Home() {
               <details key={f.q} className="group py-6">
                 <summary className="flex list-none items-center justify-between text-lg font-semibold md:text-xl">
                   {f.q}
-                  <span className="grid h-8 w-8 place-items-center rounded-full border border-white/15 text-blood transition group-open:rotate-45 group-open:bg-blood group-open:text-white">+</span>
+                  <span className="grid h-8 w-8 place-items-center rounded-full border border-white/15 text-blood-400 transition group-open:rotate-45 group-open:bg-blood group-open:text-white">+</span>
                 </summary>
                 <p className="mt-3 text-bone-dim">{f.a}</p>
               </details>

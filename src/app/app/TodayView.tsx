@@ -4,14 +4,21 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { QUICK_FOODS } from "@/lib/foods";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
-import { AiFoodLogger, type AiItem, type Slot, type StartMode } from "@/components/AiFoodLogger";
-import { BarcodeScanner } from "@/components/BarcodeScanner";
+import dynamic from "next/dynamic";
+import type { AiItem, Slot, StartMode } from "@/components/AiFoodLogger";
 import { QuickFoods, Star, useFavorites, type FoodItem } from "@/components/QuickFoods";
 import { GettingStarted } from "@/components/GettingStarted";
-import { ExerciseSheet, ExerciseThumb, type SetRow } from "@/components/ExerciseSheet";
+import { ExerciseThumb } from "@/components/ExerciseDemo";
+import type { SetRow } from "@/components/ExerciseSheet";
 import { Ring } from "@/components/Ring";
 import Link from "next/link";
 import type { DailyLog, LoggedMeal, LoggedWorkout, Plan } from "@/lib/types";
+
+// Heavy pop-ups load on first open, keeping the Today screen light.
+const SheetLoading = () => <div className="grid h-60 place-items-center"><div className="h-9 w-9 animate-spin rounded-full border-2 border-white/15 border-t-blood" /></div>;
+const AiFoodLogger = dynamic(() => import("@/components/AiFoodLogger").then((m) => m.AiFoodLogger), { ssr: false, loading: SheetLoading });
+const BarcodeScanner = dynamic(() => import("@/components/BarcodeScanner").then((m) => m.BarcodeScanner), { ssr: false, loading: SheetLoading });
+const ExerciseSheet = dynamic(() => import("@/components/ExerciseSheet").then((m) => m.ExerciseSheet), { ssr: false });
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

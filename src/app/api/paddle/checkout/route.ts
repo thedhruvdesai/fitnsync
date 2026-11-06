@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { ACTIVE_STATUSES, findPriceId, paddle, type Paid } from "@/lib/paddle";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
@@ -8,7 +9,7 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
  */
 export async function POST(req: Request) {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
   const { tier, country } = (await req.json()) as { tier: Paid; country?: string };

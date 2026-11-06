@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
-import { ExerciseSheet, ExerciseThumb } from "@/components/ExerciseSheet";
+import dynamic from "next/dynamic";
+import { ExerciseThumb } from "@/components/ExerciseDemo";
+
+const ExerciseSheet = dynamic(() => import("@/components/ExerciseSheet").then((m) => m.ExerciseSheet), { ssr: false });
 import type { Session } from "@/lib/types";
 
 /** Training program cards with animated thumbnails; tap any exercise for a demo. */

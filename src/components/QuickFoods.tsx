@@ -39,14 +39,15 @@ export function useFavorites(supabase: SupabaseClient) {
 
   const toggle = useCallback(
     async (item: FoodItem) => {
-      const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) return;
+      const { data: auth } = await supabase.auth.getSession();
+      const userId = auth.session?.user.id;
+      if (!userId) return;
       if (isFav(item.name)) {
         setFavs((f) => f.filter((x) => x.name.toLowerCase() !== item.name.toLowerCase()));
-        await supabase.from("food_favorites").delete().eq("user_id", auth.user.id).eq("name", item.name);
+        await supabase.from("food_favorites").delete().eq("user_id", userId).eq("name", item.name);
       } else {
         setFavs((f) => [item, ...f]);
-        const { error } = await supabase.from("food_favorites").upsert({ user_id: auth.user.id, name: item.name, item }, { onConflict: "user_id,name" });
+        const { error } = await supabase.from("food_favorites").upsert({ user_id: userId, name: item.name, item }, { onConflict: "user_id,name" });
         if (error) setReady("missing");
       }
     },

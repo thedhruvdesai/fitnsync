@@ -1,6 +1,8 @@
 "use client";
-import { useState } from "react";
-import { photo, type LibExercise } from "@/lib/library";
+import { useMemo, useState } from "react";
+import { ExerciseFigure } from "./ExerciseFigure";
+import { moveFor } from "@/lib/exercises";
+import { findExercise, photo, type LibExercise } from "@/lib/library";
 
 /** Real-person demo: start and finish photos crossfaded in a rep rhythm. */
 export function ExerciseDemo({ ex, className = "" }: { ex: LibExercise; className?: string }) {
@@ -59,6 +61,18 @@ export function ExerciseAvatar({ id, name, className = "h-14 w-14" }: { id: stri
       <img src={photo(id as string, 0)} alt="" loading="lazy" className="demo-photo absolute inset-0 h-full w-full object-cover" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={photo(id as string, 1)} alt={name} loading="lazy" className="demo-photo rep-b absolute inset-0 h-full w-full object-cover" />
+    </div>
+  );
+}
+
+/** Small looping thumbnail for lists. */
+export function ExerciseThumb({ name, className = "h-14 w-14" }: { name: string; className?: string }) {
+  const move = useMemo(() => moveFor(name), [name]);
+  const lib = useMemo(() => findExercise(name), [name]);
+  if (lib) return <ExerciseAvatar id={lib.id} name={lib.name} className={className} />;
+  return (
+    <div className={`shrink-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-blood/10 to-ink ${className}`}>
+      <ExerciseFigure move={move} showGround={false} className="h-full w-full" />
     </div>
   );
 }

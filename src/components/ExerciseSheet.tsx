@@ -5,6 +5,7 @@ import { ExerciseFigure } from "./ExerciseFigure";
 import { ExerciseAvatar, ExerciseDemo } from "./ExerciseDemo";
 import { moveFor, repTarget, restSeconds } from "@/lib/exercises";
 import { findExercise } from "@/lib/library";
+import { stepsFor } from "@/lib/library-steps";
 import type { Exercise } from "@/lib/types";
 
 export interface SetRow {
@@ -218,7 +219,7 @@ export function ExerciseSheet({
             <div>
               <h3 className="label">Step by step</h3>
               <ol className="space-y-2.5">
-                {(lib?.steps ?? move.cues).map((c, i) => (
+                {(lib ? stepsFor(lib.id) : move.cues).map((c, i) => (
                   <li key={c} className="flex gap-3 text-sm text-bone-dim">
                     <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-blood/20 text-xs font-semibold text-blood-400">{i + 1}</span>
                     <span className="pt-0.5">{c}</span>
@@ -265,14 +266,4 @@ export function ExerciseSheet({
   );
 }
 
-/** Small looping thumbnail for lists. */
-export function ExerciseThumb({ name, className = "h-14 w-14" }: { name: string; className?: string }) {
-  const move = useMemo(() => moveFor(name), [name]);
-  const lib = useMemo(() => findExercise(name), [name]);
-  if (lib) return <ExerciseAvatar id={lib.id} name={lib.name} className={className} />;
-  return (
-    <div className={`shrink-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-blood/10 to-ink ${className}`}>
-      <ExerciseFigure move={move} showGround={false} className="h-full w-full" />
-    </div>
-  );
-}
+export { ExerciseThumb } from "./ExerciseDemo";

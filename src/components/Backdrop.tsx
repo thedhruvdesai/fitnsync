@@ -5,13 +5,13 @@ import { useEffect, useRef } from "react";
  * Animated background: flowing "contour" lines that breathe like a heartbeat and bend toward the cursor,
  * plus drifting red glow orbs and film grain. Pauses off-screen and respects prefers-reduced-motion.
  */
-export function Backdrop({ intensity = 1 }: { intensity?: number }) {
+export function Backdrop({ intensity = 1, still = false }: { intensity?: number; still?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = ref.current!;
     const ctx = canvas.getContext("2d")!;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = still || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const mobile = window.matchMedia("(max-width: 768px)").matches;
     let w = 0, h = 0, raf = 0, t = 0, last = 0;
     const mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
@@ -69,6 +69,18 @@ export function Backdrop({ intensity = 1 }: { intensity?: number }) {
         ctx.stroke();
       }
     };
+    if (reduce) {
+      // static: draw a single frame (and again on resize) instead of animating
+      const once = () => { last = 0; draw(performance.now() + 1000); cancelAnimationFrame(raf); };
+      once();
+      window.removeEventListener("pointermove", onMove);
+      window.addEventListener("resize", once);
+      return () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("resize", resize);
+        window.removeEventListener("resize", once);
+      };
+    }
     raf = requestAnimationFrame(draw);
 
     const vis = () => { if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(draw); };
@@ -79,10 +91,10 @@ export function Backdrop({ intensity = 1 }: { intensity?: number }) {
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("visibilitychange", vis);
     };
-  }, [intensity]);
+  }, [intensity, still]);
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-0 overflow-hidden">
+    <div aria-hidden className={`pointer-events-none fixed inset-0 -z-0 overflow-hidden ${still ? "backdrop-still" : ""}`}>
       <div className="orb orb-a" />
       <div className="orb orb-b" />
       <div className="orb orb-c" />

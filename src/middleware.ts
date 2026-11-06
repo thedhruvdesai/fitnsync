@@ -22,7 +22,15 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // Fast local JWT check; falls back to a network check on legacy projects.
+  let user: { id: string } | null = null;
+  try {
+    const { data } = await supabase.auth.getClaims();
+    if (data?.claims?.sub) user = { id: data.claims.sub };
+  } catch {
+    /* ignore */
+  }
+  if (!user) user = (await supabase.auth.getUser()).data.user;
   const path = request.nextUrl.pathname;
 
   if (!user && (path.startsWith("/app") || path.startsWith("/onboarding"))) {

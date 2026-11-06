@@ -6,6 +6,7 @@ import { moveFor } from "@/lib/exercises";
 import { byId, findExercise, LIBRARY, sessionStat, type SessionStat, type SetEntry } from "@/lib/library";
 import { addDays, isoDate } from "@/lib/report";
 import { requireProfile } from "@/lib/session";
+import { stepsFor } from "@/lib/library-steps";
 import { hasTier } from "@/lib/tiers";
 import type { DailyLog } from "@/lib/types";
 import { HistoryPanel } from "./HistoryPanel";
@@ -63,7 +64,7 @@ export default async function ExercisePage({ params }: { params: { id: string } 
         <section className="card">
           <h2 className="label">Step by step</h2>
           <ol className="space-y-3">
-            {ex.steps.map((s, i) => (
+            {stepsFor(ex.id).map((s, i) => (
               <li key={i} className="flex gap-3 text-sm text-bone-dim">
                 <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blood/20 text-xs font-semibold text-blood-400">{i + 1}</span>
                 <span className="pt-1">{s}</span>

@@ -15,7 +15,6 @@ export interface LibExercise {
   level: "beginner" | "intermediate" | "expert";
   primary: string[];
   secondary: string[];
-  steps: string[];
   rank: number;
 }
 

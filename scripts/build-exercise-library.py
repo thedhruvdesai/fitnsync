@@ -225,5 +225,7 @@ for x in out:
     im.thumbnail((560, 560))
     im.save(f"public/ex/{x['id']}_{f}.webp", "WEBP", quality=68, method=6)
 
+steps = {x["id"]: x.pop("steps") for x in out}
+json.dump(steps, open("src/data/exercise-steps.json", "w"), ensure_ascii=False, separators=(",", ":"))
 json.dump({"source": "/ex/", "license": f"Public domain (Unlicense), yuhonas/free-exercise-db@{COMMIT[:7]}", "exercises": out}, open("src/data/exercises.json", "w"), ensure_ascii=False, separators=(",", ":"))
 print(len(out), "exercises,", COMMIT[:7])

@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { generateFeedback, MONTHLY_CHECKINS } from "@/lib/coach";
 import { AiBusyError } from "@/lib/llm";
@@ -9,7 +10,7 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
   const admin = createAdminClient();

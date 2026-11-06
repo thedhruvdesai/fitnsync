@@ -7,16 +7,16 @@ import { addDays, dayTotals, isoDate } from "@/lib/report";
 import { AiFoodLogger, type AiItem, type Slot, type StartMode } from "@/components/AiFoodLogger";
 import { ExerciseSheet, ExerciseThumb, type SetRow } from "@/components/ExerciseSheet";
 import { Ring } from "@/components/Ring";
-import { LogCalendar } from "@/components/LogCalendar";
+import Link from "next/link";
 import type { DailyLog, LoggedMeal, LoggedWorkout, Plan } from "@/lib/types";
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const empty = (d: string): DailyLog => ({ log_date: d, meals: [], workouts: [], water_ml: 0, weight_kg: null, sleep_hours: null, energy: null, notes: null });
 
-export default function TodayView({ plan, name, userId, locked }: { plan: Plan; name: string; userId: string; locked: boolean }) {
+export default function TodayView({ plan, name, userId, locked, initialDate }: { plan: Plan; name: string; userId: string; locked: boolean; initialDate?: string }) {
   const supabase = useMemo(() => createClient(), []);
-  const [date, setDate] = useState(isoDate(new Date()));
+  const [date, setDate] = useState(initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate) && initialDate <= isoDate(new Date()) ? initialDate : isoDate(new Date()));
   const [log, setLog] = useState<DailyLog>(empty(date));
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState<"idle" | "saving" | "saved">("idle");
@@ -24,7 +24,6 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
   const [other, setOther] = useState("");
   const [sheet, setSheet] = useState<number | null>(null);
   const [scan, setScan] = useState<StartMode | null>(null);
-  const [cal, setCal] = useState(false);
   const [custom, setCustom] = useState({ name: "", kcal: "", protein: "", carbs: "", fat: "" });
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const t = plan.targets;
@@ -108,16 +107,16 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="eyebrow">{isToday ? `${greet}, ${name || "there"}` : "Logging a past day"}</p>
-          <button onClick={() => setCal(true)} className="group text-left" aria-label="Open calendar">
+          <Link href={`/app/calendar?m=${date.slice(0, 7)}&d=${date}`} className="group block text-left" aria-label="Open calendar">
             <h1 className="h-display mt-1 text-3xl sm:text-4xl md:text-5xl">
               {new Date(date + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "short" })}
               <span className="ml-2 align-middle text-base text-bone-mute transition group-hover:text-blood">▾</span>
             </h1>
-          </button>
+          </Link>
           {!isToday && <button className="mt-1 text-xs text-blood underline underline-offset-4" onClick={() => setDate(isoDate(new Date()))}>Back to today</button>}
         </div>
         <div className="flex items-center gap-2">
-          <button className="chip" onClick={() => setCal(true)} aria-label="Calendar">📅</button>
+          <Link href={`/app/calendar?m=${date.slice(0, 7)}&d=${date}`} className="chip" aria-label="Calendar">📅</Link>
           <button className="chip" onClick={() => setDate(addDays(date, -1))} aria-label="Previous day">←</button>
           <button className="chip" disabled={isToday} onClick={() => setDate(addDays(date, 1))} aria-label="Next day">→</button>
         </div>
@@ -147,21 +146,6 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
           <div className="card !p-3"><div className="text-xs text-bone-mute">Sugars</div><div className="mt-0.5 font-semibold">{Math.round(extra.sugar)} g</div></div>
           <div className="card !p-3"><div className="text-xs text-bone-mute">Sodium</div><div className={`mt-0.5 font-semibold ${extra.sodium > 2000 ? "text-amber-300" : ""}`}>{Math.round(extra.sodium)} / 2000 mg</div></div>
         </div>
-      )}
-
-      {cal && (
-        <LogCalendar
-          supabase={supabase}
-          selected={date}
-          kcalTarget={t.kcal}
-          proteinTarget={t.protein_g}
-          onClose={() => setCal(false)}
-          onOpen={(d) => {
-            setDate(d);
-            setCal(false);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-        />
       )}
 
       {/* scan CTA */}

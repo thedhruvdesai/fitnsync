@@ -5,7 +5,8 @@ import { Logo } from "./Logo";
 
 const ITEMS = [
   { href: "/app", label: "Today", icon: "M12 3v2m0 14v2m9-9h-2M5 12H3m14.36 6.36-1.41-1.41M8.05 8.05 6.64 6.64m10.72 0-1.41 1.41M8.05 15.95l-1.41 1.41M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" },
-  { href: "/app/plan", label: "Plan", icon: "M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" },
+  { href: "/app/calendar", label: "Calendar", icon: "M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm3 10h2m4 0h2" },
+  { href: "/app/plan", label: "Plan", icon: "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4" },
   { href: "/app/exercises", label: "Exercises", icon: "M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11" },
   { href: "/app/progress", label: "Progress", icon: "M3 17l6-6 4 4 8-8M15 7h6v6" },
   { href: "/app/reports", label: "Reports", icon: "M9 17v-6m4 6V7m4 10v-3M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2Z" },
@@ -48,9 +49,9 @@ export function AppNav({ tier, name }: { tier: string; name?: string | null }) {
         <Link href="/app/billing" className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-widest text-blood">{tier === "free" ? "Upgrade" : tier}</Link>
       </header>
       {/* mobile tab bar */}
-      <nav className="no-print fixed inset-x-0 bottom-0 z-20 grid grid-cols-6 border-t border-white/5 bg-ink/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      <nav className="no-print fixed inset-x-0 bottom-0 z-20 grid grid-cols-7 border-t border-white/5 bg-ink/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
         {ITEMS.map((i) => (
-          <Link key={i.href} href={i.href} className={`flex flex-col items-center gap-1 py-2.5 text-[10px] ${active(i.href) ? "text-blood" : "text-bone-mute"}`}>
+          <Link key={i.href} href={i.href} className={`flex flex-col items-center gap-1 py-2.5 text-[9px] ${active(i.href) ? "text-blood" : "text-bone-mute"}`}>
             <Icon d={i.icon} /> {i.label}
           </Link>
         ))}

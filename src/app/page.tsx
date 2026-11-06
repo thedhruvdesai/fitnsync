@@ -85,8 +85,8 @@ function PhoneMock() {
   );
 }
 
-export default function Home() {
-  const { region, chosen, detected } = currentRegion();
+export default async function Home() {
+  const { region, chosen, detected } = await currentRegion();
   return (
     <>
       <Backdrop />

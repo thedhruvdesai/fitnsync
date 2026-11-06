@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Exercise, Plan, Session } from "@/lib/types";
 
 async function load() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return { error: NextResponse.json({ error: "Not signed in" }, { status: 401 }) } as const;
   const { data } = await supabase.from("profiles").select("plan").eq("id", user.id).single();
@@ -15,7 +15,7 @@ async function load() {
   return { supabase, user, plan } as const;
 }
 
-async function weighIns(supabase: ReturnType<typeof createClient>, today: string): Promise<WeighIn[]> {
+async function weighIns(supabase: Awaited<ReturnType<typeof createClient>>, today: string): Promise<WeighIn[]> {
   const from = addDays(today, -24);
   const [logs, body] = await Promise.all([
     supabase.from("daily_logs").select("log_date, weight_kg").gte("log_date", from).not("weight_kg", "is", null),

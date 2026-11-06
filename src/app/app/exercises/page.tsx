@@ -2,7 +2,8 @@ import { ExerciseBrowser } from "./ExerciseBrowser";
 
 export const metadata = { title: "Exercise library · Fit&Sync" };
 
-export default function ExercisesPage({ searchParams }: { searchParams: { g?: string; q?: string } }) {
+export default async function ExercisesPage(props: { searchParams: Promise<{ g?: string; q?: string }> }) {
+  const searchParams = await props.searchParams;
   return (
     <div className="space-y-6">
       <div>

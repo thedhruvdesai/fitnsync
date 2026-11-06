@@ -42,7 +42,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
   const [sheet, setSheet] = useState<number | null>(null);
   const [scan, setScan] = useState<StartMode | "barcode" | null>(null);
   const [custom, setCustom] = useState({ name: "", kcal: "", protein: "", carbs: "", fat: "" });
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const t = plan.targets;
 
   // previous sessions per exercise, for "last time" in the workout sheet

@@ -11,11 +11,13 @@ import { hasTier } from "@/lib/tiers";
 import type { DailyLog } from "@/lib/types";
 import { HistoryPanel } from "./HistoryPanel";
 
-export function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return { title: `${byId(params.id)?.name ?? "Exercise"} · Fit&Sync` };
 }
 
-export default async function ExercisePage({ params }: { params: { id: string } }) {
+export default async function ExercisePage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const ex = byId(params.id);
   if (!ex) notFound();
   const { profile, supabase } = await requireProfile();

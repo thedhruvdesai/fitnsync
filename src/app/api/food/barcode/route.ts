@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
  * Called server-side so we can send a proper User-Agent as their API asks.
  */
 export async function GET(req: Request) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 

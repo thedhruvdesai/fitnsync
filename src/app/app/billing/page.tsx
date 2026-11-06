@@ -4,9 +4,10 @@ import { currentRegion } from "@/lib/region.server";
 import { requireProfile } from "@/lib/session";
 import { AccountActions } from "./AccountActions";
 
-export default async function BillingPage({ searchParams }: { searchParams: { success?: string; welcome?: string; plan?: string } }) {
+export default async function BillingPage(props: { searchParams: Promise<{ success?: string; welcome?: string; plan?: string }> }) {
+  const searchParams = await props.searchParams;
   const { profile, user } = await requireProfile();
-  const { region } = currentRegion();
+  const { region } = await currentRegion();
   return (
     <div className="space-y-8">
       <div className="flex items-start justify-between gap-4">

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /** Opens Paddle's customer portal (cancel, change card, invoices). */
 export async function POST() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   const { data: p } = await supabase.from("profiles").select("paddle_customer_id, paddle_subscription_id").eq("id", user.id).single();

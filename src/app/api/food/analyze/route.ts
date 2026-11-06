@@ -11,7 +11,7 @@ const MEDIA = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 /** AI food logging: photo and/or text → items with calories and macros. */
 export async function POST(req: Request) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   if (!aiConfigured()) return NextResponse.json({ error: "AI food scan isn't switched on yet (add GEMINI_API_KEY)." }, { status: 503 });

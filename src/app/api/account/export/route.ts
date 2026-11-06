@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /** Download everything we store about the signed-in user as JSON. */
 export async function GET() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 

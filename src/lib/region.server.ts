@@ -2,8 +2,8 @@ import { cookies, headers } from "next/headers";
 import { getRegion, REGION_COOKIE, regionForCountry, type Region } from "./regions";
 
 /** Country from hosting geo headers (Netlify / Vercel / Cloudflare), then browser language. */
-export function detectCountry(): string | null {
-  const h = headers();
+export async function detectCountry(): Promise<string | null> {
+  const h = await headers();
   const nf = h.get("x-nf-geo");
   if (nf) {
     try {
@@ -21,8 +21,8 @@ export function detectCountry(): string | null {
 }
 
 /** The visitor's region: their saved choice first, otherwise auto-detected. */
-export function currentRegion(): { region: Region; chosen: boolean; detected: Region } {
-  const detected = regionForCountry(detectCountry());
-  const saved = getRegion(cookies().get(REGION_COOKIE)?.value);
+export async function currentRegion(): Promise<{ region: Region; chosen: boolean; detected: Region }> {
+  const detected = regionForCountry(await detectCountry());
+  const saved = getRegion((await cookies()).get(REGION_COOKIE)?.value);
   return { region: saved ?? detected, chosen: !!saved, detected };
 }

@@ -5,7 +5,8 @@ import { CalendarView } from "./CalendarView";
 
 export const metadata = { title: "Calendar · Fit&Sync" };
 
-export default async function CalendarPage({ searchParams }: { searchParams: { m?: string; d?: string } }) {
+export default async function CalendarPage(props: { searchParams: Promise<{ m?: string; d?: string }> }) {
+  const searchParams = await props.searchParams;
   const { profile, supabase } = await requireProfile();
   const today = isoDate(new Date());
   const m = /^\d{4}-\d{2}$/.test(searchParams.m ?? "") ? `${searchParams.m}-01` : today.slice(0, 8) + "01";

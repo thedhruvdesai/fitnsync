@@ -8,7 +8,7 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
  * existing subscribers are switched to the new plan directly (prorated).
  */
 export async function POST(req: Request) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 

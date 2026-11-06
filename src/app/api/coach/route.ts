@@ -9,7 +9,7 @@ import type { Profile } from "@/lib/types";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 

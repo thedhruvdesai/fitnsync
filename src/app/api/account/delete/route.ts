@@ -8,7 +8,7 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
  * remove progress photos, then delete the auth user (all tables cascade on auth.users).
  */
 export async function POST(req: Request) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   const { confirm } = await req.json().catch(() => ({}));

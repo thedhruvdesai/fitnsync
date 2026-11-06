@@ -6,7 +6,7 @@ import type { Profile } from "./types";
 
 /** One auth check + one profile query per request, shared by the layout and the page. */
 const loadSession = cache(async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getAuthUser(supabase);
   if (!user) return { supabase, user: null, profile: null };
   let { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();

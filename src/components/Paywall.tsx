@@ -3,9 +3,9 @@ import { currentRegion } from "@/lib/region.server";
 import { formatMoney } from "@/lib/regions";
 import { PLANS, TRIAL_DAYS, type Tier } from "@/lib/tiers";
 
-export function Paywall({ need, title, children }: { need: Exclude<Tier, "free">; title: string; children?: React.ReactNode }) {
+export async function Paywall({ need, title, children }: { need: Exclude<Tier, "free">; title: string; children?: React.ReactNode }) {
   const plan = PLANS.find((p) => p.id === need)!;
-  const { region } = currentRegion();
+  const { region } = await currentRegion();
   return (
     <div className="card relative overflow-hidden !p-8 text-center">
       <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-blood/20 blur-3xl" />

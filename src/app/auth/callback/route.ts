@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 
   if (errDesc) return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(errDesc)}`);
   if (code) {
-    const { error } = await createClient().auth.exchangeCodeForSession(code);
+    const { error } = await (await createClient()).auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(`${origin}${next}`);
     // Most common cause: link opened on a different device/browser. Supabase has still confirmed the email.
     return NextResponse.redirect(`${origin}/login?confirmed=1`);

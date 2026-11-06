@@ -8,7 +8,8 @@ import { PrintButton } from "./PrintButton";
 
 const fmt = (d: string) => new Date(d + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" });
 
-export default async function ReportsPage({ searchParams }: { searchParams: { w?: string } }) {
+export default async function ReportsPage(props: { searchParams: Promise<{ w?: string }> }) {
+  const searchParams = await props.searchParams;
   const { profile, supabase } = await requireProfile();
   if (!hasTier(profile.tier, "pro"))
     return (

@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   const next = nextParam.startsWith("/") ? nextParam : "/app";
 
   if (token_hash && type) {
-    const { error } = await createClient().auth.verifyOtp({ type, token_hash });
+    const { error } = await (await createClient()).auth.verifyOtp({ type, token_hash });
     if (!error) return NextResponse.redirect(`${origin}${next}`);
     return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(error.message)}`);
   }

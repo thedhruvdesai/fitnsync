@@ -4,11 +4,12 @@ import { requireProfile } from "@/lib/session";
 import { PLANS, TRIAL_DAYS } from "@/lib/tiers";
 import CheckoutView from "./CheckoutView";
 
-export default async function CheckoutPage({ searchParams }: { searchParams: { plan?: string } }) {
+export default async function CheckoutPage(props: { searchParams: Promise<{ plan?: string }> }) {
+  const searchParams = await props.searchParams;
   const { profile } = await requireProfile();
   const plan = PLANS.find((p) => p.id === searchParams.plan);
   if (!plan) redirect("/app/billing");
-  const { region } = currentRegion();
+  const { region } = await currentRegion();
   return (
     <CheckoutView
       planId={plan.id}

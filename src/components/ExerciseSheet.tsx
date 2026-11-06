@@ -179,26 +179,7 @@ export function ExerciseSheet({
 
         <div ref={scroller} className="flex-1 overflow-y-auto px-5 pb-6">
           {/* demo */}
-          {lib ? (
-            <ExerciseDemo key={lib.id} ex={lib} className="mt-4" />
-          ) : (
-          <div className="relative mt-4 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-blood/10 to-ink">
-            <div aria-hidden className="h-display text-outline pointer-events-none absolute inset-x-0 top-2 select-none text-center text-[64px] uppercase leading-none opacity-20">{move.title.split(" ")[0]}</div>
-            <ExerciseFigure key={ex.name} move={move} speed={speed} playing={playing} className="relative mx-auto h-60 w-full max-w-sm md:h-72" />
-            <div className="relative flex items-center justify-between border-t border-white/5 px-3 py-2.5">
-              <button onClick={() => setPlaying((p) => !p)} className="grid h-10 w-10 place-items-center rounded-full bg-ink/80 text-sm backdrop-blur" aria-label={playing ? "Pause" : "Play"}>
-                {playing ? "❚❚" : "▶"}
-              </button>
-              <div className="flex gap-1 rounded-full bg-ink/80 p-1 backdrop-blur">
-                {[0.5, 1, 1.5].map((s) => (
-                  <button key={s} onClick={() => setSpeed(s)} className={`rounded-full px-3 py-1 text-xs transition ${speed === s ? "bg-blood text-white" : "text-bone-dim"}`}>
-                    {s}×
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          )}
+          <ExerciseDemo key={ex.name} name={ex.name} lib={lib} className="mt-4" />
 
           {/* title */}
           <div className="mt-5 flex items-start justify-between gap-3">

@@ -1,42 +1,70 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ExerciseFigure } from "./ExerciseFigure";
 import { moveFor } from "@/lib/exercises";
-import { findExercise, photo, type LibExercise } from "@/lib/library";
+import { photo, type LibExercise } from "@/lib/library";
 
-/** Real-person demo: start and finish photos crossfaded in a rep rhythm. */
-export function ExerciseDemo({ ex, className = "" }: { ex: LibExercise; className?: string }) {
+const MODE_KEY = "fs_demo_mode";
+
+/**
+ * Exercise demo. Default: the animated figure (same style for every exercise).
+ * Where a real photo exists, "Photo" switches to start/finish photos crossfaded like a rep.
+ */
+export function ExerciseDemo({ name, lib, className = "" }: { name: string; lib?: LibExercise; className?: string }) {
+  const move = useMemo(() => moveFor(name), [name]);
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState(1);
   const [frame, setFrame] = useState<0 | 1 | null>(null);
+  const [mode, setModeState] = useState<"figure" | "photo">("figure");
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(MODE_KEY) === "photo") setModeState("photo");
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  const setMode = (m: "figure" | "photo") => {
+    setModeState(m);
+    setFrame(null);
+    try {
+      localStorage.setItem(MODE_KEY, m);
+    } catch {
+      /* ignore */
+    }
+  };
+  const showPhoto = mode === "photo" && !!lib;
+  const primary = lib?.primary ?? move.muscles.slice(0, 1);
+  const secondary = lib?.secondary.slice(0, 2) ?? move.muscles.slice(1, 3);
   const rep = `${2.8 / speed}s`;
+
   return (
-    <div className={`relative overflow-hidden rounded-3xl border border-white/10 bg-ink ${className}`}>
-      <div className={`relative aspect-[3/2] w-full ${playing && frame == null ? "" : "rep-paused"}`} style={{ ["--rep" as string]: rep }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photo(ex.id, 0)} alt={`${ex.name}: start position`} className="demo-photo absolute inset-0 h-full w-full object-cover" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={photo(ex.id, 1)}
-          alt={`${ex.name}: finish position`}
-          className={`demo-photo absolute inset-0 h-full w-full object-cover ${frame == null ? "rep-b" : ""}`}
-          style={frame != null ? { opacity: frame } : undefined}
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-ink/30" />
-        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          {ex.primary.map((m) => (
-            <span key={m} className="rounded-full bg-blood px-2.5 py-0.5 text-[11px] font-semibold text-white shadow">{m}</span>
-          ))}
-          {ex.secondary.slice(0, 2).map((m) => (
-            <span key={m} className="rounded-full bg-ink/70 px-2.5 py-0.5 text-[11px] text-bone-dim backdrop-blur">{m}</span>
-          ))}
+    <div className={`relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-blood/10 to-ink ${className}`}>
+      {showPhoto ? (
+        <div className={`relative aspect-[3/2] w-full ${playing && frame == null ? "" : "rep-paused"}`} style={{ ["--rep" as string]: rep }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={photo(lib!.id, 0)} alt={`${lib!.name}: start position`} className="demo-photo absolute inset-0 h-full w-full object-cover" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={photo(lib!.id, 1)} alt={`${lib!.name}: finish position`} className={`demo-photo absolute inset-0 h-full w-full object-cover ${frame == null ? "rep-b" : ""}`} style={frame != null ? { opacity: frame } : undefined} />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-ink/30" />
         </div>
-        <div className="absolute inset-x-3 bottom-3 h-1 overflow-hidden rounded-full bg-white/15">
-          <div className={`h-full w-full rounded-full bg-blood ${frame == null ? "rep-bar" : ""}`} style={frame != null ? { transform: `scaleX(${frame})`, transformOrigin: "left" } : undefined} />
+      ) : (
+        <div className="relative">
+          <div aria-hidden className="h-display text-outline pointer-events-none absolute inset-x-0 top-2 select-none text-center text-[64px] uppercase leading-none opacity-20">{move.title.split(" ")[0]}</div>
+          <ExerciseFigure key={name} move={move} speed={speed} playing={playing && frame == null} at={frame ?? undefined} className="relative mx-auto h-60 w-full max-w-sm md:h-72" />
         </div>
+      )}
+      <div className={`pointer-events-none absolute left-3 top-3 flex flex-wrap gap-1.5 ${lib ? "right-[132px]" : "right-3"}`}>
+        {primary.map((m) => <span key={m} className="rounded-full bg-blood px-2.5 py-0.5 text-[11px] font-semibold text-white shadow">{m}</span>)}
+        {secondary.slice(0, lib ? 1 : 2).map((m) => <span key={m} className="rounded-full bg-ink/70 px-2.5 py-0.5 text-[11px] text-bone-dim backdrop-blur">{m}</span>)}
       </div>
-      <div className="flex items-center justify-between gap-2 border-t border-white/5 px-3 py-2.5">
-        <button onClick={() => { setFrame(null); setPlaying((p) => !p); }} className="grid h-10 w-10 place-items-center rounded-full bg-white/5 text-sm" aria-label={playing ? "Pause" : "Play"}>
+      {lib && (
+        <div className="absolute right-3 top-3 flex rounded-full bg-ink/80 p-0.5 text-[11px] backdrop-blur" role="group" aria-label="Demo style">
+          <button onClick={() => setMode("figure")} className={`rounded-full px-2.5 py-1 ${!showPhoto ? "bg-bone font-semibold text-ink" : "text-bone-dim"}`}>Animation</button>
+          <button onClick={() => setMode("photo")} className={`rounded-full px-2.5 py-1 ${showPhoto ? "bg-bone font-semibold text-ink" : "text-bone-dim"}`}>Photo</button>
+        </div>
+      )}
+      <div className="relative flex items-center justify-between gap-2 border-t border-white/5 px-3 py-2.5">
+        <button onClick={() => { setFrame(null); setPlaying((p) => !p); }} className="grid h-10 w-10 place-items-center rounded-full bg-white/5 text-sm" aria-label={playing && frame == null ? "Pause" : "Play"}>
           {playing && frame == null ? "❚❚" : "▶"}
         </button>
         <div className="flex gap-1 rounded-full bg-white/5 p-1 text-xs">
@@ -44,8 +72,8 @@ export function ExerciseDemo({ ex, className = "" }: { ex: LibExercise; classNam
           <button onClick={() => setFrame(1)} className={`rounded-full px-3 py-1 ${frame === 1 ? "bg-bone text-ink" : "text-bone-dim"}`}>Finish</button>
         </div>
         <div className="flex gap-1 rounded-full bg-white/5 p-1">
-          {[0.5, 1, 1.5].map((s) => (
-            <button key={s} onClick={() => { setSpeed(s); setFrame(null); setPlaying(true); }} className={`rounded-full px-2.5 py-1 text-xs transition ${speed === s && frame == null ? "bg-blood text-white" : "text-bone-dim"}`}>{s}×</button>
+          {[0.5, 1, 1.5].map((sp) => (
+            <button key={sp} onClick={() => { setSpeed(sp); setFrame(null); setPlaying(true); }} className={`rounded-full px-2.5 py-1 text-xs transition ${speed === sp && frame == null ? "bg-blood text-white" : "text-bone-dim"}`}>{sp}×</button>
           ))}
         </div>
       </div>
@@ -53,23 +81,18 @@ export function ExerciseDemo({ ex, className = "" }: { ex: LibExercise; classNam
   );
 }
 
-/** Round looping thumbnail for lists. */
-export function ExerciseAvatar({ id, name, className = "h-14 w-14" }: { id: string; name: string; className?: string }) {
+/** Round animated figure thumbnail for lists (same style everywhere). */
+export function ExerciseAvatar({ name, className = "h-14 w-14" }: { id?: string; name: string; className?: string }) {
+  const move = useMemo(() => moveFor(name), [name]);
   return (
-    <div className={`relative shrink-0 overflow-hidden rounded-full border border-white/10 bg-ink-3 ${className}`} style={{ ["--rep" as string]: "3.4s" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={photo(id as string, 0)} alt="" loading="lazy" className="demo-photo absolute inset-0 h-full w-full object-cover" />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={photo(id as string, 1)} alt={name} loading="lazy" className="demo-photo rep-b absolute inset-0 h-full w-full object-cover" />
+    <div className={`relative shrink-0 overflow-hidden rounded-full border border-white/10 bg-gradient-to-b from-blood/15 to-ink ${className}`} aria-label={name} role="img">
+      <ExerciseFigure move={move} showGround={false} className="h-full w-full" />
     </div>
   );
 }
 
-/** Small looping thumbnail for lists. */
 export function ExerciseThumb({ name, className = "h-14 w-14" }: { name: string; className?: string }) {
   const move = useMemo(() => moveFor(name), [name]);
-  const lib = useMemo(() => findExercise(name), [name]);
-  if (lib) return <ExerciseAvatar id={lib.id} name={lib.name} className={className} />;
   return (
     <div className={`shrink-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-blood/10 to-ink ${className}`}>
       <ExerciseFigure move={move} showGround={false} className="h-full w-full" />

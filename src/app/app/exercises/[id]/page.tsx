@@ -1,7 +1,7 @@
 import { userToday } from "@/lib/tz.server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExerciseDemo } from "@/components/ExerciseDemo";
+import { ExerciseDemo, ExerciseThumb } from "@/components/ExerciseDemo";
 import { Paywall } from "@/components/Paywall";
 import { moveFor } from "@/lib/exercises";
 import { byId, findExercise, LIBRARY, sessionStat, type SessionStat, type SetEntry } from "@/lib/library";
@@ -47,7 +47,7 @@ export default async function ExercisePage(props: { params: Promise<{ id: string
       <Link href={`/app/exercises?g=${ex.group}`} className="text-sm text-bone-mute hover:text-bone">← {ex.group} exercises</Link>
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <div className="space-y-4">
-          <ExerciseDemo ex={ex} />
+          <ExerciseDemo name={ex.name} lib={ex} />
           <div>
             <h1 className="h-display text-3xl md:text-4xl">{ex.name}</h1>
             <div className="mt-3 flex flex-wrap gap-2 text-xs">
@@ -101,8 +101,7 @@ export default async function ExercisePage(props: { params: Promise<{ id: string
           <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
             {similar.map((s) => (
               <Link key={s.id} href={`/app/exercises/${s.id}`} className="card !p-3 text-sm transition hover:border-white/25">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`/ex/${s.id}_1.webp`} alt="" loading="lazy" className="mb-2 aspect-[3/2] w-full rounded-xl object-cover" />
+                <ExerciseThumb name={s.name} className="mb-2 aspect-[3/2] h-auto w-full" />
                 {s.name}
               </Link>
             ))}

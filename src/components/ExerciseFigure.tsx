@@ -61,8 +61,9 @@ export function solve(move: Move, t: number) {
 
   const footN = move.feetFromPelvis ? add(pelvis, p.foot) : p.foot;
   const footF = move.feetFromPelvis ? add(pelvis, p.footFar!) : p.footFar!;
-  const legN = ik(pelvis, footN, L.thigh, L.shin, -1);
-  const legF = ik(pelvis, footF, L.thigh, L.shin, -1);
+  const ks = move.kneeSign ?? -1;
+  const legN = ik(pelvis, footN, L.thigh, L.shin, ks);
+  const legF = ik(pelvis, footF, L.thigh, L.shin, ks);
   const armN = ik(shoulder, add(shoulder, p.hand), L.upperArm, L.forearm, 1);
   const armF = ik(shoulder, add(shoulder, p.handFar!), L.upperArm, L.forearm, 1);
 
@@ -99,6 +100,17 @@ function Gear({ move }: { move: Move }) {
           <rect x={76} y={139} width={40} height={8} rx={3} />
           <rect x={93} y={147} width={6} height={31} />
           <rect x={118} y={120} width={6} height={22} rx={3} />
+        </g>
+      )}
+      {move.gear.includes("bike") && (
+        <g stroke="#3a3a40" strokeWidth={5} strokeLinecap="round" fill="none">
+          <line x1={78} y1={124} x2={102} y2={124} />
+          <line x1={92} y1={126} x2={112} y2={156} />
+          <line x1={112} y1={156} x2={132} y2={104} />
+          <line x1={124} y1={104} x2={140} y2={104} />
+          <line x1={100} y1={178} x2={150} y2={178} />
+          <line x1={112} y1={156} x2={112} y2={178} />
+          <circle cx={112} cy={155} r={14} strokeWidth={3} />
         </g>
       )}
       {move.gear.includes("box") && <rect x={108} y={146} width={46} height={32} rx={4} fill="#1A1A1D" stroke="#33333A" strokeWidth={2} />}

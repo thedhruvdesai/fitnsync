@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { QUICK_FOODS } from "@/lib/foods";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
-import { AiFoodLogger } from "@/components/AiFoodLogger";
+import { AiFoodLogger, type AiItem, type Slot, type StartMode } from "@/components/AiFoodLogger";
 import { ExerciseSheet, ExerciseThumb, type SetRow } from "@/components/ExerciseSheet";
 import { Ring } from "@/components/Ring";
 import type { DailyLog, LoggedMeal, LoggedWorkout, Plan } from "@/lib/types";
@@ -22,6 +22,7 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
   const [adding, setAdding] = useState(false);
   const [other, setOther] = useState("");
   const [sheet, setSheet] = useState<number | null>(null);
+  const [scan, setScan] = useState<StartMode | null>(null);
   const [custom, setCustom] = useState({ name: "", kcal: "", protein: "", carbs: "", fat: "" });
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const t = plan.targets;
@@ -65,6 +66,29 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
   );
 
   const totals = dayTotals(log);
+  const extra = log.meals.reduce((a, m) => ({ fibre: a.fibre + (m.fibre ?? 0), sugar: a.sugar + (m.sugar ?? 0), sodium: a.sodium + (m.sodium ?? 0) }), { fibre: 0, sugar: 0, sodium: 0 });
+  const hasExtra = log.meals.some((m) => m.sodium != null || m.fibre != null);
+  const logScanned = (items: AiItem[], slot: Slot, source: "ai" | "manual") =>
+    persist({
+      ...log,
+      meals: [
+        ...log.meals,
+        ...items.map((it) => ({
+          id: uid(),
+          name: it.portion ? `${it.name} (${it.portion})` : it.name,
+          slot,
+          source,
+          kcal: it.kcal,
+          protein: it.protein,
+          carbs: it.carbs,
+          fat: it.fat,
+          fibre: it.fibre,
+          sugar: it.sugar,
+          sat_fat: it.sat_fat,
+          sodium: it.sodium,
+        })),
+      ],
+    });
   const addMeal = (m: Omit<LoggedMeal, "id">) => persist({ ...log, meals: [...log.meals, { ...m, id: uid() }] });
   const removeMeal = (id: string) => persist({ ...log, meals: log.meals.filter((m) => m.id !== id) });
   const toggleExercise = (name: string, sets: number) => {
@@ -110,27 +134,61 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
         </div>
       </div>
 
+      {hasExtra && (
+        <div className="grid grid-cols-3 gap-3 text-sm">
+          <div className="card !p-3"><div className="text-xs text-bone-mute">Fibre</div><div className="mt-0.5 font-semibold">{Math.round(extra.fibre)} / {t.fibre_g} g</div></div>
+          <div className="card !p-3"><div className="text-xs text-bone-mute">Sugars</div><div className="mt-0.5 font-semibold">{Math.round(extra.sugar)} g</div></div>
+          <div className="card !p-3"><div className="text-xs text-bone-mute">Sodium</div><div className={`mt-0.5 font-semibold ${extra.sodium > 2000 ? "text-amber-300" : ""}`}>{Math.round(extra.sodium)} / 2000 mg</div></div>
+        </div>
+      )}
+
+      {/* scan CTA */}
+      <section className="glow-border relative overflow-hidden rounded-3xl bg-gradient-to-br from-blood/25 via-ink-2 to-ink-2 p-5">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blood">✨ AI food scan</div>
+        <h2 className="h-display mt-1 text-2xl">What did you eat?</h2>
+        <p className="mt-1 text-sm text-bone-dim">Snap your plate. Get calories, protein, carbs, fat, fibre, sugar and sodium in seconds.</p>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <button className="btn-red col-span-3 !py-3.5 text-base" onClick={() => setScan("camera")}>📷 Scan food</button>
+          <button className="chip !py-2.5 text-xs" onClick={() => setScan("gallery")}>🖼️ Upload</button>
+          <button className="chip !py-2.5 text-xs" onClick={() => setScan("text")}>⌨️ Type it</button>
+          <button className="chip !py-2.5 text-xs" onClick={() => setScan("manual")}>✍️ Manual</button>
+        </div>
+      </section>
+
+      {scan && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center" role="dialog" aria-modal="true" aria-label="Log food">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setScan(null)} />
+          <div className="sheet-in relative max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-t-[28px] bg-ink-2 pb-[env(safe-area-inset-bottom)] md:rounded-[28px]">
+            <div className="sticky top-0 z-10 flex items-center justify-between bg-ink-2/95 px-5 pb-2 pt-4 backdrop-blur">
+              <span className="text-sm text-bone-dim">Logging to {isToday ? "today" : new Date(date + "T00:00:00").toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" })}</span>
+              <button onClick={() => setScan(null)} className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-bone-dim" aria-label="Close">✕</button>
+            </div>
+            <div className="px-1 pb-4">
+              <AiFoodLogger
+                start={scan}
+                dayLabel={isToday ? "today" : "this day"}
+                guide={{ kcal: t.kcal, protein: t.protein_g, carbs: t.carbs_g, fat: t.fat_g, fibre: t.fibre_g }}
+                onAdd={logScanned}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-6 md:grid-cols-2">
         {/* meals */}
         <section className="card">
           <div className="flex items-center justify-between">
             <h2 className="h-display text-2xl">Food</h2>
-            <button className="btn-red !px-4 !py-2" onClick={() => setAdding(!adding)}>{adding ? "Close" : "📷 + Add food"}</button>
+            <button className="btn-red !px-4 !py-2" onClick={() => setAdding(!adding)}>{adding ? "Close" : "+ Add food"}</button>
           </div>
 
           {adding && (
             <div className="mt-4 space-y-4 rounded-xl bg-ink-3 p-4">
-              <AiFoodLogger
-                onAdd={(items) =>
-                  persist({
-                    ...log,
-                    meals: [
-                      ...log.meals,
-                      ...items.map((it) => ({ id: uid(), name: it.portion ? `${it.name} (${it.portion})` : it.name, slot: "ai", kcal: it.kcal, protein: it.protein, carbs: it.carbs, fat: it.fat })),
-                    ],
-                  })
-                }
-              />
+              <div className="grid grid-cols-2 gap-2">
+                <button className="btn-red !py-2.5 text-sm" onClick={() => setScan("camera")}>📷 Scan food</button>
+                <button className="btn-ghost !py-2.5 text-sm" onClick={() => setScan("manual")}>✍️ Enter manually</button>
+              </div>
               {plannedDay && !locked && (
                 <div>
                   <div className="label">From today&apos;s plan</div>
@@ -170,12 +228,15 @@ export default function TodayView({ plan, name, userId, locked }: { plan: Plan; 
           )}
 
           <ul className="mt-4 divide-y divide-white/5">
-            {log.meals.length === 0 && <li className="py-6 text-center text-sm text-bone-mute">Nothing logged yet.</li>}
+            {log.meals.length === 0 && <li className="py-6 text-center text-sm text-bone-mute">Nothing logged yet. Tap 📷 Scan food above.</li>}
             {log.meals.map((m) => (
               <li key={m.id} className="flex items-center justify-between py-3">
                 <div>
                   <div className="font-medium">{m.name}</div>
-                  <div className="text-xs text-bone-mute">{m.kcal} kcal · {m.protein} g P · {m.carbs} g C · {m.fat} g F</div>
+                  <div className="text-xs text-bone-mute">
+                    {["breakfast", "lunch", "dinner", "snack"].includes(m.slot) && <span className="capitalize text-bone-dim">{m.slot} · </span>}
+                    {m.kcal} kcal · {m.protein} g P · {m.carbs} g C · {m.fat} g F{m.sodium != null ? ` · ${m.sodium} mg Na` : ""}
+                  </div>
                 </div>
                 <button className="text-bone-mute hover:text-blood" onClick={() => removeMeal(m.id)} aria-label="Remove">✕</button>
               </li>

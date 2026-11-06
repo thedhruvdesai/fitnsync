@@ -85,6 +85,13 @@ export interface LoggedMeal {
   protein: number;
   carbs: number;
   fat: number;
+  fibre?: number;
+  sugar?: number;
+  sat_fat?: number;
+  /** mg */
+  sodium?: number;
+  /** "ai" | "manual" | plan slot */
+  source?: string;
 }
 
 export interface LoggedWorkout {

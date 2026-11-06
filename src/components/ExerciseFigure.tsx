@@ -113,6 +113,33 @@ function Gear({ move }: { move: Move }) {
           <circle cx={112} cy={155} r={14} strokeWidth={3} />
         </g>
       )}
+      {move.gear.includes("dipbars") && (
+        <g>
+          <line x1={84} y1={100} x2={136} y2={100} stroke="#6B6862" strokeWidth={5} strokeLinecap="round" />
+          <line x1={130} y1={100} x2={130} y2={178} stroke="#33333A" strokeWidth={5} />
+          <line x1={90} y1={100} x2={90} y2={178} stroke="#33333A" strokeWidth={5} />
+        </g>
+      )}
+      {move.gear.includes("lowbar") && (
+        <g>
+          <line x1={58} y1={100} x2={100} y2={100} stroke="#6B6862" strokeWidth={5} strokeLinecap="round" />
+          <line x1={62} y1={100} x2={62} y2={178} stroke="#33333A" strokeWidth={4} />
+        </g>
+      )}
+      {move.gear.includes("sled") && (
+        <g stroke="#26262A" strokeLinecap="round">
+          <line x1={46} y1={118} x2={92} y2={160} strokeWidth={9} />
+          <line x1={80} y1={160} x2={110} y2={160} strokeWidth={8} />
+          <line x1={94} y1={164} x2={94} y2={178} strokeWidth={6} />
+        </g>
+      )}
+      {move.gear.includes("incline") && (
+        <g stroke="#26262A" strokeLinecap="round">
+          <line x1={46} y1={170} x2={104} y2={118} strokeWidth={9} />
+          <line x1={104} y1={118} x2={104} y2={178} strokeWidth={6} />
+          <line x1={46} y1={170} x2={46} y2={178} strokeWidth={6} />
+        </g>
+      )}
       {move.gear.includes("box") && <rect x={108} y={146} width={46} height={32} rx={4} fill="#1A1A1D" stroke="#33333A" strokeWidth={2} />}
       {move.gear.includes("bar") && (
         <g>

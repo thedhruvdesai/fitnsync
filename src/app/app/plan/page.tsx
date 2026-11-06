@@ -3,6 +3,7 @@ import { Paywall } from "@/components/Paywall";
 import { requireProfile } from "@/lib/session";
 import { hasTier } from "@/lib/tiers";
 import { SessionCards } from "./SessionCards";
+import { AdaptiveCard } from "@/components/AdaptiveCard";
 
 export default async function PlanPage() {
   const { profile } = await requireProfile();
@@ -39,6 +40,12 @@ export default async function PlanPage() {
             </div>
           ))}
         </div>
+        <div className="mt-4"><AdaptiveCard always /></div>
+        {!!plan.adjustments?.length && (
+          <div className="mt-3 text-xs text-bone-mute">
+            Calorie changes: {plan.adjustments.slice(-4).map((a) => `${new Date(a.date + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" })} ${a.from}→${a.to}`).join(" · ")}
+          </div>
+        )}
         <ul className="mt-4 space-y-2 text-sm text-bone-dim">
           {plan.notes.map((n) => <li key={n} className="flex gap-2"><span className="text-blood">●</span>{n}</li>)}
         </ul>
@@ -69,7 +76,7 @@ export default async function PlanPage() {
 
       <section>
         <h2 className="h-display text-2xl">{plan.training.split}</h2>
-        <SessionCards sessions={plan.training.sessions} />
+        <SessionCards sessions={plan.training.sessions} editable homeOnly={profile.equipment !== "gym"} />
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <div className="card text-sm"><div className="label">Cardio</div><p className="text-bone-dim">{plan.training.cardio}</p></div>
           <div className="card text-sm"><div className="label">How to progress</div><p className="text-bone-dim">{plan.training.progression}</p></div>

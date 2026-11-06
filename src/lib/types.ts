@@ -75,6 +75,8 @@ export interface Plan {
   meals: PlannedDay[];
   training: { split: string; sessions: Session[]; cardio: string; progression: string };
   notes: string[];
+  /** weekly calorie adjustments made from the user's weight trend */
+  adjustments?: { date: string; from: number; to: number; reason: string }[];
 }
 
 export interface LoggedMeal {

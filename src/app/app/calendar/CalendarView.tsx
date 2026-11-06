@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
 import type { DailyLog } from "@/lib/types";
+import { kgTo, useUnits } from "@/lib/units";
 
 type Lite = Pick<DailyLog, "log_date" | "meals" | "workouts" | "water_ml" | "weight_kg">;
 const WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -31,6 +32,7 @@ const shift = (m: string, n: number) => {
 
 export function CalendarView({ month, today, initial, logs, kcalTarget, proteinTarget }: { month: string; today: string; initial?: string; logs: Lite[]; kcalTarget: number; proteinTarget: number }) {
   const router = useRouter();
+  const [u] = useUnits();
   const goBack = () => {
     if (typeof window !== "undefined" && window.history.length > 1 && document.referrer.startsWith(window.location.origin)) router.back();
     else router.push("/app");
@@ -145,7 +147,7 @@ export function CalendarView({ month, today, initial, logs, kcalTarget, proteinT
                 <div className="rounded-xl bg-white/[0.04] p-3"><div className="text-xs text-bone-mute">Calories</div><div className="font-semibold">{Math.round(dt!.kcal)} <span className="font-normal text-bone-mute">/ {kcalTarget}</span></div></div>
                 <div className="rounded-xl bg-white/[0.04] p-3"><div className="text-xs text-bone-mute">Protein</div><div className="font-semibold">{Math.round(dt!.protein)} g <span className="font-normal text-bone-mute">/ {proteinTarget}</span></div></div>
                 <div className="rounded-xl bg-white/[0.04] p-3"><div className="text-xs text-bone-mute">Water</div><div className="font-semibold">{((day?.water_ml ?? 0) / 1000).toFixed(1)} L</div></div>
-                <div className="rounded-xl bg-white/[0.04] p-3"><div className="text-xs text-bone-mute">Weight</div><div className="font-semibold">{day?.weight_kg ?? "—"} kg</div></div>
+                <div className="rounded-xl bg-white/[0.04] p-3"><div className="text-xs text-bone-mute">Weight</div><div className="font-semibold">{day?.weight_kg != null ? `${kgTo(day.weight_kg, u.w)} ${u.w}` : "—"}</div></div>
               </div>
               {!!day?.meals?.length && (
                 <div className="mt-5">
@@ -170,7 +172,7 @@ export function CalendarView({ month, today, initial, logs, kcalTarget, proteinT
                     {day.workouts.map((w) => (
                       <li key={w.id} className="flex justify-between gap-3 py-2">
                         <span className="truncate">{w.name}</span>
-                        <span className="shrink-0 text-xs text-bone-mute">{w.set_list?.length ? w.set_list.map((s) => `${s.w || "BW"}×${s.r}`).join(" · ") : w.sets ? `${w.sets} sets` : w.minutes ? `${w.minutes} min` : ""}</span>
+                        <span className="shrink-0 text-xs text-bone-mute">{w.set_list?.length ? w.set_list.map((s) => `${s.w ? kgTo(s.w, u.w) : "BW"}×${s.r}`).join(" · ") : w.sets ? `${w.sets} sets` : w.minutes ? `${w.minutes} min` : ""}</span>
                       </li>
                     ))}
                   </ul>

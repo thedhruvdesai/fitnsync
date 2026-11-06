@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Bars, LineChart } from "@/components/Charts";
+import { Bars } from "@/components/Charts";
+import { W, WeightChart } from "@/components/Units";
 import { Paywall } from "@/components/Paywall";
 import { addDays, dayTotals, isoDate } from "@/lib/report";
 import { requireProfile } from "@/lib/session";
@@ -48,7 +49,7 @@ export default async function ProgressPage() {
       </div>
       <Link href="/app/body" className="card flex items-center justify-between !p-4 transition hover:border-white/25"><span><span className="block font-medium">📸 Body check-in</span><span className="block text-xs text-bone-mute">Progress photos, waist, chest, arms and body fat</span></span><span className="text-bone-mute">→</span></Link>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {[["Streak", `${streak} days`], ["Sessions", `${sessions}`], ["Weight change", change == null ? "—" : `${change > 0 ? "+" : ""}${change} kg`], ["Days logged", `${logs.length}/30`]].map(([k, v]) => (
+        {([["Streak", `${streak} days`], ["Sessions", `${sessions}`], ["Weight change", change == null ? "—" : <W kg={change} signed />], ["Days logged", `${logs.length}/30`]] as [string, React.ReactNode][]).map(([k, v]) => (
           <div key={k} className="card !p-4">
             <div className="text-xs uppercase tracking-widest text-bone-mute">{k}</div>
             <div className="h-display mt-1 text-2xl">{v}</div>
@@ -57,7 +58,7 @@ export default async function ProgressPage() {
       </div>
       <section className="card">
         <h2 className="h-display text-xl">Body weight</h2>
-        <div className="mt-3"><LineChart points={weights} unit=" kg" target={profile.goal_weight_kg ?? undefined} /></div>
+        <div className="mt-3"><WeightChart points={weights} goalKg={profile.goal_weight_kg ?? undefined} /></div>
       </section>
       <div className="grid gap-6 md:grid-cols-2">
         <section className="card">

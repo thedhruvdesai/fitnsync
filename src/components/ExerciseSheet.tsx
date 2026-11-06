@@ -6,6 +6,18 @@ import { ExerciseAvatar, ExerciseDemo } from "./ExerciseDemo";
 import { moveFor, repTarget, restSeconds } from "@/lib/exercises";
 import { findExercise } from "@/lib/library";
 import { stepsFor } from "@/lib/library-steps";
+import { kgTo, round, toKg, useUnits } from "@/lib/units";
+
+export interface LastSession {
+  date: string;
+  sets: { w: number; r: number }[];
+}
+
+/** "8–12" → 12, "6–8" → 8, "10" → 10 */
+const repTop = (reps: string) => {
+  const nums = reps.match(/\d+/g)?.map(Number) ?? [];
+  return nums.length ? Math.max(...nums) : 10;
+};
 import type { Exercise } from "@/lib/types";
 
 export interface SetRow {
@@ -70,6 +82,8 @@ export function ExerciseSheet({
   done,
   onComplete,
   onUndo,
+  last,
+  onSwap,
 }: {
   exercises: Exercise[];
   index: number;
@@ -79,6 +93,9 @@ export function ExerciseSheet({
   done?: Set<string>;
   onComplete?: (ex: Exercise, sets: SetRow[]) => void;
   onUndo?: (ex: Exercise) => void;
+  /** previous logged session for an exercise (weights in kg) */
+  last?: (name: string) => LastSession | undefined;
+  onSwap?: (index: number) => void;
 }) {
   const ex = exercises[index];
   const move = useMemo(() => moveFor(ex.name), [ex.name]);
@@ -89,7 +106,21 @@ export function ExerciseSheet({
   const [resting, setResting] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
 
-  const rows: SetRow[] = logs[ex.name] ?? Array.from({ length: ex.sets }, () => ({ weight: "", reps: String(repTarget(ex.reps)), done: false }));
+  const [units] = useUnits();
+  const prev = last?.(ex.name);
+  const top = repTop(ex.reps);
+  const hitTop = !!prev && prev.sets.length > 0 && prev.sets.every((x) => x.r >= top) && prev.sets.some((x) => x.w > 0);
+  const step = units.w === "lb" ? 5 : 2.5;
+  const prevW = (i: number) => (prev?.sets.length ? prev.sets[Math.min(i, prev.sets.length - 1)].w : 0);
+  const shown = (kg: number) => (kg > 0 ? String(kgTo(kg, units.w)) : "");
+  const rows: SetRow[] =
+    logs[ex.name] ??
+    Array.from({ length: ex.sets }, (_, i) => ({ weight: shown(prevW(i)), reps: String(repTarget(ex.reps)), done: false }));
+  const suggestion = prev
+    ? hitTop
+      ? { text: `You hit ${top} reps on every set last time. Time to go up: try ${round(kgTo(Math.max(...prev.sets.map((x) => x.w)), units.w) + step)} ${units.w}.`, apply: () => setRows(rows.map((r) => ({ ...r, weight: String(round((Number(r.weight) || kgTo(prevW(0), units.w)) + step)) }))) }
+      : { text: `Same weight as last time and aim for one more rep on at least one set.`, apply: null }
+    : null;
   const setRows = (r: SetRow[]) => setLogs((l) => ({ ...l, [ex.name]: r }));
   const isDone = done?.has(ex.name) ?? false;
   const completed = rows.filter((r) => r.done).length;
@@ -110,17 +141,19 @@ export function ExerciseSheet({
     setResting(false);
   }, [index]);
 
+  const toKgRows = (list: SetRow[]) => list.map((r) => ({ ...r, weight: r.weight ? String(round(toKg(Number(r.weight) || 0, units.w), 2)) : "" }));
+
   function tickSet(i: number) {
     const next = rows.map((r, k) => (k === i ? { ...r, done: !r.done } : r));
     setRows(next);
     const nowDone = next[i].done;
     const all = next.every((r) => r.done);
-    if (nowDone && all) onComplete?.(ex, next);
+    if (nowDone && all) onComplete?.(ex, toKgRows(next));
     else if (nowDone) setResting(true);
     if (!nowDone && isDone) onUndo?.(ex);
   }
 
-  const last = index === exercises.length - 1;
+  const isLast = index === exercises.length - 1;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center" role="dialog" aria-modal="true" aria-label={ex.name}>
@@ -173,7 +206,10 @@ export function ExerciseSheet({
                 {ex.sets} sets × {ex.reps} reps · rest {ex.rest}
               </p>
             </div>
-            {isDone && <span className="rounded-full bg-blood px-3 py-1 text-xs font-semibold text-white">✓ Done</span>}
+            <div className="flex shrink-0 items-center gap-2">
+              {isDone && <span className="rounded-full bg-blood px-3 py-1 text-xs font-semibold text-white">✓ Done</span>}
+              {onSwap && !isDone && <button onClick={() => onSwap(index)} className="rounded-full border border-white/15 px-3 py-1 text-xs text-bone-dim hover:border-white/40 hover:text-bone">⇄ Swap</button>}
+            </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {(lib ? [...lib.primary, ...lib.secondary.slice(0, 3), lib.equipment] : move.muscles).map((m, i) => (
@@ -182,6 +218,26 @@ export function ExerciseSheet({
           </div>
 
           {/* set tracker */}
+          {mode === "log" && prev && (
+            <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-xs uppercase tracking-widest text-bone-mute">Last time</span>
+                <span className="text-[11px] text-bone-mute">{new Date(prev.date + "T00:00:00").toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" })}</span>
+              </div>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {prev.sets.map((x, i) => (
+                  <span key={i} className="rounded-lg bg-ink px-2 py-1 text-sm tabular-nums">{x.w > 0 ? `${kgTo(x.w, units.w)} ${units.w}` : "BW"} × {x.r}</span>
+                ))}
+              </div>
+              {suggestion && (
+                <div className={`mt-2 flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-xs ${hitTop ? "bg-emerald-400/10 text-emerald-200" : "bg-white/5 text-bone-dim"}`}>
+                  <span>{hitTop ? "📈 " : "🎯 "}{suggestion.text}</span>
+                  {suggestion.apply && <button onClick={suggestion.apply} className="shrink-0 rounded-full bg-emerald-400 px-3 py-1 font-semibold text-ink">Apply</button>}
+                </div>
+              )}
+            </div>
+          )}
+
           {mode === "log" && (
             <div className="mt-6">
               <div className="flex items-center justify-between">
@@ -194,7 +250,7 @@ export function ExerciseSheet({
                     <span className="w-12 text-sm text-bone-dim">Set {i + 1}</span>
                     <label className="flex flex-1 items-center gap-1 rounded-xl bg-ink px-3 py-2">
                       <input inputMode="decimal" placeholder="—" value={r.weight} onChange={(e) => setRows(rows.map((x, k) => (k === i ? { ...x, weight: e.target.value } : x)))} className="w-full bg-transparent text-center outline-none" aria-label={`Set ${i + 1} weight`} />
-                      <span className="text-[10px] text-bone-mute">kg</span>
+                      <span className="text-[10px] text-bone-mute">{units.w}</span>
                     </label>
                     <label className="flex flex-1 items-center gap-1 rounded-xl bg-ink px-3 py-2">
                       <input inputMode="numeric" value={r.reps} onChange={(e) => setRows(rows.map((x, k) => (k === i ? { ...x, reps: e.target.value } : x)))} className="w-full bg-transparent text-center outline-none" aria-label={`Set ${i + 1} reps`} />
@@ -207,7 +263,7 @@ export function ExerciseSheet({
                 ))}
               </div>
               {!isDone && (
-                <button className="mt-3 text-xs text-bone-mute underline underline-offset-4 hover:text-bone" onClick={() => onComplete?.(ex, rows.map((r) => ({ ...r, done: true })))}>
+                <button className="mt-3 text-xs text-bone-mute underline underline-offset-4 hover:text-bone" onClick={() => onComplete?.(ex, toKgRows(rows.map((r) => ({ ...r, done: true }))))}>
                   Mark exercise as done
                 </button>
               )}
@@ -251,7 +307,7 @@ export function ExerciseSheet({
         {/* footer nav */}
         <div className="flex gap-3 border-t border-white/5 bg-ink-2/95 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <button className="btn-ghost !py-3" disabled={index === 0} onClick={() => onIndex(index - 1)}>←</button>
-          {last ? (
+          {isLast ? (
             <button className="btn-red flex-1 !py-3" onClick={onClose}>{mode === "log" ? "Finish workout" : "Done"}</button>
           ) : (
             <button className="btn-red flex-1 !py-3" onClick={() => onIndex(index + 1)}>

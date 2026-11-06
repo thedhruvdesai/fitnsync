@@ -9,7 +9,10 @@ import type { AiItem, Slot, StartMode } from "@/components/AiFoodLogger";
 import { QuickFoods, Star, useFavorites, type FoodItem } from "@/components/QuickFoods";
 import { GettingStarted } from "@/components/GettingStarted";
 import { ExerciseThumb } from "@/components/ExerciseDemo";
-import type { SetRow } from "@/components/ExerciseSheet";
+import type { LastSession, SetRow } from "@/components/ExerciseSheet";
+import { ExercisePicker } from "@/components/ExercisePicker";
+import { AdaptiveCard } from "@/components/AdaptiveCard";
+import { ConvertedInput, kgTo, toKg, useUnits } from "@/lib/units";
 import { Ring } from "@/components/Ring";
 import Link from "next/link";
 import type { DailyLog, LoggedMeal, LoggedWorkout, Plan } from "@/lib/types";
@@ -24,7 +27,11 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const empty = (d: string): DailyLog => ({ log_date: d, meals: [], workouts: [], water_ml: 0, weight_kg: null, sleep_hours: null, energy: null, notes: null });
 
-export default function TodayView({ plan, name, userId, locked, initialDate }: { plan: Plan; name: string; userId: string; locked: boolean; initialDate?: string }) {
+export default function TodayView({ plan: initialPlan, name, userId, locked, initialDate }: { plan: Plan; name: string; userId: string; locked: boolean; initialDate?: string }) {
+  const [plan, setPlan] = useState(initialPlan);
+  const [units] = useUnits();
+  const [swapAt, setSwapAt] = useState<number | null>(null);
+  const [history, setHistory] = useState<Map<string, LastSession>>(new Map());
   const supabase = useMemo(() => createClient(), []);
   const [date, setDate] = useState(initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate) && initialDate <= isoDate(new Date()) ? initialDate : isoDate(new Date()));
   const [log, setLog] = useState<DailyLog>(empty(date));
@@ -37,6 +44,41 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
   const [custom, setCustom] = useState({ name: "", kcal: "", protein: "", carbs: "", fat: "" });
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const t = plan.targets;
+
+  // previous sessions per exercise, for "last time" in the workout sheet
+  useEffect(() => {
+    let live = true;
+    supabase
+      .from("daily_logs")
+      .select("log_date, workouts")
+      .lt("log_date", date)
+      .gte("log_date", addDays(date, -120))
+      .order("log_date", { ascending: false })
+      .then(({ data }) => {
+        if (!live) return;
+        const m = new Map<string, LastSession>();
+        for (const r of (data ?? []) as { log_date: string; workouts: LoggedWorkout[] }[])
+          for (const w of r.workouts ?? []) {
+            const sets = w.set_list?.length ? w.set_list : w.reps ? Array.from({ length: w.sets ?? 1 }, () => ({ w: w.weight ?? 0, r: w.reps! })) : [];
+            if (!sets.length) continue;
+            for (const k of [w.ex, w.name.toLowerCase()]) if (k && !m.has(k)) m.set(k, { date: r.log_date, sets });
+          }
+        setHistory(m);
+      });
+    return () => {
+      live = false;
+    };
+  }, [supabase, date]);
+  const lastFor = (n: string) => history.get(findExercise(n)?.id ?? "") ?? history.get(n.toLowerCase());
+
+  async function swapExercise(i: number, newName: string) {
+    if (!session) return;
+    const sIdx = plan.training.sessions.indexOf(session);
+    const sessions = plan.training.sessions.map((s, k) => (k === sIdx ? { ...s, exercises: s.exercises.map((e, j) => (j === i ? { ...e, name: newName } : e)) } : s));
+    const next = { ...plan, training: { ...plan.training, sessions } };
+    setPlan(next);
+    await fetch("/api/plan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "training", sessions }) });
+  }
 
   const dow = DOW[new Date(date + "T00:00:00").getDay()];
   const plannedDay = plan.meals.find((d) => d.day === dow);
@@ -166,6 +208,7 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
       )}
 
       <GettingStarted supabase={supabase} onDemo={() => setScan("demo")} onScan={() => setScan("camera")} />
+      {isToday && !locked && <AdaptiveCard onApplied={(p) => setPlan(p)} />}
 
       {/* scan CTA */}
       <section className="glow-border relative overflow-hidden rounded-3xl bg-gradient-to-br from-blood/25 via-ink-2 to-ink-2 p-5">
@@ -310,7 +353,7 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
                           <span className="block truncate font-medium">{e.name}</span>
                           <span className="block text-xs text-bone-mute">
                             {e.sets} × {e.reps} · rest {e.rest}
-                            {logged?.weight ? ` · ${logged.weight} kg` : ""}
+                            {logged?.weight ? ` · ${kgTo(logged.weight, units.w)} ${units.w}` : lastFor(e.name) ? ` · last ${Math.max(...lastFor(e.name)!.sets.map((x) => x.w)) ? `${kgTo(Math.max(...lastFor(e.name)!.sets.map((x) => x.w)), units.w)} ${units.w}` : "BW"}` : ""}
                           </span>
                           <span className="mt-0.5 block text-[11px] text-blood-400">Tap for demo & tracker →</span>
                         </span>
@@ -327,6 +370,8 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
                   onIndex={setSheet}
                   onClose={() => setSheet(null)}
                   mode="log"
+                  last={lastFor}
+                  onSwap={(i) => setSwapAt(i)}
                   done={new Set(log.workouts.map((w) => w.name))}
                   onComplete={(ex, sets: SetRow[]) => {
                     const weights = sets.map((r) => Number(r.weight)).filter((n) => n > 0);
@@ -336,6 +381,18 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
                     persist({ ...log, workouts: [...log.workouts.filter((w) => w.name !== ex.name), entry] });
                   }}
                   onUndo={(ex) => persist({ ...log, workouts: log.workouts.filter((w) => w.name !== ex.name) })}
+                />
+              )}
+              {swapAt != null && session.exercises[swapAt] && (
+                <ExercisePicker
+                  title={`Swap ${session.exercises[swapAt].name}`}
+                  initialGroup={findExercise(session.exercises[swapAt].name)?.group}
+                  exclude={session.exercises.map((e) => e.name)}
+                  onClose={() => setSwapAt(null)}
+                  onPick={(e) => {
+                    swapExercise(swapAt, e.name);
+                    setSwapAt(null);
+                  }}
                 />
               )}
             </>
@@ -376,8 +433,16 @@ export default function TodayView({ plan, name, userId, locked, initialDate }: {
             </div>
           </div>
           <div>
-            <div className="label flex justify-between">Morning weight kg <Link href="/app/body" className="normal-case tracking-normal text-blood">📸 Body</Link></div>
-            <input className="input !py-2" inputMode="decimal" value={log.weight_kg ?? ""} onChange={(e) => persist({ ...log, weight_kg: e.target.value ? Number(e.target.value) : null })} />
+            <div className="label flex justify-between">Morning weight ({units.w}) <Link href="/app/body" className="normal-case tracking-normal text-blood">📸 Body</Link></div>
+            <ConvertedInput
+              key={`${date}-${units.w}-${loading}`}
+              className="input !py-2"
+              value={log.weight_kg}
+              unitKey={units.w}
+              show={(v) => kgTo(v, units.w)}
+              store={(v) => toKg(v, units.w)}
+              onChange={(v) => persist({ ...log, weight_kg: v ?? null })}
+            />
           </div>
           <div>
             <div className="label">Sleep hours</div>

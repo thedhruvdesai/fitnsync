@@ -80,7 +80,7 @@ export default async function PlanPage() {
       <section>
         <h2 className="h-display text-2xl">{plan.training.split}</h2>
         <SessionCards sessions={plan.training.sessions} editable homeOnly={profile.equipment !== "gym"} />
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
           <div className="card text-sm"><div className="label">Cardio</div><p className="text-bone-dim">{plan.training.cardio}</p></div>
           <div className="card text-sm"><div className="label">How to progress</div><p className="text-bone-dim">{plan.training.progression}</p></div>
         </div>

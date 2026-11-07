@@ -254,7 +254,7 @@ export function ExerciseSheet({
           )}
 
           {/* how to */}
-          <div className="mt-6 grid gap-4 md:grid-cols-[1.4fr_1fr]">
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-[1.4fr_1fr]">
             <div>
               <h3 className="label">Step by step</h3>
               <ol className="space-y-2.5">

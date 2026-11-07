@@ -94,7 +94,7 @@ export function CalendarView({ month, today, initial, logs, kcalTarget, proteinT
         ))}
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
         <section className="card !p-2 sm:!p-4">
           <div className="grid grid-cols-7 gap-1 sm:gap-2">
             {WEEK.map((w) => <div key={w} className="pb-1 text-center text-[10px] uppercase tracking-wider text-bone-mute sm:text-xs">{w}</div>)}

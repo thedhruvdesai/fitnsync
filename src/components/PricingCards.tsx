@@ -27,7 +27,7 @@ export function PricingCards({ current, mode, highlight, trialEligible = true, r
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {PLANS.map((p) => {
           const isCurrent = current === p.id;
           const featured = highlight ? highlight === p.id : p.highlight;

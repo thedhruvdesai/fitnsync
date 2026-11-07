@@ -45,7 +45,7 @@ export default async function ExercisePage(props: { params: Promise<{ id: string
   return (
     <div className="space-y-6">
       <Link href={`/app/exercises?g=${ex.group}`} className="text-sm text-bone-mute hover:text-bone">← {ex.group} exercises</Link>
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_1fr]">
         <div className="min-w-0 space-y-4">
           <ExerciseDemo name={ex.name} lib={ex} />
           <div>
@@ -63,7 +63,7 @@ export default async function ExercisePage(props: { params: Promise<{ id: string
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-[1.4fr_1fr]">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.4fr_1fr]">
         <section className="card">
           <h2 className="label">Step by step</h2>
           <ol className="space-y-3">

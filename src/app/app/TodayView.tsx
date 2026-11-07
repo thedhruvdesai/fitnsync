@@ -341,7 +341,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
         <p className="mt-1 text-sm text-bone-dim">Snap your plate. Get calories, protein, carbs, fat, fibre, sugar and sodium in seconds.</p>
         <div className="mt-4 grid grid-cols-3 gap-2">
           <button className="btn-red col-span-2 !py-3.5 text-base" onClick={() => setScan("camera")}>📷 Scan food</button>
-          <button className="chip !py-3.5 text-sm" onClick={() => setScan("barcode")}>▥ Barcode</button>
+          <button className="chip whitespace-nowrap !px-3 !py-3.5 text-sm" onClick={() => setScan("barcode")}>▥ Barcode</button>
           <button className="chip !py-2.5 text-xs" onClick={() => setScan("gallery")}>🖼️ Upload</button>
           <button className="chip !py-2.5 text-xs" onClick={() => setScan("text")}>⌨️ Type it</button>
           <button className="chip !py-2.5 text-xs" onClick={() => setScan("manual")}>✍️ Manual</button>
@@ -373,7 +373,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* meals */}
         <section className="card">
           <div className="flex items-center justify-between">
@@ -562,7 +562,7 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
       {/* habits */}
       <section className="card">
         <h2 className="h-display text-2xl">Check-in</h2>
-        <div className="mt-4 grid gap-5 md:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-4">
           <div>
             <div className="label">Water</div>
             <div className="flex items-center gap-2">

@@ -63,7 +63,7 @@ export function SessionCards({ sessions: initial, editable = false, homeOnly = f
         </div>
       )}
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
         {sessions.map((s, si) => (
           <div key={si} className={`card min-w-0 ${editing ? "border-blood/30" : ""}`}>
             <div className="flex items-baseline justify-between">

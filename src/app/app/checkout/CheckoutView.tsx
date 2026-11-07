@@ -183,7 +183,7 @@ export default function CheckoutView(props: {
         <Steps at={2} />
       </div>
 
-      <div className="relative mt-8 grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
+      <div className="relative mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
         {/* plan summary */}
         <section onPointerMove={onMove} onPointerLeave={onLeave} className="fade-up" style={{ animationDelay: "120ms" }}>
           <div ref={card} className="tilt-3d glow-border sheen h-full rounded-[28px] bg-gradient-to-br from-blood/25 via-ink-2/90 to-ink-2/90 p-7 backdrop-blur-md md:p-9">

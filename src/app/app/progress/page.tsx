@@ -61,7 +61,7 @@ export default async function ProgressPage() {
         <h2 className="h-display text-xl">Body weight</h2>
         <div className="mt-3"><WeightChart points={weights} goalKg={profile.goal_weight_kg ?? undefined} /></div>
       </section>
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <section className="card">
           <h2 className="h-display text-xl">Calories · 14 days</h2>
           <div className="mt-3"><Bars data={kcal} target={t.kcal} /></div>

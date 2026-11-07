@@ -123,7 +123,7 @@ export function RecipesView({ diet, userId, today, open, initialTab }: { diet: D
       </div>
 
       <p className="text-xs text-bone-mute">{list.length} recipe{list.length === 1 ? "" : "s"}</p>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {list.map((m) => {
           const meth = methodFor(m.name);
           const b = DIET_BADGE[m.tag];

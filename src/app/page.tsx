@@ -113,7 +113,7 @@ export default async function Home() {
         </header>
 
         {/* hero */}
-        <section className="relative mx-auto grid min-h-[92vh] max-w-7xl items-center gap-12 px-6 pb-16 pt-12 lg:grid-cols-[1.25fr_1fr]">
+        <section className="relative mx-auto grid grid-cols-1 min-h-[92vh] max-w-7xl items-center gap-12 px-6 pb-16 pt-12 lg:grid-cols-[1.25fr_1fr]">
           <div>
             <p className="eyebrow fade-up" style={{ animationDelay: "100ms" }}>Personal fitness &amp; nutrition coaching</p>
             <h1 className="h-display mt-6 text-[19vw] uppercase leading-[0.82] sm:text-[120px] lg:text-[150px]">
@@ -177,7 +177,7 @@ export default async function Home() {
             <p className="eyebrow">Everything in one place</p>
             <h2 className="h-display mt-3 max-w-3xl text-5xl leading-[0.92] md:text-7xl">Built like a coach. <span className="text-outline">Used like an app.</span></h2>
           </Reveal>
-          <div className="mt-14 grid auto-rows-[minmax(220px,auto)] gap-4 md:grid-cols-6">
+          <div className="mt-14 grid grid-cols-1 auto-rows-[minmax(220px,auto)] gap-4 md:grid-cols-6">
             <Reveal className="md:col-span-4">
               <div className="card tilt shine flex h-full flex-col justify-between !p-8">
                 <div>
@@ -236,7 +236,7 @@ export default async function Home() {
           <div className="mt-12 border-t border-white/10">
             {STEPS.map((s, i) => (
               <Reveal key={s.n} delay={i * 80}>
-                <div className="group grid items-center gap-4 border-b border-white/10 py-8 transition hover:bg-white/[0.02] md:grid-cols-[140px_1fr_1.2fr]">
+                <div className="group grid grid-cols-1 items-center gap-4 border-b border-white/10 py-8 transition hover:bg-white/[0.02] md:grid-cols-[140px_1fr_1.2fr]">
                   <div className="h-display text-5xl text-bone-mute transition group-hover:text-blood-400">{s.n}</div>
                   <h3 className="h-display text-3xl md:text-4xl">{s.t}</h3>
                   <p className="text-bone-dim md:text-lg">{s.d}</p>
@@ -247,7 +247,7 @@ export default async function Home() {
         </section>
 
         {/* coach */}
-        <section id="coach" className="mx-auto grid max-w-7xl gap-12 px-6 pb-28 lg:grid-cols-2 lg:items-center">
+        <section id="coach" className="mx-auto grid grid-cols-1 max-w-7xl gap-12 px-6 pb-28 lg:grid-cols-2 lg:items-center">
           <Reveal>
             <p className="eyebrow">Elite · Fit&amp;Sync Coach</p>
             <h2 className="h-display mt-3 text-5xl leading-[0.92] md:text-6xl">Feedback that sounds like it came from someone who&apos;s <span className="text-blood-400">seen it all.</span></h2>

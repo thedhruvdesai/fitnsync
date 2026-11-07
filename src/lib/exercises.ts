@@ -24,7 +24,7 @@ export interface Pose {
   footFar?: Vec;
 }
 
-export type Gear = "barbell" | "dumbbell" | "cable" | "bench" | "seat" | "bar" | "mat" | "box" | "bike" | "dipbars" | "lowbar" | "sled" | "incline" | "inclinebench" | "declinebench" | "chair" | "preacher" | "lowbox" | "none";
+export type Gear = "barbell" | "dumbbell" | "cable" | "bench" | "seat" | "bar" | "mat" | "box" | "bike" | "dipbars" | "lowbar" | "sled" | "incline" | "inclinebench" | "declinebench" | "chair" | "preacher" | "lowbox" | "treadmill" | "stairs" | "elliptical" | "squatbox" | "rearbench" | "thrustbench" | "none";
 export type Highlight = "thigh" | "shin" | "upperArm" | "forearm" | "torso" | "hip";
 
 export interface Move {
@@ -336,6 +336,174 @@ export const MOVES: Record<string, Move> = {
     a: { pelvis: [100, STAND], torso: 4, hand: [-6, 50], foot: [112, 172], footFar: [84, 172] },
     b: { pelvis: [100, STAND], torso: 4, hand: [40, -20], foot: [112, 172], footFar: [84, 172] },
     gear: ["cable"], cableFrom: [16, 170], highlight: ["torso", "upperArm"],
+  },
+  deadlift: {
+    key: "deadlift", title: "Deadlift", muscles: ["Glutes", "Hamstrings", "Back", "Grip"],
+    cues: ["Bar over mid-foot, shins close", "Hips down, chest up, flat back", "Push the floor away, bar slides up the legs", "Stand tall, squeeze glutes, don't lean back"],
+    mistake: "Rounding the lower back or jerking the bar off the floor.",
+    a: { pelvis: [98, STAND], torso: 4, hand: [0, 52], foot: [100, 172] },
+    b: { pelvis: [78, 128], torso: 68, hand: [0, 52], foot: [100, 172] },
+    gear: ["barbell"], highlight: ["hip", "torso", "thigh"],
+  },
+  goodmorning: {
+    key: "goodmorning", title: "Good morning", muscles: ["Hamstrings", "Glutes", "Lower back"],
+    cues: ["Bar on the upper back like a squat", "Soft knees, push the hips back", "Hinge until the back is nearly flat", "Drive the hips forward to stand"],
+    mistake: "Rounding the back as you bend.",
+    a: { pelvis: [98, STAND], torso: 4, hand: [-4, 8], foot: [100, 172] },
+    b: { pelvis: [86, 104], torso: 76, hand: [-4, 8], foot: [100, 172] },
+    gear: ["barbell"], highlight: ["hip", "torso"],
+  },
+  rackpull: {
+    key: "rackpull", title: "Rack pull", muscles: ["Upper back", "Glutes", "Grip"],
+    cues: ["Bar starts just below the knees", "Flat back, chest up", "Drive the hips through", "Lock out tall, then lower to the pins"],
+    mistake: "Leaning back hard at the top.",
+    a: { pelvis: [98, STAND], torso: 4, hand: [0, 52], foot: [100, 172] },
+    b: { pelvis: [88, 110], torso: 48, hand: [0, 52], foot: [100, 172] },
+    gear: ["barbell"], highlight: ["torso", "hip"],
+  },
+  pushpress: {
+    key: "pushpress", title: "Push press", muscles: ["Shoulders", "Triceps", "Legs"],
+    cues: ["Weights at the shoulders", "Quick, short dip of the knees", "Drive up with the legs and press", "Lock out overhead"],
+    mistake: "Dipping too deep and turning it into a squat.",
+    a: { pelvis: [98, STAND + 18], torso: 4, hand: [8, -2], foot: [100, 172] },
+    b: { pelvis: [100, STAND + 2], torso: 0, hand: [3, -50], foot: [100, 172] },
+    gear: ["dumbbell"], highlight: ["upperArm", "thigh"], tempo: 1800,
+  },
+  plyopushup: {
+    key: "plyopushup", title: "Plyo push-up", muscles: ["Chest", "Triceps", "Power"],
+    cues: ["Lower under control", "Push hard so the hands leave the floor", "Land softly with bent elbows", "Keep the body in one line"],
+    mistake: "Landing with locked elbows.",
+    a: { pelvis: [80, 140], shoulder: [124, 114], hand: [6, 40], foot: [8, 170] },
+    b: { pelvis: [80, 166], shoulder: [124, 161], hand: [2, 17], foot: [8, 170] },
+    gear: ["mat"], highlight: ["torso", "upperArm"], tempo: 1400,
+  },
+  inchworm: {
+    key: "inchworm", title: "Inchworm", muscles: ["Hamstrings", "Core", "Shoulders"],
+    cues: ["From a plank, walk the feet towards the hands", "Keep the legs as straight as you can", "Then walk the hands back out to a plank", "Move slowly and keep the core tight"],
+    mistake: "Letting the hips sag at the plank.",
+    a: { pelvis: [80, 147], shoulder: [124, 128], hand: [2, 50], foot: [8, 170] },
+    b: { pelvis: [90, 104], shoulder: [128, 132], hand: [0, 46], foot: [96, 172] },
+    gear: ["mat"], highlight: ["torso", "thigh"], tempo: 3200,
+  },
+  bulgarian: {
+    key: "bulgarian", title: "Bulgarian split squat", muscles: ["Quads", "Glutes"],
+    cues: ["Rear foot laces-down on a bench", "Front foot far enough forward", "Drop the back knee straight down", "Drive up through the front heel"],
+    mistake: "Front knee caving in, or the front foot too close to the bench.",
+    a: { pelvis: [96, 100], torso: 8, hand: [0, 52], foot: [120, 172], footFar: [44, 136] },
+    b: { pelvis: [92, 130], torso: 14, hand: [0, 52], foot: [120, 172], footFar: [44, 136] },
+    gear: ["rearbench", "dumbbell"], highlight: ["thigh"],
+  },
+  hipthrust: {
+    key: "hipthrust", title: "Hip thrust", muscles: ["Glutes", "Hamstrings"],
+    cues: ["Upper back on the bench edge, bar over the hips", "Feet flat, shins vertical at the top", "Drive the hips up and squeeze", "Chin tucked, ribs down"],
+    mistake: "Arching the lower back instead of squeezing the glutes.",
+    a: { pelvis: [96, 162], shoulder: [56, 134], hand: [40, 26], foot: [134, 172] },
+    b: { pelvis: [100, 134], shoulder: [56, 134], hand: [44, 0], foot: [134, 172] },
+    gear: ["thrustbench", "barbell"], highlight: ["hip"],
+  },
+  singlebridge: {
+    key: "singlebridge", title: "Single-leg glute bridge", muscles: ["Glutes", "Hamstrings", "Core"],
+    cues: ["One foot flat, the other leg straight", "Push through the heel", "Lift until hips and thigh line up", "Keep the hips level"],
+    mistake: "Letting one hip drop.",
+    a: { pelvis: [106, 172], shoulder: [60, 170], hand: [53, 5], foot: [136, 172], footFar: [180, 152] },
+    b: { pelvis: [106, 140], shoulder: [60, 170], hand: [53, 5], foot: [136, 172], footFar: [176, 116] },
+    gear: ["mat"], highlight: ["hip"],
+  },
+  situp: {
+    key: "situp", title: "Sit-up", muscles: ["Abs", "Hip flexors"],
+    cues: ["Knees bent, feet flat or anchored", "Curl up one vertebra at a time", "Sit all the way up", "Lower back down slowly"],
+    mistake: "Yanking on the neck with the hands.",
+    a: { pelvis: [112, 172], shoulder: [66, 172], hand: [-4, -16], foot: [148, 172] },
+    b: { pelvis: [112, 172], shoulder: [104, 127], hand: [-4, -16], foot: [148, 172] },
+    gear: ["mat"], highlight: ["torso"],
+  },
+  legraise: {
+    key: "legraise", title: "Lying leg raise", muscles: ["Lower abs", "Hip flexors"],
+    cues: ["Lower back pressed into the floor", "Legs straight, lift to vertical", "Lower slowly without arching", "Stop just above the floor"],
+    mistake: "Arching the lower back as the legs come down.",
+    a: { pelvis: [112, 172], shoulder: [66, 172], hand: [44, 2], foot: [186, 168] },
+    b: { pelvis: [112, 170], shoulder: [66, 172], hand: [44, 2], foot: [130, 100] },
+    gear: ["mat"], highlight: ["torso", "thigh"],
+  },
+  hanglegraise: {
+    key: "hanglegraise", title: "Hanging leg raise", muscles: ["Lower abs", "Hip flexors", "Grip"],
+    cues: ["Dead hang, shoulders active", "Legs straight, raise them to hip height or higher", "No swinging", "Lower slowly"],
+    mistake: "Swinging to get the legs up.",
+    a: { pelvis: [100, 126], torso: 0, hand: [4, -52], foot: [4, 74] },
+    b: { pelvis: [98, 122], torso: -6, hand: [4, -52], foot: [72, 4] },
+    gear: ["bar"], feetFromPelvis: true, highlight: ["torso", "thigh"],
+  },
+  sideplank: {
+    key: "sideplank", title: "Side plank", muscles: ["Obliques", "Core", "Glutes"],
+    cues: ["Elbow under the shoulder", "Feet stacked, body in one line", "Lift the hips and hold", "Top arm up to the ceiling"],
+    mistake: "Hips sagging towards the floor.",
+    a: { pelvis: [90, 142], shoulder: [130, 120], hand: [2, -50], handFar: [4, 50], foot: [14, 170] },
+    b: { pelvis: [90, 138], shoulder: [130, 118], hand: [2, -50], handFar: [4, 52], foot: [14, 170] },
+    gear: ["mat"], highlight: ["torso", "hip"], tempo: 3600, hold: true,
+  },
+  walk: {
+    key: "walk", title: "Incline walk", muscles: ["Glutes", "Calves", "Heart"],
+    cues: ["Set an incline you can hold a conversation on", "Tall posture, don't hold the rails", "Full stride, push from the back foot", "Keep a steady pace"],
+    mistake: "Leaning on the handrails and taking the work off the legs.",
+    a: { pelvis: [100, STAND - 4], torso: 8, hand: [-10, 44], handFar: [10, 44], foot: [116, 164], footFar: [86, 170] },
+    b: { pelvis: [100, STAND - 4], torso: 8, hand: [10, 44], handFar: [-10, 44], foot: [86, 170], footFar: [116, 164] },
+    gear: ["treadmill"], highlight: ["thigh"], tempo: 1500,
+  },
+  stairs: {
+    key: "stairs", title: "Stair climber", muscles: ["Glutes", "Quads", "Heart"],
+    cues: ["Stand tall, light hands on the rails", "Step through the whole foot", "Steady rhythm", "Don't lean on the machine"],
+    mistake: "Hunching over and resting on the rails.",
+    a: { pelvis: [100, STAND - 6], torso: 6, hand: [24, 30], foot: [120, 140], footFar: [96, 170] },
+    b: { pelvis: [100, STAND - 6], torso: 6, hand: [24, 30], foot: [96, 170], footFar: [120, 140] },
+    gear: ["stairs"], highlight: ["thigh"], tempo: 1300,
+  },
+  elliptical: {
+    key: "elliptical", title: "Elliptical", muscles: ["Legs", "Arms", "Heart"],
+    cues: ["Hold the moving handles", "Push and pull with the arms", "Smooth, oval stride", "Stay tall"],
+    mistake: "Bouncing up and down instead of gliding.",
+    a: { pelvis: [100, STAND - 10], torso: 4, hand: [34, 10], handFar: [16, 22], foot: [120, 160], footFar: [86, 166] },
+    b: { pelvis: [100, STAND - 10], torso: 4, hand: [16, 22], handFar: [34, 10], foot: [86, 166], footFar: [120, 160] },
+    gear: ["elliptical"], highlight: ["thigh"], tempo: 1300,
+  },
+  legpresscalf: {
+    key: "legpresscalf", title: "Leg press calf raise", muscles: ["Calves"],
+    cues: ["Balls of the feet on the bottom edge of the plate", "Legs straight but not locked", "Push through the toes", "Lower the heels for a stretch"],
+    mistake: "Bending the knees to move more weight.",
+    a: { pelvis: [82, 150], torso: -58, hand: [10, 34], foot: [138, 88] },
+    b: { pelvis: [82, 150], torso: -58, hand: [10, 34], foot: [144, 82] },
+    gear: ["sled"], highlight: ["shin"], tempo: 1600,
+  },
+  chestdip: {
+    key: "chestdip", title: "Chest dip", muscles: ["Lower chest", "Triceps", "Front shoulders"],
+    cues: ["Lean the chest forward", "Elbows slightly out", "Lower until you feel a chest stretch", "Press up without locking hard"],
+    mistake: "Staying bolt upright, which turns it into a triceps dip.",
+    a: { pelvis: [96, 94], torso: 26, hand: [10, 52], foot: [-30, 40] },
+    b: { pelvis: [88, 118], torso: 36, hand: [-2, 26], foot: [-30, 40] },
+    gear: ["dipbars"], feetFromPelvis: true, highlight: ["torso", "upperArm"],
+  },
+  onearmrow: {
+    key: "onearmrow", title: "One-arm row", muscles: ["Lats", "Upper back", "Biceps"],
+    cues: ["Hand and knee on the bench, back flat", "Let the dumbbell hang straight down", "Pull the elbow back to the hip", "Lower slowly to a full stretch"],
+    mistake: "Twisting the torso to lift the weight.",
+    a: { pelvis: [70, 108], torso: 84, hand: [0, 52], handFar: [4, 32], foot: [74, 172], footFar: [38, 134] },
+    b: { pelvis: [70, 108], torso: 84, hand: [-14, 18], handFar: [4, 32], foot: [74, 172], footFar: [38, 134] },
+    gear: ["bench", "dumbbell"], highlight: ["upperArm", "torso"],
+  },
+  chestrow: {
+    key: "chestrow", title: "Chest-supported row", muscles: ["Upper back", "Lats", "Rear shoulders"],
+    cues: ["Chest on an incline bench", "Arms hang straight down", "Pull the elbows back and squeeze", "Lower with control"],
+    mistake: "Lifting the chest off the pad.",
+    a: { pelvis: [124, 134], shoulder: [89, 104], hand: [0, 52], foot: [160, 172] },
+    b: { pelvis: [124, 134], shoulder: [89, 104], hand: [14, 20], foot: [160, 172] },
+    gear: ["inclinebench", "dumbbell"], highlight: ["upperArm", "torso"],
+  },
+  stepknee: {
+    key: "stepknee", title: "Step-up with knee raise", muscles: ["Glutes", "Quads", "Balance"],
+    cues: ["Whole foot on the box", "Drive up through that heel", "Raise the other knee to hip height", "Step back down with control"],
+    mistake: "Pushing off the back foot.",
+    a: { pelvis: [96, 110], torso: 14, hand: [0, 52], foot: [124, 140], footFar: [82, 172] },
+    b: { pelvis: [118, 66], torso: 2, hand: [0, 52], foot: [124, 140], footFar: [140, 104] },
+    gear: ["box"], highlight: ["thigh"],
   },
   preacher: {
     key: "preacher", title: "Preacher curl", muscles: ["Biceps", "Forearms"],
@@ -795,7 +963,30 @@ export const MOVES: Record<string, Move> = {
 const RULES: [RegExp, keyof typeof MOVES][] = [
   [/chest press \(machine\)|incline chest press \(machine\)|pec deck|chest press machine/i, "seatedchest"],
   [/chest press \(cable\)|cable chest press/i, "cablepress"],
+  [/box squat/i, "squat"],
   [/low.to.high/i, "lowhighfly"],
+  [/romanian|stiff.leg/i, "hinge"],
+  [/good morning/i, "goodmorning"],
+  [/rack pull/i, "rackpull"],
+  [/^(deadlift|trap bar deadlift|sumo deadlift)|deadlift \(barbell\)/i, "deadlift"],
+  [/push press/i, "pushpress"],
+  [/plyo push/i, "plyopushup"],
+  [/inchworm/i, "inchworm"],
+  [/bulgarian/i, "bulgarian"],
+  [/hip thrust/i, "hipthrust"],
+  [/single.leg (glute )?bridge/i, "singlebridge"],
+  [/sit.?up/i, "situp"],
+  [/lying leg raise/i, "legraise"],
+  [/hanging leg raise/i, "hanglegraise"],
+  [/side plank/i, "sideplank"],
+  [/incline walk/i, "walk"],
+  [/stair climber|stairmaster/i, "stairs"],
+  [/elliptical/i, "elliptical"],
+  [/leg press calf/i, "legpresscalf"],
+  [/chest dip/i, "chestdip"],
+  [/one.arm row|single.arm row/i, "onearmrow"],
+  [/chest.supported row/i, "chestrow"],
+  [/step.up with knee/i, "stepknee"],
   [/preacher|spider curl/i, "preacher"],
   [/concentration/i, "concentration"],
   [/seated leg curl/i, "seatedlegcurl"],
@@ -881,8 +1072,17 @@ const RULES: [RegExp, keyof typeof MOVES][] = [
 
 /** Show what's actually held: dumbbells for dumbbell moves, a bar for barbell moves, nothing for machines. */
 function withEquipment(move: Move, name: string): Move {
+  if (/cable/i.test(name) && !move.cableFrom && ["curl", "raise", "reardelt", "swing"].includes(move.key)) {
+    const from: Vec = move.key === "reardelt" ? [40, 172] : move.key === "swing" ? [16, 172] : [150, 174];
+    return { ...move, gear: [...move.gear.filter((g) => g !== "barbell" && g !== "dumbbell"), "cable"], cableFrom: from };
+  }
+  if (move.key === "bridge" && /barbell/i.test(name)) return { ...move, gear: [...move.gear, "barbell"] };
+  if (move.key === "calf" && /dumbbell/i.test(name)) return { ...move, gear: ["dumbbell"] };
+  if (/box squat/i.test(name)) return { ...move, gear: [...move.gear, "squatbox"] };
+  if (/treadmill run|^running/i.test(name) && move.key === "cardio") return { ...move, gear: ["treadmill"] };
   const held = move.gear.includes("barbell") || move.gear.includes("dumbbell");
   if (!held) return move;
+  if (/bodyweight|jump squat/i.test(name)) return { ...move, gear: move.gear.filter((g) => g !== "barbell" && g !== "dumbbell") };
   const base = move.gear.filter((g) => g !== "barbell" && g !== "dumbbell");
   if (/machine|pec deck|smith/i.test(name) && !/smith/i.test(name)) return { ...move, gear: base };
   if (/dumbbell|kettlebell/i.test(name)) return { ...move, gear: [...base, "dumbbell"] };

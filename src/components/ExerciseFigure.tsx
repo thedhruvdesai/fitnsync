@@ -102,6 +102,42 @@ function Gear({ move }: { move: Move }) {
           <rect x={74} y={94} width={7} height={50} rx={3} />
         </g>
       )}
+      {move.gear.includes("treadmill") && (
+        <g stroke="#26262A" strokeLinecap="round">
+          <line x1={40} y1={174} x2={170} y2={174} strokeWidth={6} />
+          <line x1={166} y1={174} x2={166} y2={104} strokeWidth={5} />
+          <line x1={150} y1={110} x2={172} y2={104} strokeWidth={6} />
+        </g>
+      )}
+      {move.gear.includes("stairs") && (
+        <g fill="#1A1A1D" stroke="#33333A" strokeWidth={2}>
+          <rect x={108} y={146} width={60} height={32} rx={3} />
+          <rect x={60} y={170} width={50} height={8} rx={2} />
+          <line x1={150} y1={146} x2={150} y2={110} stroke="#26262A" strokeWidth={5} />
+        </g>
+      )}
+      {move.gear.includes("elliptical") && (
+        <g stroke="#26262A" strokeLinecap="round">
+          <ellipse cx={104} cy={168} rx={28} ry={8} fill="none" strokeWidth={4} />
+          <line x1={150} y1={178} x2={150} y2={96} strokeWidth={6} />
+          <line x1={150} y1={110} x2={128} y2={100} strokeWidth={4} />
+        </g>
+      )}
+      {move.gear.includes("squatbox") && <rect x={44} y={140} width={38} height={38} rx={4} fill="#1A1A1D" stroke="#33333A" strokeWidth={2} />}
+      {move.gear.includes("rearbench") && (
+        <g fill="#26262A">
+          <rect x={22} y={138} width={44} height={8} rx={3} />
+          <rect x={30} y={146} width={5} height={32} />
+          <rect x={54} y={146} width={5} height={32} />
+        </g>
+      )}
+      {move.gear.includes("thrustbench") && (
+        <g fill="#26262A">
+          <rect x={14} y={136} width={46} height={8} rx={3} />
+          <rect x={22} y={144} width={5} height={34} />
+          <rect x={48} y={144} width={5} height={34} />
+        </g>
+      )}
       {move.gear.includes("preacher") && (
         <g stroke="#26262A" strokeLinecap="round">
           <line x1={104} y1={100} x2={134} y2={128} strokeWidth={8} />

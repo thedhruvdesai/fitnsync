@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { currentRegion } from "@/lib/region.server";
+import { paymentRegion } from "@/lib/pay-region.server";
+import { requireProfile } from "@/lib/session";
 import { formatMoney } from "@/lib/regions";
 import { PLANS, TRIAL_DAYS, type Tier } from "@/lib/tiers";
 
 export async function Paywall({ need, title, children }: { need: Exclude<Tier, "free">; title: string; children?: React.ReactNode }) {
   const plan = PLANS.find((p) => p.id === need)!;
-  const { region } = await currentRegion();
+  const { user } = await requireProfile();
+  const { region } = await paymentRegion(user.id);
   return (
     <div className="card relative overflow-hidden !p-8 text-center">
       <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-blood/20 blur-3xl" />

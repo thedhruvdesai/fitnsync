@@ -98,6 +98,7 @@ export default function CheckoutView(props: {
   const [recurring, setRecurring] = useState<string>(formatMoney(region.prices[props.planId], region));
   const [tax, setTax] = useState<string | null>(null);
   const started = useRef(false);
+  const expectedCountry = useRef<string | null>(null);
   const card = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -112,6 +113,10 @@ export default function CheckoutView(props: {
         if (t) setToday(t);
         if (r) setRecurring(r);
         if (taxN > 0) setTax(money(taxN, cur));
+        const cc = d?.customer?.address?.country_code;
+        if (expectedCountry.current && cc && cc !== expectedCountry.current) {
+          setNotice(`Please keep your billing country as ${expectedCountry.current}. Prices follow where you live, and a subscription with a different country is cancelled automatically.`);
+        }
       }
       if (e.name === "checkout.completed") {
         setDone(true);
@@ -130,11 +135,13 @@ export default function CheckoutView(props: {
     });
     if (!started.current) {
       started.current = true;
-      fetch("/api/paddle/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tier: props.planId, country: props.regionId }) })
+      fetch("/api/paddle/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tier: props.planId }) })
         .then((r) => r.json())
         .then((j) => {
           if (j.switched) return window.location.assign("/app/billing?success=1");
+          if (j.needPhone) return window.location.assign(`/app/billing?plan=${props.planId}&verify=1`);
           if (!j.checkout) throw new Error(j.error || "Couldn't start checkout");
+          expectedCountry.current = j.checkout.countryCode ?? null;
           return openInlineCheckout(j.checkout, FRAME);
         })
         .catch((e) => setError((e as Error).message));

@@ -3,7 +3,6 @@ import { Backdrop } from "@/components/Backdrop";
 import { Logo } from "@/components/Logo";
 import { Counter, Cursor, Magnetic, Reveal, RotatingWord } from "@/components/Motion";
 import { PricingCards } from "@/components/PricingCards";
-import { RegionBanner, RegionPicker } from "@/components/RegionPicker";
 import { currentRegion } from "@/lib/region.server";
 import { formatMoney } from "@/lib/regions";
 
@@ -86,7 +85,7 @@ function PhoneMock() {
 }
 
 export default async function Home() {
-  const { region, chosen, detected } = await currentRegion();
+  const { region } = await currentRegion();
   return (
     <>
       <Backdrop />
@@ -102,7 +101,7 @@ export default async function Home() {
               </span>
             </div>
             <nav className="flex items-center gap-1 text-sm">
-              <div className="mr-1"><RegionPicker region={region} /></div>
+              <span className="mr-1 flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs uppercase text-bone-dim" title={`Prices for ${region.label}, based on your location`}>{region.flag} {region.currency}</span>
               <a href="#features" className="hidden px-3 text-bone-dim hover:text-bone md:block">Features</a>
               <a href="#coach" className="hidden px-3 text-bone-dim hover:text-bone md:block">Coach</a>
               <a href="#pricing" className="hidden px-3 text-bone-dim hover:text-bone sm:block">Pricing</a>
@@ -277,6 +276,7 @@ export default async function Home() {
           <Reveal className="text-center">
             <p className="eyebrow">Pricing</p>
             <h2 className="h-display mt-3 text-5xl md:text-7xl">Pick your level of <span className="text-outline">support.</span></h2>
+            <p className="mt-4 text-sm text-bone-dim">Prices for {region.flag} {region.label}, based on where you are. You pay the price for the country you live in.</p>
           </Reveal>
           <Reveal delay={100} className="mt-14"><PricingCards mode="public" region={region} /></Reveal>
         </section>
@@ -318,7 +318,6 @@ export default async function Home() {
           </div>
         </footer>
       </main>
-      {!chosen && <RegionBanner detected={detected} />}
     </>
   );
 }

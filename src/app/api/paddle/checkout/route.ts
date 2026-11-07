@@ -2,6 +2,7 @@ import { getAuthUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { ACTIVE_STATUSES, findPriceId, paddle, type Paid } from "@/lib/paddle";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { paymentRegion } from "@/lib/pay-region.server";
 
 /**
  * Starts a purchase. New subscribers get what the browser needs to open Paddle's checkout overlay;
@@ -12,9 +13,13 @@ export async function POST(req: Request) {
   const user = await getAuthUser(supabase);
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
-  const { tier, country } = (await req.json()) as { tier: Paid; country?: string };
+  const { tier } = (await req.json()) as { tier: Paid };
   if (!["starter", "pro", "elite"].includes(tier)) return NextResponse.json({ error: "Unknown plan" }, { status: 400 });
   if (!process.env.PADDLE_API_KEY || !process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN) return NextResponse.json({ error: "Payments aren't connected yet (Paddle keys missing)." }, { status: 503 });
+
+  // The billing country is decided here on the server (location + verified phone), never by the browser.
+  const pay = await paymentRegion(user.id);
+  if (pay.needPhone) return NextResponse.json({ error: "Verify your mobile number first.", needPhone: true }, { status: 403 });
 
   let priceId: string | null;
   try {
@@ -40,7 +45,8 @@ export async function POST(req: Request) {
     }
   }
 
-  const countryCode = country && /^[A-Z]{2}$/.test(country) && country !== "EU" ? country : undefined;
+  const countryCode = pay.country && /^[A-Z]{2}$/.test(pay.country) ? pay.country : undefined;
+  await admin.from("profiles").update({ billing_country: countryCode ?? null }).eq("id", user.id);
   return NextResponse.json({
     checkout: {
       priceId,

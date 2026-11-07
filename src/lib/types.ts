@@ -126,6 +126,7 @@ export interface Profile extends Partial<Intake> {
   plan: Plan | null;
   onboarded: boolean;
   tier: "free" | "starter" | "pro" | "elite";
+  billing_country?: string | null;
   subscription_status: string | null;
   /** IANA zone, e.g. "Australia/Brisbane" */
   timezone?: string | null;

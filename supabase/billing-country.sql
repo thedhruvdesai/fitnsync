@@ -1,0 +1,3 @@
+-- Run once in Supabase SQL Editor (paste each line on its own if the editor adds brackets).
+alter table public.profiles add column if not exists billing_country text;
+create or replace function public.protect_billing_columns() returns trigger language plpgsql as $$ begin if current_user in ('authenticated', 'anon') then new.tier := old.tier; new.paddle_customer_id := old.paddle_customer_id; new.paddle_subscription_id := old.paddle_subscription_id; new.subscription_status := old.subscription_status; new.billing_country := old.billing_country; end if; new.updated_at := now(); return new; end $$;

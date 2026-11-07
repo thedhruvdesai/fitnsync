@@ -60,7 +60,7 @@ export function AppNav({ tier, name }: { tier: string; name?: string | null }) {
         <Logo href="/app" />
         <nav className="mt-10 flex flex-col gap-1" aria-label="Main">
           {DESKTOP.map((i) => (
-            <Link key={i.href} href={i.href} onClick={toggle(i.href)} aria-current={active(i.href) ? "page" : undefined} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${active(i.href) ? "bg-blood/15 text-bone" : "text-bone-dim hover:bg-white/5 hover:text-bone"}`}>
+            <Link key={i.href} href={i.href} onClick={toggle(i.href)} onTouchStart={() => router.prefetch(i.href)} onMouseEnter={() => router.prefetch(i.href)} aria-current={active(i.href) ? "page" : undefined} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${active(i.href) ? "bg-blood/15 text-bone" : "text-bone-dim hover:bg-white/5 hover:text-bone"}`}>
               <Icon d={i.icon} /> {i.label}
             </Link>
           ))}
@@ -82,7 +82,7 @@ export function AppNav({ tier, name }: { tier: string; name?: string | null }) {
       {/* mobile tab bar */}
       <nav className="no-print fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-white/5 bg-ink/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden" aria-label="Main">
         {TABS.map((i) => (
-          <Link key={i.href} href={i.href} onClick={toggle(i.href)} aria-current={active(i.href) ? "page" : undefined} className={`flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium ${active(i.href) && !more ? "text-blood-400" : "text-bone-dim"}`}>
+          <Link key={i.href} href={i.href} onClick={toggle(i.href)} onTouchStart={() => router.prefetch(i.href)} onMouseEnter={() => router.prefetch(i.href)} aria-current={active(i.href) ? "page" : undefined} className={`flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium ${active(i.href) && !more ? "text-blood-400" : "text-bone-dim"}`}>
             <Icon d={i.icon} className="h-6 w-6" /> {i.label}
           </Link>
         ))}
@@ -96,7 +96,7 @@ export function AppNav({ tier, name }: { tier: string; name?: string | null }) {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div role="menu" aria-label="More" className="sheet-in absolute inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] mx-3 rounded-3xl border border-white/10 bg-ink-2 p-2 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             {MORE.map((i) => (
-              <Link key={i.href} role="menuitem" href={i.href} aria-current={active(i.href) ? "page" : undefined} className={`flex items-center gap-3 rounded-2xl px-4 py-3.5 text-base transition ${active(i.href) ? "bg-blood/15 text-bone" : "text-bone-dim hover:bg-white/5"}`}>
+              <Link key={i.href} role="menuitem" href={i.href} onTouchStart={() => router.prefetch(i.href)} aria-current={active(i.href) ? "page" : undefined} className={`flex items-center gap-3 rounded-2xl px-4 py-3.5 text-base transition ${active(i.href) ? "bg-blood/15 text-bone" : "text-bone-dim hover:bg-white/5"}`}>
                 <Icon d={i.icon} /> {i.label}
                 <span className="ml-auto text-bone-mute">›</span>
               </Link>

@@ -3,8 +3,8 @@ import { detectGeoCountry } from "./region.server";
 import { DEFAULT_REGION, getRegion, regionForCountry, type Region } from "./regions";
 import { createAdminClient } from "./supabase/server";
 
-/** Phone verification is switched on once an SMS provider is set up in Supabase (Auth → Phone). */
-export const phoneVerifyRequired = () => process.env.NEXT_PUBLIC_PHONE_VERIFY === "1";
+/** Verify-then-pay is on by default. Set NEXT_PUBLIC_PHONE_VERIFY=0 to switch it off (needs an SMS provider in Supabase → Auth → Phone). */
+export const phoneVerifyRequired = () => process.env.NEXT_PUBLIC_PHONE_VERIFY !== "0";
 
 /** Rough USD value of one unit of each currency. Only used to tell which of two prices is higher. */
 const USD: Record<string, number> = { usd: 1, aud: 0.65, nzd: 0.6, cad: 0.73, gbp: 1.27, eur: 1.08, inr: 0.012, sgd: 0.75, zar: 0.055 };

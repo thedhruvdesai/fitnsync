@@ -4,6 +4,7 @@ import { Logo } from "@/components/Logo";
 import { Counter, Cursor, Magnetic, Reveal, RotatingWord } from "@/components/Motion";
 import { PricingCards } from "@/components/PricingCards";
 import { currentRegion } from "@/lib/region.server";
+import { LocationBanner } from "@/components/LocationBanner";
 import { formatMoney } from "@/lib/regions";
 
 const STEPS = [
@@ -318,6 +319,7 @@ export default async function Home() {
           </div>
         </footer>
       </main>
+      <LocationBanner region={region} />
     </>
   );
 }

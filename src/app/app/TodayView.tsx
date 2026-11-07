@@ -282,27 +282,28 @@ export default function TodayView({ plan: initialPlan, name, userId, locked, ini
 
   return (
     <div className="space-y-6">
-      <div className="flex items-end justify-between gap-4">
-        <div>
+      <div className="flex items-end justify-between gap-3">
+        <div className="min-w-0">
           <p className="eyebrow">{isToday ? `${greet}, ${name.trim().split(/\s+/)[0] || "there"}` : "Logging a past day"}</p>
           <Link href={`/app/calendar?m=${date.slice(0, 7)}&d=${date}`} className="group block text-left" aria-label="Open calendar">
-            <h1 className="h-display mt-1 text-3xl sm:text-4xl md:text-5xl">
-              {new Date(date + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "short" })}
+            <h1 className="h-display mt-1 whitespace-nowrap text-[clamp(1.4rem,7.5vw,1.75rem)] leading-tight sm:text-4xl md:text-5xl">
+              <span className="sm:hidden">{new Date(date + "T00:00:00").toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" })}</span>
+              <span className="hidden sm:inline">{new Date(date + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "short" })}</span>
               <span className="ml-2 align-middle text-base text-bone-mute transition group-hover:text-blood-400">▾</span>
             </h1>
           </Link>
           {!isToday && <button className="mt-1 text-xs text-blood-400 underline underline-offset-4" onClick={() => setDate(today)}>Back to today</button>}
         </div>
-        <div className="flex items-center gap-2">
-          <Link href={`/app/calendar?m=${date.slice(0, 7)}&d=${date}`} className="chip" aria-label="Calendar">📅</Link>
-          <button className="chip" onClick={() => setDate(addDays(date, -1))} aria-label="Previous day">←</button>
-          <button className="chip" disabled={isToday} onClick={() => setDate(addDays(date, 1))} aria-label="Next day">→</button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <Link href={`/app/calendar?m=${date.slice(0, 7)}&d=${date}`} className="chip hidden !h-10 !w-10 place-items-center !p-0 min-[360px]:inline-grid" aria-label="Calendar">📅</Link>
+          <button className="chip inline-grid !h-10 !w-10 place-items-center !p-0" onClick={() => setDate(addDays(date, -1))} aria-label="Previous day">←</button>
+          <button className="chip inline-grid !h-10 !w-10 place-items-center !p-0" disabled={isToday} onClick={() => setDate(addDays(date, 1))} aria-label="Next day">→</button>
         </div>
       </div>
       <p className="-mt-3 h-4 text-xs text-bone-mute">{loading ? "Loading…" : saved === "saving" ? "Saving…" : saved === "saved" ? "All changes saved" : saved === "error" ? "Offline? Changes kept on this phone and will save automatically." : ""}</p>
 
       {/* rings */}
-      <div className="card grid grid-cols-3 gap-2 !py-6">
+      <div className="card grid grid-cols-3 gap-2 !px-3 !py-6 sm:!px-6">
         <Ring value={totals.kcal} max={t.kcal} label="Calories" unit="kcal" />
         <Ring value={totals.protein} max={t.protein_g} label="Protein" unit="g" />
         <Ring value={log.water_ml / 1000} max={t.water_ml / 1000} label="Water" unit="L" />

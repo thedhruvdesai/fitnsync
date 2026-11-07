@@ -7,7 +7,8 @@
   --font-sans: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
 }
 
-html, body { background: #0A0A0B; color: #F4F1EC; }
+html, body { background: #0A0A0B; color: #F4F1EC; max-width: 100%; overflow-x: clip; }
+body { overflow-wrap: break-word; }
 body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 ::selection { background: #E11D2E; color: #fff; }
 

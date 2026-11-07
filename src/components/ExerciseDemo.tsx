@@ -63,17 +63,17 @@ export function ExerciseDemo({ name, lib, className = "" }: { name: string; lib?
           <button onClick={() => setMode("photo")} className={`rounded-full px-2.5 py-1 ${showPhoto ? "bg-bone font-semibold text-ink" : "text-bone-dim"}`}>Photo</button>
         </div>
       )}
-      <div className="relative flex items-center justify-between gap-2 border-t border-white/5 px-3 py-2.5">
-        <button onClick={() => { setFrame(null); setPlaying((p) => !p); }} className="grid h-10 w-10 place-items-center rounded-full bg-white/5 text-sm" aria-label={playing && frame == null ? "Pause" : "Play"}>
+      <div className="relative flex flex-wrap items-center justify-between gap-1.5 border-t border-white/5 px-2 py-2.5 min-[380px]:gap-2 min-[380px]:px-3">
+        <button onClick={() => { setFrame(null); setPlaying((p) => !p); }} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/5 text-sm min-[380px]:h-10 min-[380px]:w-10" aria-label={playing && frame == null ? "Pause" : "Play"}>
           {playing && frame == null ? "❚❚" : "▶"}
         </button>
         <div className="flex gap-1 rounded-full bg-white/5 p-1 text-xs">
-          <button onClick={() => setFrame(0)} className={`rounded-full px-3 py-1 ${frame === 0 ? "bg-bone text-ink" : "text-bone-dim"}`}>Start</button>
-          <button onClick={() => setFrame(1)} className={`rounded-full px-3 py-1 ${frame === 1 ? "bg-bone text-ink" : "text-bone-dim"}`}>Finish</button>
+          <button onClick={() => setFrame(0)} className={`rounded-full px-2 py-1 min-[380px]:px-3 ${frame === 0 ? "bg-bone text-ink" : "text-bone-dim"}`}>Start</button>
+          <button onClick={() => setFrame(1)} className={`rounded-full px-2 py-1 min-[380px]:px-3 ${frame === 1 ? "bg-bone text-ink" : "text-bone-dim"}`}>Finish</button>
         </div>
         <div className="flex gap-1 rounded-full bg-white/5 p-1">
           {[0.5, 1, 1.5].map((sp) => (
-            <button key={sp} onClick={() => { setSpeed(sp); setFrame(null); setPlaying(true); }} className={`rounded-full px-2.5 py-1 text-xs transition ${speed === sp && frame == null ? "bg-blood text-white" : "text-bone-dim"}`}>{sp}×</button>
+            <button key={sp} onClick={() => { setSpeed(sp); setFrame(null); setPlaying(true); }} className={`rounded-full px-2 py-1 text-xs transition min-[380px]:px-2.5 ${speed === sp && frame == null ? "bg-blood text-white" : "text-bone-dim"}`}>{sp}×</button>
           ))}
         </div>
       </div>

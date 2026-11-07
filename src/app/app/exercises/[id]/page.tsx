@@ -46,7 +46,7 @@ export default async function ExercisePage(props: { params: Promise<{ id: string
     <div className="space-y-6">
       <Link href={`/app/exercises?g=${ex.group}`} className="text-sm text-bone-mute hover:text-bone">← {ex.group} exercises</Link>
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <ExerciseDemo name={ex.name} lib={ex} />
           <div>
             <h1 className="h-display text-3xl md:text-4xl">{ex.name}</h1>
@@ -58,7 +58,7 @@ export default async function ExercisePage(props: { params: Promise<{ id: string
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           {paid ? <HistoryPanel history={history} /> : <Paywall need="starter" title="Track your heaviest weight, 1-rep max, volume and PRs for every exercise." />}
         </div>
       </div>
@@ -75,7 +75,7 @@ export default async function ExercisePage(props: { params: Promise<{ id: string
             ))}
           </ol>
         </section>
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <section className="card">
             <h2 className="label">Muscles worked</h2>
             <div className="flex flex-wrap gap-2">

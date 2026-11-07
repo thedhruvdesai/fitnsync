@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Move, Pose, Vec } from "@/lib/exercises";
 
 const L = { torso: 46, upperArm: 28, forearm: 26, thigh: 38, shin: 38, neck: 14 };
@@ -95,6 +95,37 @@ function Gear({ move }: { move: Move }) {
           <rect x={126} y={145} width={5} height={33} />
         </g>
       )}
+      {move.gear.includes("chair") && (
+        <g fill="#26262A">
+          <rect x={78} y={139} width={40} height={8} rx={3} />
+          <rect x={93} y={147} width={6} height={31} />
+          <rect x={74} y={94} width={7} height={50} rx={3} />
+        </g>
+      )}
+      {move.gear.includes("preacher") && (
+        <g stroke="#26262A" strokeLinecap="round">
+          <line x1={104} y1={100} x2={134} y2={128} strokeWidth={8} />
+          <line x1={126} y1={124} x2={126} y2={178} strokeWidth={5} />
+        </g>
+      )}
+      {move.gear.includes("lowbox") && <rect x={2} y={150} width={36} height={28} rx={4} fill="#1A1A1D" stroke="#33333A" strokeWidth={2} />}
+      {move.gear.includes("inclinebench") && (
+        <g stroke="#26262A" strokeLinecap="round">
+          <line x1={84} y1={112} x2={124} y2={142} strokeWidth={9} />
+          <line x1={112} y1={141} x2={148} y2={141} strokeWidth={8} />
+          <line x1={128} y1={145} x2={128} y2={178} strokeWidth={5} />
+          <line x1={100} y1={126} x2={100} y2={178} strokeWidth={5} />
+        </g>
+      )}
+      {move.gear.includes("declinebench") && (
+        <g stroke="#26262A" strokeLinecap="round">
+          <line x1={70} y1={150} x2={136} y2={130} strokeWidth={9} />
+          <line x1={80} y1={152} x2={80} y2={178} strokeWidth={5} />
+          <line x1={126} y1={136} x2={126} y2={178} strokeWidth={5} />
+          <line x1={126} y1={142} x2={152} y2={150} strokeWidth={5} />
+          <circle cx={154} cy={150} r={5} fill="#33333A" stroke="none" />
+        </g>
+      )}
       {move.gear.includes("seat") && (
         <g fill="#26262A">
           <rect x={76} y={139} width={40} height={8} rx={3} />
@@ -168,10 +199,25 @@ function Held({ move, hand, far }: { move: Move; hand: Vec; far?: boolean }) {
   return null;
 }
 
+/** A square view box around where the figure actually moves, so small thumbnails aren't mostly empty space. */
+export function fitBox(move: Move) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+    const f = solve(move, t);
+    for (const q of [f.pelvis, f.shoulder, f.head, f.near.knee, f.near.ankle, f.near.toe, f.near.elbow, f.near.hand, f.far.knee, f.far.ankle, f.far.hand]) {
+      x0 = Math.min(x0, q[0]); y0 = Math.min(y0, q[1]); x1 = Math.max(x1, q[0]); y1 = Math.max(y1, q[1]);
+    }
+  }
+  y1 = Math.max(y1, GROUND);
+  const side = Math.min(200, Math.max(x1 - x0, y1 - y0, 96) + 44);
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  return `${(cx - side / 2).toFixed(1)} ${(cy - side / 2).toFixed(1)} ${side.toFixed(1)} ${side.toFixed(1)}`;
+}
+
 /**
  * Animated side-view exercise figure. Pauses when off-screen and respects reduced-motion.
  */
-export function ExerciseFigure({ move, speed = 1, playing = true, className = "", showGround = true, at }: { move: Move; speed?: number; playing?: boolean; className?: string; showGround?: boolean; at?: number }) {
+export function ExerciseFigure({ move, speed = 1, playing = true, className = "", showGround = true, at, fit = false }: { move: Move; speed?: number; playing?: boolean; className?: string; showGround?: boolean; at?: number; fit?: boolean }) {
   const ref = useRef<SVGSVGElement>(null);
   const [t, setT] = useState(0);
   const visible = useRef(true);
@@ -208,12 +254,13 @@ export function ExerciseFigure({ move, speed = 1, playing = true, className = ""
     return () => cancelAnimationFrame(raf);
   }, [move, speed, playing]);
 
+  const box = useMemo(() => (fit ? fitBox(move) : "0 0 200 200"), [fit, move]);
   const f = solve(move, at ?? t);
   const hl = new Set(move.highlight);
   const nearW = 9;
 
   return (
-    <svg ref={ref} viewBox="0 0 200 200" className={className} role="img" aria-label={`${move.title} demonstration`}>
+    <svg ref={ref} viewBox={box} className={className} role="img" aria-label={`${move.title} demonstration`}>
       <defs>
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="3" result="b" />

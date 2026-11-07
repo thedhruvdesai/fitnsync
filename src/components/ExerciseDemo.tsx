@@ -86,7 +86,7 @@ export function ExerciseAvatar({ name, className = "h-14 w-14" }: { id?: string;
   const move = useMemo(() => moveFor(name), [name]);
   return (
     <div className={`relative shrink-0 overflow-hidden rounded-full border border-white/10 bg-gradient-to-b from-blood/15 to-ink ${className}`} aria-label={name} role="img">
-      <ExerciseFigure move={move} showGround={false} className="h-full w-full" />
+      <ExerciseFigure move={move} showGround={false} fit className="h-full w-full" />
     </div>
   );
 }
@@ -95,7 +95,7 @@ export function ExerciseThumb({ name, className = "h-14 w-14" }: { name: string;
   const move = useMemo(() => moveFor(name), [name]);
   return (
     <div className={`shrink-0 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-blood/10 to-ink ${className}`}>
-      <ExerciseFigure move={move} showGround={false} className="h-full w-full" />
+      <ExerciseFigure move={move} showGround={false} fit className="h-full w-full" />
     </div>
   );
 }

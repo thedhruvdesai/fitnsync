@@ -24,7 +24,7 @@ export interface Pose {
   footFar?: Vec;
 }
 
-export type Gear = "barbell" | "dumbbell" | "cable" | "bench" | "seat" | "bar" | "mat" | "box" | "bike" | "dipbars" | "lowbar" | "sled" | "incline" | "none";
+export type Gear = "barbell" | "dumbbell" | "cable" | "bench" | "seat" | "bar" | "mat" | "box" | "bike" | "dipbars" | "lowbar" | "sled" | "incline" | "inclinebench" | "declinebench" | "chair" | "preacher" | "lowbox" | "none";
 export type Highlight = "thigh" | "shin" | "upperArm" | "forearm" | "torso" | "hip";
 
 export interface Move {
@@ -102,7 +102,7 @@ export const MOVES: Record<string, Move> = {
     cues: ["Shoulder blades pulled back and down", "Feet planted, slight arch in the upper back", "Lower to the middle of your chest with control", "Press up and slightly back over your shoulders"],
     mistake: "Flaring elbows straight out to the sides.",
     a: { pelvis: [118, 134], shoulder: [72, 132], hand: [0, -54], foot: [150, 172] },
-    b: { pelvis: [118, 134], shoulder: [72, 132], hand: [4, -14], foot: [150, 172] },
+    b: { pelvis: [118, 134], shoulder: [72, 132], hand: [12, -12], foot: [150, 172] },
     gear: ["bench", "barbell"],
     highlight: ["torso", "upperArm"],
   },
@@ -281,14 +281,134 @@ export const MOVES: Record<string, Move> = {
     gear: ["dumbbell"],
     highlight: ["upperArm"],
   },
+  inclinepress: {
+    key: "inclinepress", title: "Incline press", muscles: ["Upper chest", "Front shoulders", "Triceps"],
+    cues: ["Bench at 30–45°", "Shoulder blades back and down", "Lower to your upper chest", "Press up over your shoulders"],
+    mistake: "Setting the bench too steep so it turns into a shoulder press.",
+    a: { pelvis: [124, 134], shoulder: [89, 104], hand: [-4, -52], foot: [160, 172] },
+    b: { pelvis: [124, 134], shoulder: [89, 104], hand: [14, -4], foot: [160, 172] },
+    gear: ["inclinebench", "barbell"], highlight: ["torso", "upperArm"],
+  },
+  declinepress: {
+    key: "declinepress", title: "Decline press", muscles: ["Lower chest", "Triceps"],
+    cues: ["Hook your feet under the pads", "Shoulder blades pinned back", "Lower to your lower chest", "Press up over your shoulders"],
+    mistake: "Bouncing the bar off the chest.",
+    a: { pelvis: [126, 124], shoulder: [83, 140], hand: [6, -52], foot: [152, 146] },
+    b: { pelvis: [126, 124], shoulder: [83, 140], hand: [14, -14], foot: [152, 146] },
+    gear: ["declinebench", "barbell"], highlight: ["torso", "upperArm"],
+  },
+  floorpress: {
+    key: "floorpress", title: "Floor press", muscles: ["Chest", "Triceps"],
+    cues: ["Lie on the floor, knees bent, feet flat", "Lower until your upper arms touch the floor", "Pause, then press straight up", "Keep wrists stacked over elbows"],
+    mistake: "Letting the elbows crash into the floor.",
+    a: { pelvis: [118, 166], shoulder: [72, 168], hand: [2, -50], foot: [150, 172] },
+    b: { pelvis: [118, 166], shoulder: [72, 168], hand: [10, -18], foot: [150, 172] },
+    gear: ["mat", "dumbbell"], highlight: ["torso", "upperArm"],
+  },
+  seatedchest: {
+    key: "seatedchest", title: "Seated chest press", muscles: ["Chest", "Front shoulders", "Triceps"],
+    cues: ["Back flat against the pad", "Handles level with mid-chest", "Press forward until arms are nearly straight", "Return slowly, feel the chest stretch"],
+    mistake: "Shoulders rolling forward off the pad.",
+    a: { pelvis: [96, 136], torso: -4, hand: [12, 4], foot: [132, 172] },
+    b: { pelvis: [96, 136], torso: -4, hand: [52, 2], foot: [132, 172] },
+    gear: ["chair"], highlight: ["torso", "upperArm"],
+  },
+  cablepress: {
+    key: "cablepress", title: "Standing cable press", muscles: ["Chest", "Front shoulders", "Triceps"],
+    cues: ["Split stance, slight forward lean", "Handles at chest height", "Press forward and slightly together", "Control the return"],
+    mistake: "Leaning so far forward the legs do the work.",
+    a: { pelvis: [96, STAND + 2], torso: 10, hand: [10, 6], foot: [112, 172], footFar: [78, 172] },
+    b: { pelvis: [96, STAND + 2], torso: 10, hand: [50, 4], foot: [112, 172], footFar: [78, 172] },
+    gear: ["cable"], cableFrom: [10, 92], highlight: ["torso", "upperArm"],
+  },
+  crossover: {
+    key: "crossover", title: "Cable crossover", muscles: ["Chest", "Front shoulders"],
+    cues: ["Step forward, slight lean", "Soft, fixed bend in the elbows", "Sweep the handles down and together", "Let the arms open back with control"],
+    mistake: "Turning it into a press by bending the elbows more.",
+    a: { pelvis: [100, STAND], torso: 12, hand: [-8, -30], foot: [112, 172], footFar: [84, 172] },
+    b: { pelvis: [100, STAND], torso: 12, hand: [34, 44], foot: [112, 172], footFar: [84, 172] },
+    gear: ["cable"], cableFrom: [16, 26], highlight: ["torso", "upperArm"],
+  },
+  lowhighfly: {
+    key: "lowhighfly", title: "Low-to-high fly", muscles: ["Upper chest", "Front shoulders"],
+    cues: ["Handles start low by your hips", "Soft, fixed bend in the elbows", "Sweep up and together to eye height", "Lower with control"],
+    mistake: "Shrugging the shoulders up as the arms rise.",
+    a: { pelvis: [100, STAND], torso: 4, hand: [-6, 50], foot: [112, 172], footFar: [84, 172] },
+    b: { pelvis: [100, STAND], torso: 4, hand: [40, -20], foot: [112, 172], footFar: [84, 172] },
+    gear: ["cable"], cableFrom: [16, 170], highlight: ["torso", "upperArm"],
+  },
+  preacher: {
+    key: "preacher", title: "Preacher curl", muscles: ["Biceps", "Forearms"],
+    cues: ["Armpits snug to the top of the pad", "Upper arms flat on the pad", "Curl up without lifting the elbows", "Lower slowly to almost straight"],
+    mistake: "Dropping fast and bouncing out of the bottom.",
+    a: { pelvis: [92, 136], torso: 8, hand: [38, 38], foot: [130, 172] },
+    b: { pelvis: [92, 136], torso: 8, hand: [12, -2], foot: [130, 172] },
+    gear: ["chair", "preacher", "barbell"], highlight: ["upperArm", "forearm"],
+  },
+  concentration: {
+    key: "concentration", title: "Concentration curl", muscles: ["Biceps"],
+    cues: ["Sit, lean forward, elbow against the inner thigh", "Arm hangs straight down", "Curl towards your shoulder", "Squeeze, then lower slowly"],
+    mistake: "Using the shoulder to swing the weight up.",
+    a: { pelvis: [92, 136], torso: 34, hand: [4, 46], foot: [132, 172] },
+    b: { pelvis: [92, 136], torso: 34, hand: [-4, 14], foot: [132, 172] },
+    gear: ["chair", "dumbbell"], highlight: ["upperArm", "forearm"],
+  },
+  seatedlegcurl: {
+    key: "seatedlegcurl", title: "Seated leg curl", muscles: ["Hamstrings"],
+    cues: ["Back against the pad, thigh pad locked down", "Start with legs straight out", "Pull the heels down and back under the seat", "Return slowly"],
+    mistake: "Lifting the hips off the seat to finish the rep.",
+    a: { pelvis: [96, 136], torso: -8, hand: [8, 46], foot: [168, 128] },
+    b: { pelvis: [96, 136], torso: -8, hand: [8, 46], foot: [114, 176] },
+    gear: ["chair"], highlight: ["thigh"],
+  },
+  declinepushup: {
+    key: "declinepushup", title: "Decline push-up", muscles: ["Upper chest", "Front shoulders", "Triceps"],
+    cues: ["Feet up on a bench or box", "Body in one straight line", "Lower your chest towards the floor", "Push back up"],
+    mistake: "Hips piking up into the air.",
+    a: { pelvis: [92, 142], shoulder: [136, 155], hand: [2, 23], foot: [18, 146] },
+    b: { pelvis: [93, 150], shoulder: [137, 166], hand: [2, 12], foot: [18, 146] },
+    gear: ["lowbox"], highlight: ["torso", "upperArm"],
+  },
+  boxjump: {
+    key: "boxjump", title: "Box jump", muscles: ["Quads", "Glutes", "Calves"],
+    cues: ["Quarter squat, arms swing back", "Explode up and forward", "Land softly on the whole foot", "Step down, don't jump down"],
+    mistake: "Landing with stiff legs or knees caving in.",
+    a: { pelvis: [70, 128], torso: 40, hand: [-22, 34], foot: [74, 172] },
+    b: { pelvis: [130, 72], torso: 0, hand: [10, 48], foot: [130, 146] },
+    gear: ["box"], highlight: ["thigh"], tempo: 2200,
+  },
+  inclinecurl: {
+    key: "inclinecurl", title: "Incline curl", muscles: ["Biceps (long head)", "Forearms"],
+    cues: ["Lie back on a 45–60° bench", "Let the arms hang straight down", "Curl without moving the elbows forward", "Lower all the way for a full stretch"],
+    mistake: "Swinging the elbows forward to lift more.",
+    a: { pelvis: [124, 134], shoulder: [89, 104], hand: [0, 52], foot: [160, 172] },
+    b: { pelvis: [124, 134], shoulder: [89, 104], hand: [10, 12], foot: [160, 172] },
+    gear: ["inclinebench", "dumbbell"], highlight: ["upperArm", "forearm"],
+  },
+  inclinepushup: {
+    key: "inclinepushup", title: "Incline push-up", muscles: ["Chest", "Triceps", "Core"],
+    cues: ["Hands on a bench or box, a bit wider than shoulders", "Body in one straight line", "Lower your chest to the edge", "Push back up to straight arms"],
+    mistake: "Letting the hips sag.",
+    a: { pelvis: [86, 126], shoulder: [128, 104], hand: [2, 42], foot: [12, 172] },
+    b: { pelvis: [84, 140], shoulder: [126, 122], hand: [4, 24], foot: [12, 172] },
+    gear: ["box"], highlight: ["torso", "upperArm"],
+  },
+  inclinefly: {
+    key: "inclinefly", title: "Incline fly", muscles: ["Upper chest", "Front shoulders"],
+    cues: ["Bench at 30–45°", "Slight, fixed bend in the elbows", "Open wide until you feel a stretch", "Hug the weights together over your upper chest"],
+    mistake: "Dropping the weights too low and straining the shoulders.",
+    a: { pelvis: [124, 134], shoulder: [89, 104], hand: [12, 18], foot: [160, 172] },
+    b: { pelvis: [124, 134], shoulder: [89, 104], hand: [-4, -50], foot: [160, 172] },
+    gear: ["inclinebench", "dumbbell"], highlight: ["torso", "upperArm"],
+  },
   fly: {
     key: "fly",
     title: "Chest fly",
     muscles: ["Chest", "Front shoulders"],
     cues: ["Slight, fixed bend in the elbows", "Open wide until you feel a chest stretch", "Hug the weights back together over your chest", "Keep shoulder blades pinned to the bench"],
     mistake: "Bending the elbows more and more until it turns into a press.",
-    a: { pelvis: [118, 134], shoulder: [72, 132], hand: [-6, 24], foot: [150, 172] },
-    b: { pelvis: [118, 134], shoulder: [72, 132], hand: [2, -50], foot: [150, 172] },
+    a: { pelvis: [118, 134], shoulder: [72, 132], hand: [4, 16], foot: [150, 172] },
+    b: { pelvis: [118, 134], shoulder: [72, 132], hand: [4, -50], foot: [150, 172] },
     gear: ["bench", "dumbbell"],
     highlight: ["torso", "upperArm"],
   },
@@ -346,7 +466,7 @@ export const MOVES: Record<string, Move> = {
     mistake: "Kicking the weight up fast and dropping it back down.",
     a: { pelvis: [96, 136], torso: -8, hand: [8, 46], foot: [122, 174] },
     b: { pelvis: [96, 136], torso: -8, hand: [8, 46], foot: [168, 128] },
-    gear: ["seat"],
+    gear: ["chair"],
     highlight: ["thigh"],
   },
   sidelying: {
@@ -587,7 +707,7 @@ export const MOVES: Record<string, Move> = {
     mistake: "Arching off the backrest to push the weight.",
     a: { pelvis: [96, 136], torso: -4, hand: [8, -2], foot: [132, 172] },
     b: { pelvis: [96, 136], torso: -4, hand: [3, -50], foot: [132, 172] },
-    gear: ["seat", "dumbbell"], highlight: ["upperArm"],
+    gear: ["chair", "dumbbell"], highlight: ["upperArm"],
   },
   hspu: {
     key: "hspu", title: "Handstand push-up", muscles: ["Shoulders", "Triceps"],
@@ -673,6 +793,21 @@ export const MOVES: Record<string, Move> = {
 
 /** Match a plan exercise name to an animation. Order matters: specific words first. */
 const RULES: [RegExp, keyof typeof MOVES][] = [
+  [/chest press \(machine\)|incline chest press \(machine\)|pec deck|chest press machine/i, "seatedchest"],
+  [/chest press \(cable\)|cable chest press/i, "cablepress"],
+  [/low.to.high/i, "lowhighfly"],
+  [/preacher|spider curl/i, "preacher"],
+  [/concentration/i, "concentration"],
+  [/seated leg curl/i, "seatedlegcurl"],
+  [/decline push.?up/i, "declinepushup"],
+  [/box jump/i, "boxjump"],
+  [/incline (dumbbell )?curl/i, "inclinecurl"],
+  [/incline push.?up/i, "inclinepushup"],
+  [/incline (chest )?fly|incline dumbbell fly/i, "inclinefly"],
+  [/crossover/i, "crossover"],
+  [/floor press/i, "floorpress"],
+  [/incline (bench|dumbbell|barbell)? ?press|incline bench/i, "inclinepress"],
+  [/decline (bench )?press|decline bench/i, "declinepress"],
   // exact variants first
   [/bench dip/i, "benchdip"],
   [/\bdips?\b/i, "dip"],
@@ -744,9 +879,20 @@ const RULES: [RegExp, keyof typeof MOVES][] = [
   [/walk|run|cardio|jog|zone|interval|march|treadmill|elliptical|stair|climber/i, "cardio"],
 ];
 
+/** Show what's actually held: dumbbells for dumbbell moves, a bar for barbell moves, nothing for machines. */
+function withEquipment(move: Move, name: string): Move {
+  const held = move.gear.includes("barbell") || move.gear.includes("dumbbell");
+  if (!held) return move;
+  const base = move.gear.filter((g) => g !== "barbell" && g !== "dumbbell");
+  if (/machine|pec deck|smith/i.test(name) && !/smith/i.test(name)) return { ...move, gear: base };
+  if (/dumbbell|kettlebell/i.test(name)) return { ...move, gear: [...base, "dumbbell"] };
+  if (/barbell|ez-bar|smith|t-bar|trap bar/i.test(name)) return { ...move, gear: [...base, "barbell"] };
+  return move;
+}
+
 export function moveFor(name: string): Move {
-  for (const [re, key] of RULES) if (re.test(name)) return MOVES[key];
-  return MOVES.squat;
+  for (const [re, key] of RULES) if (re.test(name)) return withEquipment(MOVES[key], name);
+  return withEquipment(MOVES.squat, name);
 }
 
 /** "90 s" → 90, "2–3 min" → 120, "60–75 s" → 60 */

@@ -1,10 +1,10 @@
-import { Backdrop } from "./Backdrop";
+import { PulseBackdrop } from "./PulseBackdrop";
 import { Logo } from "./Logo";
 
 export function AuthShell({ title, sub, children }: { title: string; sub: string; children: React.ReactNode }) {
   return (
     <>
-      <Backdrop intensity={0.8} />
+      <PulseBackdrop />
       <main className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col px-6 py-10">
         <Logo />
         <div className="mt-16">

@@ -7,8 +7,12 @@ import { addMealsToDay, slotNow } from "@/lib/dayLog";
 import { useFavorites, type MyMeal } from "@/components/QuickFoods";
 import type { Diet } from "@/lib/types";
 
-type TabKey = "all" | "veg" | "vegan" | "egg" | "nonveg" | "meat" | "seafood" | "protein" | "quick" | "indian";
+type TabKey = "all" | "veg" | "vegan" | "egg" | "nonveg" | "meat" | "seafood" | "protein" | "quick" | "mediterranean" | "asian" | "mexican" | "indian";
 const INDIAN = /dal|paneer|roti|masala|chana|chole|rajma|tikka|idli|sambar|poha|khichdi|chilla|kulcha|bhurji|keema|tandoori|rogan|biryani|palak|soya chunk|goan|butter chicken|jeera|thali/i;
+
+const ASIAN = /teriyaki|stir-fry|thai|poke|sushi|soba|noodle|bibimbap|banh mi|rice paper|edamame|fried rice|fried cauliflower|miso/i;
+const MEDITERRANEAN = /greek|souvlaki|kofta|tabbouleh|falafel|hummus|halloumi|feta|shakshuka|couscous|tzatziki|white bean|pesto|bolognese|mediterranean|margherita|barramundi/i;
+const MEXICAN = /burrito|taco|quesadilla|fajita|ranchero|chilli|black bean/i;
 
 const TABS: Record<TabKey, { label: string; test: (m: MealTemplate) => boolean }> = {
   all: { label: "All", test: () => true },
@@ -20,16 +24,19 @@ const TABS: Record<TabKey, { label: string; test: (m: MealTemplate) => boolean }
   seafood: { label: "Seafood", test: (m) => m.tag === "fish" },
   protein: { label: "High protein", test: (m) => m.protein >= 30 || (m.protein * 4) / m.kcal >= 0.3 },
   quick: { label: "Quick ≤15 min", test: (m) => (methodFor(m.name)?.mins ?? 99) <= 15 },
+  mediterranean: { label: "Mediterranean", test: (m) => MEDITERRANEAN.test(m.name) },
+  asian: { label: "Asian", test: (m) => ASIAN.test(m.name) },
+  mexican: { label: "Mexican", test: (m) => MEXICAN.test(m.name) },
   indian: { label: "Indian", test: (m) => INDIAN.test(m.name) },
 };
 const ALL_KEYS = Object.keys(TABS) as TabKey[];
 
 const DEFAULT_TABS: Record<Diet, TabKey[]> = {
-  vegan: ["vegan", "protein", "quick", "indian"],
-  vegetarian: ["veg", "vegan", "protein", "quick", "indian"],
-  eggetarian: ["veg", "egg", "vegan", "protein", "quick", "indian"],
-  pescatarian: ["all", "veg", "seafood", "vegan", "protein", "quick"],
-  non_veg: ["all", "veg", "vegan", "nonveg", "meat", "seafood", "protein", "quick", "indian"],
+  vegan: ["vegan", "protein", "quick", "mediterranean", "asian", "mexican", "indian"],
+  vegetarian: ["veg", "vegan", "protein", "quick", "mediterranean", "asian", "mexican", "indian"],
+  eggetarian: ["veg", "egg", "vegan", "protein", "quick", "mediterranean", "asian", "mexican", "indian"],
+  pescatarian: ["all", "veg", "seafood", "vegan", "protein", "quick", "mediterranean", "asian", "mexican", "indian"],
+  non_veg: ["all", "veg", "vegan", "nonveg", "meat", "seafood", "protein", "quick", "mediterranean", "asian", "mexican", "indian"],
 };
 
 export const DIET_BADGE: Record<DietTag, { label: string; dot: string }> = {

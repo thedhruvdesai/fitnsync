@@ -6,6 +6,18 @@ export interface Method {
 }
 
 export const METHODS: Record<string, Method> = {
+  "Protein pancakes & berries": { mins: 12, steps: ["Blend the banana, eggs and whey until smooth.", "Cook small pancakes in a lightly oiled non-stick pan, 1–2 minutes each side.", "Stack and top with berries."], tip: "Add a pinch of baking powder for fluffier pancakes." },
+  "Huevos rancheros (light)": { mins: 12, steps: ["Warm the black beans with a little salsa.", "Fry the eggs in a lightly oiled pan.", "Warm the tortillas, top with beans, eggs, more salsa and coriander."] },
+  "Korean beef bibimbap": { mins: 20, steps: ["Stir-fry the beef with garlic and a splash of soy for 3 minutes.", "Quickly sauté or blanch the spinach, carrot and sprouts.", "Top the rice with beef, veg and a fried egg; add gochujang and mix before eating."] },
+  "Mediterranean chicken & couscous": { mins: 20, steps: ["Season the chicken with oregano, lemon, salt and pepper; grill 5–6 minutes each side.", "Pour boiling water over the couscous, cover 5 minutes, then fluff with a fork.", "Serve with roasted zucchini and capsicum and a spoon of tzatziki."] },
+  "Italian tuna & white bean salad": { mins: 8, steps: ["Drain and rinse the beans; drain the tuna.", "Toss with rocket, halved tomatoes and thin red onion.", "Dress with olive oil, lemon, salt and pepper."] },
+  "Tofu banh mi": { mins: 15, steps: ["Slice the tofu, pan-fry until golden and splash with soy.", "Quick-pickle carrot and cucumber in vinegar with a pinch of sugar and salt.", "Fill the baguette with tofu, pickles, coriander, chilli and a little vegan mayo."] },
+  "Chicken pesto pasta (lighter)": { mins: 20, steps: ["Boil the pasta.", "Pan-fry sliced chicken until cooked through.", "Toss pasta, chicken, pesto, halved tomatoes and spinach with a splash of pasta water."] },
+  "Chicken fajitas": { mins: 20, steps: ["Toss the chicken with paprika, cumin, garlic and lime.", "Stir-fry with sliced capsicum and onion on high heat for 6–8 minutes.", "Serve in warm tortillas with salsa and Greek yogurt."] },
+  "Thai basil chicken & rice": { mins: 15, steps: ["Fry garlic and chilli for 30 seconds.", "Add the mince and green beans; cook 6 minutes with soy and a dash of fish or oyster sauce.", "Stir through Thai basil and serve on jasmine rice."] },
+  "Greek lentil & vegetable stew": { mins: 35, steps: ["Soften onion, carrot and celery in the olive oil.", "Add rinsed lentils, chopped tomato, oregano, a bay leaf and water to cover; simmer 25 minutes.", "Season, finish with a splash of red wine vinegar and serve with bread."], tip: "Tastes even better the next day." },
+  "High-protein margherita flatbread": { mins: 15, steps: ["Spread passata over the flatbread.", "Dot with ricotta and torn mozzarella.", "Bake at 220°C for 8–10 minutes and top with basil."] },
+  "Miso salmon & brown rice": { mins: 20, steps: ["Mix the miso with a little water and honey; brush over the salmon.", "Bake at 200°C for 12–14 minutes.", "Serve with brown rice and steamed bok choy."] },
   // ---------------- breakfast ----------------
   "Greek yogurt berry bowl": { mins: 5, steps: ["Spoon the yogurt into a bowl.", "Top with berries, oats and chia seeds.", "Let it sit 2 minutes so the chia softens, then eat."], tip: "Use frozen berries the night before; they thaw into a sauce." },
   "Avocado toast & cottage cheese": { mins: 8, steps: ["Toast the sourdough.", "Mash the avocado with salt, pepper and a squeeze of lemon.", "Spread on toast, top with cottage cheese and halved cherry tomatoes."] },

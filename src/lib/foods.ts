@@ -132,6 +132,19 @@ export const MEALS: MealTemplate[] = [
   // non-veg extras
   { name: "Chicken & veg soup with sourdough", slot: "dinner", tag: "meat", items: ["150g chicken breast", "carrot, celery, leek broth", "1 slice sourdough"], kcal: 430, protein: 42, carbs: 38, fat: 9, keywords: ["chicken", "soup", "bread"] },
   { name: "Prawn & avocado sushi bowl", slot: "lunch", tag: "fish", items: ["150g cooked prawns", "130g sushi rice", "½ avocado, cucumber, nori", "soy & sesame"], kcal: 580, protein: 34, carbs: 60, fat: 20, keywords: ["prawn", "seafood", "rice", "avocado", "sesame"] },
+  // ---------- World favourites ----------
+  { name: "Protein pancakes & berries", slot: "breakfast", tag: "egg", items: ["1 scoop whey (30g)", "1 banana", "2 eggs", "100g berries"], kcal: 430, protein: 34, carbs: 48, fat: 10, keywords: ["egg", "whey", "banana", "dairy"] },
+  { name: "Huevos rancheros (light)", slot: "breakfast", tag: "egg", items: ["2 eggs", "2 small corn tortillas", "80g black beans", "salsa & coriander"], kcal: 460, protein: 26, carbs: 44, fat: 18, keywords: ["egg", "beans", "tortilla"] },
+  { name: "Korean beef bibimbap", slot: "lunch", tag: "meat", items: ["150g cooked rice", "100g lean beef strips", "1 egg", "spinach, carrot, bean sprouts", "1 tsp gochujang"], kcal: 620, protein: 38, carbs: 70, fat: 18, keywords: ["beef", "rice", "egg"] },
+  { name: "Mediterranean chicken & couscous", slot: "lunch", tag: "meat", items: ["150g chicken breast", "150g cooked couscous", "roasted zucchini & capsicum", "2 tbsp tzatziki"], kcal: 580, protein: 46, carbs: 58, fat: 15, keywords: ["chicken", "couscous", "dairy"] },
+  { name: "Italian tuna & white bean salad", slot: "lunch", tag: "fish", items: ["95g tuna in springwater", "150g cannellini beans", "rocket, cherry tomatoes, red onion", "1 tsp olive oil, lemon"], kcal: 450, protein: 36, carbs: 30, fat: 18, keywords: ["tuna", "fish", "beans"] },
+  { name: "Tofu banh mi", slot: "lunch", tag: "vegan", items: ["150g firm tofu", "½ baguette", "pickled carrot & cucumber", "coriander, chilli, vegan mayo"], kcal: 520, protein: 26, carbs: 62, fat: 16, keywords: ["tofu", "soy", "bread"] },
+  { name: "Chicken pesto pasta (lighter)", slot: "dinner", tag: "meat", items: ["80g dry wholemeal pasta", "150g chicken breast", "20g basil pesto", "cherry tomatoes & spinach"], kcal: 640, protein: 48, carbs: 66, fat: 18, keywords: ["chicken", "pasta", "pesto", "nuts"] },
+  { name: "Chicken fajitas", slot: "dinner", tag: "meat", items: ["150g chicken strips", "2 wholemeal tortillas", "capsicum & onion", "salsa + 2 tbsp Greek yogurt"], kcal: 590, protein: 45, carbs: 55, fat: 17, keywords: ["chicken", "tortilla", "dairy"] },
+  { name: "Thai basil chicken & rice", slot: "dinner", tag: "meat", items: ["150g chicken mince", "150g cooked jasmine rice", "Thai basil, chilli, garlic", "green beans"], kcal: 600, protein: 42, carbs: 62, fat: 18, keywords: ["chicken", "rice"] },
+  { name: "Greek lentil & vegetable stew", slot: "dinner", tag: "vegan", items: ["80g dry brown lentils", "tomato, carrot, onion, celery", "1 tsp olive oil", "1 slice wholegrain bread"], kcal: 480, protein: 26, carbs: 70, fat: 9, keywords: ["lentils", "bread"] },
+  { name: "High-protein margherita flatbread", slot: "dinner", tag: "veg", items: ["1 wholemeal flatbread", "60g light mozzarella", "80g ricotta", "tomato passata & basil"], kcal: 520, protein: 32, carbs: 54, fat: 18, keywords: ["cheese", "dairy", "bread"] },
+  { name: "Miso salmon & brown rice", slot: "dinner", tag: "fish", items: ["150g salmon fillet", "150g cooked brown rice", "1 tsp white miso", "bok choy"], kcal: 610, protein: 40, carbs: 52, fat: 24, keywords: ["salmon", "fish", "rice", "soy"] },
 ];
 
 export function mealsFor(diet: Diet, dislikes: string) {

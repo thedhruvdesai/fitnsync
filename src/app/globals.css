@@ -153,3 +153,11 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 /* inside the app the background is static: no blurred orbs drifting behind scrolling content */
 .backdrop-still .orb { animation: none; will-change: auto; }
 @media (max-width: 768px) { .backdrop-still .orb { filter: blur(60px); opacity: .35; } }
+
+/* loading: soft light sweeping across placeholder cards, and a heartbeat being drawn */
+.skeleton { position: relative; overflow: hidden; background: rgba(255,255,255,0.05); }
+.skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), rgba(225,29,46,0.06), transparent); animation: skeleton-sweep 1.4s ease-in-out infinite; }
+@keyframes skeleton-sweep { to { transform: translateX(100%); } }
+.ecg-draw { stroke-dasharray: 160; stroke-dashoffset: 160; animation: ecg-draw 1.3s linear infinite; }
+@keyframes ecg-draw { 60% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton::after, .ecg-draw { animation: none; } .ecg-draw { stroke-dashoffset: 0; } }

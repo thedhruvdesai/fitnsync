@@ -12,7 +12,7 @@ function ecg(u: number) {
  * the screen glows softly on each beat, over a faint monitor grid.
  * Light on the phone (canvas, ~30 fps on mobile, pauses when hidden) and still for reduced motion.
  */
-export function PulseBackdrop() {
+export function PulseBackdrop({ variant = "auth" }: { variant?: "auth" | "app" }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -34,11 +34,14 @@ export function PulseBackdrop() {
     window.addEventListener("resize", resize);
 
     // two traces: a bold one low on the screen, a faint one behind the heading
-    const traces = [
-      { y: 0.84, amp: 0.085, beatPx: 260, alpha: 1, width: 2.4, speed: 1 },
-      { y: 0.2, amp: 0.045, beatPx: 200, alpha: 0.35, width: 1.4, speed: 0.8 },
-    ];
-    const SWEEP = mobile ? 130 : 210; // px per second
+    const app = variant === "app";
+    const traces = app
+      ? [{ y: 0.9, amp: 0.05, beatPx: 300, alpha: 0.45, width: 1.8, speed: 1 }]
+      : [
+          { y: 0.84, amp: 0.085, beatPx: 260, alpha: 1, width: 2.4, speed: 1 },
+          { y: 0.2, amp: 0.045, beatPx: 200, alpha: 0.35, width: 1.4, speed: 0.8 },
+        ];
+    const SWEEP = (mobile ? 130 : 210) * (app ? 0.6 : 1); // px per second
     const TRAIL = 0.62; // share of the screen that stays lit behind the head
 
     const yAt = (tr: (typeof traces)[number], x: number) => h * tr.y - ecg(((x % tr.beatPx) + tr.beatPx) % tr.beatPx / tr.beatPx) * h * tr.amp;
@@ -51,7 +54,7 @@ export function PulseBackdrop() {
       ctx.clearRect(0, 0, w, h);
 
       // monitor grid
-      ctx.strokeStyle = "rgba(244,241,236,0.035)";
+      ctx.strokeStyle = `rgba(244,241,236,${app ? 0.022 : 0.035})`;
       ctx.lineWidth = 1;
       const cell = mobile ? 28 : 36;
       ctx.beginPath();
@@ -66,7 +69,7 @@ export function PulseBackdrop() {
       const since = (phase - 0.33 + 1) % 1;
       const glow = reduce ? 0.4 : Math.exp(-since * 9);
       const rg = ctx.createRadialGradient(headMain, h * main.y, 0, headMain, h * main.y, Math.max(w, h) * 0.6);
-      rg.addColorStop(0, `rgba(225,29,46,${0.16 + glow * 0.22})`);
+      rg.addColorStop(0, `rgba(225,29,46,${(0.16 + glow * 0.22) * (app ? 0.45 : 1)})`);
       rg.addColorStop(1, "rgba(225,29,46,0)");
       ctx.fillStyle = rg;
       ctx.fillRect(0, 0, w, h);
@@ -111,7 +114,7 @@ export function PulseBackdrop() {
       // soft vignette so the form stays the focus
       const vg = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.2, w / 2, h / 2, Math.max(w, h) * 0.75);
       vg.addColorStop(0, "rgba(10,10,11,0)");
-      vg.addColorStop(1, "rgba(10,10,11,0.7)");
+      vg.addColorStop(1, `rgba(10,10,11,${app ? 0.5 : 0.7})`);
       ctx.fillStyle = vg;
       ctx.fillRect(0, 0, w, h);
     };
@@ -129,7 +132,7 @@ export function PulseBackdrop() {
       window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, []);
+  }, [variant]);
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-0 bg-ink">

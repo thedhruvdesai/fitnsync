@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AuthShell } from "@/components/AuthShell";
 import { friendlyAuthError, supabaseConfigured } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -60,7 +61,7 @@ export default function SignupPage() {
         </div>
         <div>
           <label className="label">Password</label>
-          <input className="input" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
+          <PasswordInput value={password} onChange={setPassword} autoComplete="new-password" />
         </div>
         <label className="flex items-start gap-3 text-sm text-bone-dim">
           <input type="checkbox" className="mt-1 accent-[#E11D2E]" checked={agree} onChange={(e) => setAgree(e.target.checked)} required />

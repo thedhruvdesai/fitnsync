@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { AuthShell } from "@/components/AuthShell";
 import { createClient } from "@/lib/supabase/client";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export default function ResetPage() {
   const [password, setPassword] = useState("");
@@ -15,7 +16,7 @@ export default function ResetPage() {
   return (
     <AuthShell title="New password." sub="Choose something you'll remember.">
       <form onSubmit={onSubmit} className="space-y-4">
-        <input className="input" type="password" minLength={8} required value={password} onChange={(e) => setPassword(e.target.value)} />
+        <PasswordInput value={password} onChange={setPassword} autoComplete="new-password" minLength={8} ariaLabel="New password" />
         {msg && <p className="text-sm text-blood-400">{msg}</p>}
         <button className="btn-red w-full">Save password</button>
       </form>

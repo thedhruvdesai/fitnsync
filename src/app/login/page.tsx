@@ -5,6 +5,7 @@ import { Suspense, useState } from "react";
 import { AuthShell } from "@/components/AuthShell";
 import { friendlyAuthError, supabaseConfigured } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
+import { PasswordInput } from "@/components/PasswordInput";
 
 function LoginForm() {
   const params = useSearchParams();
@@ -60,7 +61,7 @@ function LoginForm() {
       </div>
       <div>
         <label className="label">Password</label>
-        <input className="input" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+        <PasswordInput value={password} onChange={setPassword} autoComplete="current-password" />
       </div>
       {error && <p className="text-sm text-blood-400">{error}</p>}
       {unconfirmed && <button type="button" onClick={resend} className="text-sm text-bone underline">Resend confirmation email</button>}

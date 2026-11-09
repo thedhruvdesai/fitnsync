@@ -50,7 +50,7 @@ npm run dev                  # http://localhost:3000
 Paddle is the **merchant of record**: it's the legal seller, so it collects and pays VAT, GST and sales tax in every country. You get paid out by Paddle. A sole trader ABN is fine. Fee: 5% + 50¢ per transaction, no monthly fee.
 
 1. Sign up at **paddle.com** and open a **Sandbox** account for testing (sandbox-vendors.paddle.com). Use the live account once Paddle approves your website.
-2. **Checkout → Checkout settings → Default payment link**: set it to your site URL (e.g. `https://syncnfit.netlify.app`).
+2. **Checkout → Checkout settings → Default payment link**: set it to your site URL (e.g. `https://liftkai.netlify.app`).
 3. **Developer tools → Authentication**: create a **client-side token** for `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` and an **API key** for `PADDLE_API_KEY`.
 4. **Developer tools → Notifications → New destination**: URL `https://YOURDOMAIN/api/paddle/webhook`, type webhook, and select the `subscription.*` events (created, updated, activated, canceled, past_due, paused, resumed, trialing). Copy the secret key into `PADDLE_WEBHOOK_SECRET`.
 5. Set `CRON_SECRET`, redeploy, then open once:

@@ -30,7 +30,7 @@ export async function GET(req: Request) {
       }
       const product = await paddle<{ data: { id: string } }>("/products", {
         method: "POST",
-        body: { name: `PlateLift ${plan.name}`, description: plan.tagline, tax_category: "standard", custom_data: { fitsync_tier: plan.id } },
+        body: { name: `Liftkai ${plan.name}`, description: plan.tagline, tax_category: "standard", custom_data: { fitsync_tier: plan.id } },
       });
       const price = await paddle<{ data: { id: string } }>("/prices", {
         method: "POST",

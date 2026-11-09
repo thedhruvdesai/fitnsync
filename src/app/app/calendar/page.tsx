@@ -4,7 +4,7 @@ import { addDays, isoDate } from "@/lib/report";
 import type { DailyLog } from "@/lib/types";
 import { CalendarView } from "./CalendarView";
 
-export const metadata = { title: "Calendar · PlateLift" };
+export const metadata = { title: "Calendar · Liftkai" };
 
 export default async function CalendarPage(props: { searchParams: Promise<{ m?: string; d?: string }> }) {
   const searchParams = await props.searchParams;

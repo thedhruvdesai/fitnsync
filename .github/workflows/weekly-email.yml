@@ -1,7 +1,7 @@
-# Sends PlateLift weekly emails on each user's own Monday from 7:00am local time.
+# Sends Liftkai weekly emails on each user's own Monday from 7:00am local time.
 # Runs hourly through Sunday and Monday UTC so every time zone (UTC−12 to UTC+14) is covered;
 # the app only emails users whose local Monday 7am has arrived, once each.
-# Add repo secrets: SITE_URL (e.g. https://platelift.fit) and CRON_SECRET (same as your app env).
+# Add repo secrets: SITE_URL (e.g. https://liftkai.fit) and CRON_SECRET (same as your app env).
 name: Weekly email
 on:
   schedule:

@@ -21,14 +21,14 @@ const interTight = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://platelift.fit"),
-  title: { default: "PlateLift: AI meal plans & workouts, built around you", template: "%s" },
-  description: "PlateLift builds your personal meal plan, training program and calorie targets, then coaches you every week with AI feedback. Food you love, workouts that fit.",
-  applicationName: "PlateLift",
-  keywords: ["meal plan app", "workout planner", "AI fitness coach", "macro tracker", "calorie counter", "gym meal plan", "PlateLift"],
-  openGraph: { type: "website", siteName: "PlateLift", title: "PlateLift: AI meal plans & workouts", description: "Your meal plan, training program and AI coach in one app." },
-  twitter: { card: "summary_large_image", title: "PlateLift: AI meal plans & workouts", description: "Your meal plan, training program and AI coach in one app." },
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "PlateLift" },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://liftkai.fit"),
+  title: { default: "Liftkai: AI meal plans & workouts, built around you", template: "%s" },
+  description: "Liftkai builds your personal meal plan, training program and calorie targets, then coaches you every week with AI feedback. Food you love, workouts that fit.",
+  applicationName: "Liftkai",
+  keywords: ["meal plan app", "workout planner", "AI fitness coach", "macro tracker", "calorie counter", "gym meal plan", "Liftkai"],
+  openGraph: { type: "website", siteName: "Liftkai", title: "Liftkai: AI meal plans & workouts", description: "Your meal plan, training program and AI coach in one app." },
+  twitter: { card: "summary_large_image", title: "Liftkai: AI meal plans & workouts", description: "Your meal plan, training program and AI coach in one app." },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Liftkai" },
 };
 
 export const viewport: Viewport = { themeColor: "#0A0A0B", width: "device-width", initialScale: 1, viewportFit: "cover" };

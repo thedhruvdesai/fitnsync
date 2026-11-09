@@ -18,7 +18,7 @@ export async function GET(req: Request) {
   let j: { status?: number; product?: Record<string, unknown> } = {};
   try {
     const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=${fields}`, {
-      headers: { "User-Agent": "PlateLift/1.0 (fitness app; contact via website)" },
+      headers: { "User-Agent": "Liftkai/1.0 (fitness app; contact via website)" },
       next: { revalidate: 60 * 60 * 24 * 7 },
     });
     if (res.status === 404) return NextResponse.json({ error: "not_found" }, { status: 404 });

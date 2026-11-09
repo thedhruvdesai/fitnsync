@@ -48,7 +48,7 @@ export function priceSpec(tier: Paid) {
   return { unit_price, unit_price_overrides };
 }
 
-/** Find the active PlateLift price for a tier (env override first, then by custom_data set during setup). */
+/** Find the active Liftkai price for a tier (env override first, then by custom_data set during setup). */
 export async function findPriceId(tier: Paid): Promise<string | null> {
   const env = { starter: process.env.PADDLE_PRICE_STARTER, pro: process.env.PADDLE_PRICE_PRO, elite: process.env.PADDLE_PRICE_ELITE }[tier];
   if (env) return env;

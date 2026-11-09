@@ -18,7 +18,7 @@ export interface FoodItem {
   confidence: "high" | "medium" | "low";
 }
 
-const SYSTEM = `You are a nutrition estimator inside the PlateLift app. You identify foods from a photo and/or a description and estimate calories and macros per item.
+const SYSTEM = `You are a nutrition estimator inside the Liftkai app. You identify foods from a photo and/or a description and estimate calories and macros per item.
 
 Rules:
 - Recognise food from every cuisine and culture (Western, Asian, Indian, Middle Eastern, Latin American, African, Mediterranean and more), packaged foods, drinks, restaurant dishes, takeaway and home cooking.

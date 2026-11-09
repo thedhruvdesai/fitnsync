@@ -42,7 +42,7 @@ export const PLANS = [
     tagline: "A coach in your corner every week.",
     features: [
       "Everything in Pro",
-      "Weekly in-depth review from PlateLift Coach (AI)",
+      "Weekly in-depth review from Liftkai Coach (AI)",
       "On-demand check-ins: up to 8 a month",
       "Specific fixes for food, training, sleep & recovery",
       "Plan adjustments written for your week",

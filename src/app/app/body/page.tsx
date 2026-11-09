@@ -2,7 +2,7 @@ import { userToday } from "@/lib/tz.server";
 import { requireProfile } from "@/lib/session";
 import { BodyView, type Checkin } from "./BodyView";
 
-export const metadata = { title: "Body · PlateLift" };
+export const metadata = { title: "Body · Liftkai" };
 
 export default async function BodyPage() {
   const { profile, user, supabase } = await requireProfile();

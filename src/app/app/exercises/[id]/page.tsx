@@ -14,7 +14,7 @@ import { HistoryPanel } from "./HistoryPanel";
 
 export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  return { title: `${byId(params.id)?.name ?? "Exercise"} · PlateLift` };
+  return { title: `${byId(params.id)?.name ?? "Exercise"} · Liftkai` };
 }
 
 export default async function ExercisePage(props: { params: Promise<{ id: string }> }) {

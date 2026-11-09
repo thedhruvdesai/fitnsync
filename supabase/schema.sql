@@ -1,5 +1,5 @@
 -- =====================================================================
--- PlateLift database schema
+-- Liftkai database schema
 -- Run this once in Supabase: SQL Editor > New query > paste > Run
 -- =====================================================================
 

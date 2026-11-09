@@ -1,5 +1,5 @@
 -- =====================================================================
--- Fit&Sync database schema
+-- PlateLift database schema
 -- Run this once in Supabase: SQL Editor > New query > paste > Run
 -- =====================================================================
 

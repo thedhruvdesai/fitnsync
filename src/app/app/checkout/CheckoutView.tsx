@@ -5,7 +5,7 @@ import { Counter } from "@/components/Motion";
 import { closeCheckout, onPaddleEvent, openInlineCheckout } from "@/lib/paddle-client";
 import { formatMoney, getRegion } from "@/lib/regions";
 
-const FRAME = "fitsync-checkout";
+const FRAME = "platelift-checkout";
 
 function money(amount: unknown, currency?: string) {
   const n = Number(amount);
@@ -189,7 +189,7 @@ export default function CheckoutView(props: {
           <div ref={card} className="tilt-3d glow-border sheen h-full rounded-[28px] bg-gradient-to-br from-blood/25 via-ink-2/90 to-ink-2/90 p-7 backdrop-blur-md md:p-9">
             <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blood/30 blur-3xl" />
             <div className="pop relative">
-              <p className="eyebrow">Fit&amp;Sync {props.planName}</p>
+              <p className="eyebrow">PlateLift {props.planName}</p>
               <h1 className="h-display mt-3 text-4xl leading-[0.92] md:text-[54px]">{props.tagline}</h1>
 
               <div className="mt-8 flex items-end gap-2">

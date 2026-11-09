@@ -60,13 +60,13 @@ export function weeklyEmailHtml(opts: { name: string; tier: string; s: WeekSumma
   return `<!doctype html><html><body style="margin:0;background:#0A0A0B;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#A8A49D">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#0A0A0B"><tr><td align="center" style="padding:32px 16px">
 <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
-<tr><td style="font-size:22px;font-weight:800;color:#F4F1EC;padding-bottom:28px">Fit<span style="color:#E11D2E">&amp;</span>Sync</td></tr>
+<tr><td style="font-size:22px;font-weight:800;color:#F4F1EC;padding-bottom:28px">Plate<span style="color:#E11D2E">Lift</span></td></tr>
 <tr><td style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#E11D2E">Your week · ${esc(s.start)} → ${esc(s.end)}</td></tr>
 <tr><td style="font-size:34px;line-height:1.05;font-weight:800;color:#F4F1EC;padding:8px 0 6px">${esc(name || "Hey")}, you scored <span style="color:#E11D2E">${s.score}</span>/100.</td></tr>
 <tr><td style="font-size:15px;padding-bottom:18px">You logged ${s.daysLogged} of 7 days. Here's how the week stacked up.</td></tr>
 <tr><td><table width="100%" cellpadding="0" cellspacing="0">${rows.map((r) => `<tr>${r.join("")}</tr>`).join("")}</table></td></tr>
 <tr><td style="padding:18px 0"><div style="border-left:3px solid #E11D2E;padding:6px 0 6px 14px"><div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#948F88">This week's focus</div><div style="font-size:16px;color:#F4F1EC;margin-top:4px">${esc(focus)}</div></div></td></tr>
-${coach ? `<tr><td style="background:#121214;border:1px solid #222;border-radius:16px;padding:20px;font-size:15px;line-height:1.6"><div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#E11D2E;margin-bottom:6px">Fit&amp;Sync Coach (AI) · weekly review</div>${mdToHtml(coach)}</td></tr><tr><td style="height:16px"></td></tr>` : ""}
+${coach ? `<tr><td style="background:#121214;border:1px solid #222;border-radius:16px;padding:20px;font-size:15px;line-height:1.6"><div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#E11D2E;margin-bottom:6px">PlateLift Coach (AI) · weekly review</div>${mdToHtml(coach)}</td></tr><tr><td style="height:16px"></td></tr>` : ""}
 ${!full ? `<tr><td style="padding:8px 0 16px;font-size:14px">Want the full breakdown with adherence, trends and a PDF? <a href="${site}/app/billing?plan=pro" style="color:#E11D2E">Upgrade to Pro</a>.</td></tr>` : ""}
 <tr><td style="padding:8px 0 28px"><a href="${site}/app${full ? "/reports" : ""}" style="display:inline-block;background:#E11D2E;color:#fff;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:999px">${full ? "Open full report" : "Log today"}</a></td></tr>
 <tr><td style="font-size:12px;color:#948F88;border-top:1px solid #1f1f22;padding-top:18px">General fitness guidance, not medical advice. <a href="${site}/app/billing" style="color:#948F88">Email settings</a></td></tr>

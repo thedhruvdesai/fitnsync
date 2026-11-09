@@ -39,7 +39,7 @@ export async function GET() {
   return new NextResponse(JSON.stringify(data, null, 2), {
     headers: {
       "Content-Type": "application/json",
-      "Content-Disposition": `attachment; filename="fitsync-data-${new Date().toISOString().slice(0, 10)}.json"`,
+      "Content-Disposition": `attachment; filename="platelift-data-${new Date().toISOString().slice(0, 10)}.json"`,
     },
   });
 }

@@ -2,7 +2,7 @@ import { requireProfile } from "@/lib/session";
 import { userToday } from "@/lib/tz.server";
 import { RecipesView } from "./RecipesView";
 
-export const metadata = { title: "Recipes · Fit&Sync" };
+export const metadata = { title: "Recipes · PlateLift" };
 
 export default async function RecipesPage(props: { searchParams: Promise<{ r?: string; tab?: string }> }) {
   const searchParams = await props.searchParams;

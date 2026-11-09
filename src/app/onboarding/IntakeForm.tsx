@@ -307,7 +307,7 @@ export default function IntakeForm({ initial, customTraining = null }: { initial
                 </p>
               )
             )}
-            <p className="mt-3 text-xs text-bone-mute">Fit&amp;Sync gives general fitness and nutrition guidance. It isn&apos;t medical advice. If you have a medical condition, are pregnant, or have a history of disordered eating, please check with your GP first.</p>
+            <p className="mt-3 text-xs text-bone-mute">PlateLift gives general fitness and nutrition guidance. It isn&apos;t medical advice. If you have a medical condition, are pregnant, or have a history of disordered eating, please check with your GP first.</p>
           </div>
         )}
         {error && <p className="text-sm text-blood-400">{error}</p>}

@@ -11,15 +11,15 @@ const STEPS = [
   { n: "01", t: "Tell us about you", d: "Two minutes: body, goal, schedule, diet, equipment, injuries. No generic templates." },
   { n: "02", t: "Get your plan", d: "Calorie and protein targets, a 7-day meal plan for how you eat, and a program for where you train." },
   { n: "03", t: "Log in seconds", d: "Tap planned meals, tick off sets, add water. Built for one thumb, on the go." },
-  { n: "04", t: "Get coached", d: "Weekly reports in your inbox, and Elite members get a detailed review from Fit&Sync Coach." },
+  { n: "04", t: "Get coached", d: "Weekly reports in your inbox, and Elite members get a detailed review from PlateLift Coach." },
 ];
 
 const FAQ = [
-  { q: "Who writes the coach feedback?", a: "Fit&Sync Coach is an AI coach. It reads your logs, notes and targets each week and writes specific, honest feedback the way an experienced coach would. We tell you it's AI because you deserve to know." },
+  { q: "Who writes the coach feedback?", a: "PlateLift Coach is an AI coach. It reads your logs, notes and targets each week and writes specific, honest feedback the way an experienced coach would. We tell you it's AI because you deserve to know." },
   { q: "Does it work with my diet?", a: "Yes. Eat everything, or choose pescatarian, vegetarian, vegetarian with eggs or vegan, and exclude any foods you don't eat. Your meal plan, protein targets and quick-add foods follow your choices, and the AI food log recognises meals from any cuisine." },
   { q: "How does the free trial work?", a: "Every plan starts with 7 days free. Cancel before day 7 and you pay nothing. Otherwise your plan starts automatically and renews monthly." },
   { q: "Can I cancel anytime?", a: "Yes. Manage or cancel from your account in two clicks. You keep access until the end of your billing month." },
-  { q: "Is this medical advice?", a: "No. Fit&Sync gives general fitness and nutrition guidance. If you have a medical condition, are pregnant, or have a history of disordered eating, please speak with your GP or an Accredited Practising Dietitian first." },
+  { q: "Is this medical advice?", a: "No. PlateLift gives general fitness and nutrition guidance. If you have a medical condition, are pregnant, or have a history of disordered eating, please speak with your GP or an Accredited Practising Dietitian first." },
 ];
 
 const MARQUEE = ["Train", "Eat", "Sleep", "Recover", "Repeat", "Sync"];
@@ -249,7 +249,7 @@ export default async function Home() {
         {/* coach */}
         <section id="coach" className="mx-auto grid grid-cols-1 max-w-7xl gap-12 px-6 pb-28 lg:grid-cols-2 lg:items-center">
           <Reveal>
-            <p className="eyebrow">Elite · Fit&amp;Sync Coach</p>
+            <p className="eyebrow">Elite · PlateLift Coach</p>
             <h2 className="h-display mt-3 text-5xl leading-[0.92] md:text-6xl">Feedback that sounds like it came from someone who&apos;s <span className="text-blood-400">seen it all.</span></h2>
             <p className="mt-6 max-w-lg text-lg text-bone-dim">
               Every Monday, our AI coach reviews your food, training, sleep and notes, then tells you what&apos;s working, the three things to fix, and how to adjust your plan. Ask for a check-in any time.
@@ -312,10 +312,10 @@ export default async function Home() {
         </section>
 
         <footer className="relative mx-auto max-w-7xl overflow-hidden px-6 pb-10 pt-6">
-          <div className="h-display select-none text-center text-[22vw] uppercase leading-[0.8] text-outline opacity-40 md:text-[18vw]">Fit&amp;Sync</div>
+          <div className="h-display select-none text-center text-[22vw] uppercase leading-[0.8] text-outline opacity-40 md:text-[18vw]">PlateLift</div>
           <div className="mt-8 flex flex-col gap-4 border-t border-white/5 pt-8 text-sm text-bone-mute md:flex-row md:justify-between">
-            <p className="max-w-md text-xs">Fit&amp;Sync provides general fitness and nutrition guidance and is not a substitute for medical advice. Fit&amp;Sync Coach is an AI.</p>
-            <div className="flex gap-6"><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link><a href="mailto:hello@fitsync.app">Contact</a></div>
+            <p className="max-w-md text-xs">PlateLift provides general fitness and nutrition guidance and is not a substitute for medical advice. PlateLift Coach is an AI.</p>
+            <div className="flex gap-6"><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link><a href="mailto:hello@platelift.fit">Contact</a></div>
           </div>
         </footer>
       </main>

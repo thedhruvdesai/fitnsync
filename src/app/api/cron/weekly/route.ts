@@ -55,9 +55,9 @@ export async function GET(req: Request) {
       }
 
       await resend.emails.send({
-        from: process.env.EMAIL_FROM || "Fit&Sync <onboarding@resend.dev>",
+        from: process.env.EMAIL_FROM || "PlateLift <onboarding@resend.dev>",
         to: u.email!,
-        subject: coach ? `Your coach review is in · score ${s.score}/100` : `Your week on Fit&Sync · score ${s.score}/100`,
+        subject: coach ? `Your coach review is in · score ${s.score}/100` : `Your week on PlateLift · score ${s.score}/100`,
         html: weeklyEmailHtml({ name: u.full_name ?? "", tier: u.tier, s, t: u.plan!.targets, site: siteUrl(), coach }),
       });
       await admin.from("email_log").insert({ user_id: u.id, week_start: tag });

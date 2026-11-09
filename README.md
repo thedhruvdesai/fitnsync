@@ -1,4 +1,4 @@
-# Fit&Sync: subscription fitness & nutrition coaching
+# PlateLift: subscription fitness & nutrition coaching
 
 A production-ready Next.js 14 app with:
 
@@ -7,7 +7,7 @@ A production-ready Next.js 14 app with:
 - **Daily logging**: food (from plan, quick-add or custom), workout tick-offs, water, weight, sleep, energy, notes
 - **Progress**: 30-day weight trend, calorie & protein bars, streaks
 - **Reports (Pro)**: weekly consistency score, adherence, day-by-day table, PDF via print
-- **Fit&Sync Coach (Elite)**: Claude writes an expert-voice weekly review plus up to 8 on-demand check-ins a month, clearly labelled as AI
+- **PlateLift Coach (Elite)**: Claude writes an expert-voice weekly review plus up to 8 on-demand check-ins a month, clearly labelled as AI
 - **Weekly email every Monday** (Resend); depth depends on tier, and Elite gets the coach review inline
 - **Paddle subscriptions** (merchant of record, handles worldwide tax): Starter $9.99, Pro $19.99, Elite $39 AUD/month, with local prices in 10+ regions, a 7-day free trial, and a customer portal
 
@@ -116,7 +116,7 @@ Create a key at console.anthropic.com → `ANTHROPIC_API_KEY`. Default model is 
 ```
 src/lib/plan.ts        targets (Mifflin-St Jeor), meal plan, training program
 src/lib/foods.ts       meal library by diet + quick-add foods
-src/lib/coach.ts       Fit&Sync Coach prompt + Claude call
+src/lib/coach.ts       PlateLift Coach prompt + Claude call
 src/lib/report.ts      weekly summary / consistency score
 src/lib/email.ts       weekly email HTML
 src/lib/tiers.ts       plans, prices, feature gating

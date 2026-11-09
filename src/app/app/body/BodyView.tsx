@@ -167,7 +167,7 @@ export function BodyView({ userId, initial, setupNeeded, goalWeight, today }: { 
       const blob = await zip.generateAsync({ type: "blob" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `fitsync-progress-photos-${today}.zip`;
+      a.download = `platelift-progress-photos-${today}.zip`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
       setZipping(null);

@@ -1,6 +1,6 @@
 import { ExerciseBrowser } from "./ExerciseBrowser";
 
-export const metadata = { title: "Exercise library · Fit&Sync" };
+export const metadata = { title: "Exercise library · PlateLift" };
 
 export default async function ExercisesPage(props: { searchParams: Promise<{ g?: string; q?: string }> }) {
   const searchParams = await props.searchParams;

@@ -66,7 +66,7 @@ export default function SignupPage() {
         <label className="flex items-start gap-3 text-sm text-bone-dim">
           <input type="checkbox" className="mt-1 accent-[#E11D2E]" checked={agree} onChange={(e) => setAgree(e.target.checked)} required />
           <span>
-            I agree to the <Link href="/terms" className="underline">Terms</Link> and understand Fit&amp;Sync gives general fitness guidance, not medical advice.
+            I agree to the <Link href="/terms" className="underline">Terms</Link> and understand PlateLift gives general fitness guidance, not medical advice.
           </span>
         </label>
         {error && <p className="text-sm text-blood-400">{error}</p>}

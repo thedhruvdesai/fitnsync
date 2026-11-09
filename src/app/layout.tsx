@@ -21,9 +21,14 @@ const interTight = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Fit&Sync: personal fitness & nutrition coaching",
-  description: "Personal targets, meal plans, training programs, weekly reports and an AI coach in your corner.",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Fit&Sync" },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://platelift.fit"),
+  title: { default: "PlateLift: AI meal plans & workouts, built around you", template: "%s" },
+  description: "PlateLift builds your personal meal plan, training program and calorie targets, then coaches you every week with AI feedback. Food you love, workouts that fit.",
+  applicationName: "PlateLift",
+  keywords: ["meal plan app", "workout planner", "AI fitness coach", "macro tracker", "calorie counter", "gym meal plan", "PlateLift"],
+  openGraph: { type: "website", siteName: "PlateLift", title: "PlateLift: AI meal plans & workouts", description: "Your meal plan, training program and AI coach in one app." },
+  twitter: { card: "summary_large_image", title: "PlateLift: AI meal plans & workouts", description: "Your meal plan, training program and AI coach in one app." },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "PlateLift" },
 };
 
 export const viewport: Viewport = { themeColor: "#0A0A0B", width: "device-width", initialScale: 1, viewportFit: "cover" };

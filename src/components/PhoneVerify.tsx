@@ -65,9 +65,6 @@ export function PhoneVerify({ needed, phone, note, plan }: { needed: boolean; ph
           <button className="text-blood-400 underline underline-offset-4" onClick={() => setOpen(true)}>Change</button>
         </p>
       )}
-      {!masked && !open && (
-        <button className="mt-2 text-sm text-blood-400 underline underline-offset-4" onClick={() => setOpen(true)}>Verify my mobile number</button>
-      )}
       {open && !sentTo && (
         <div className="mt-4">
           <div className="label">Mobile number</div>

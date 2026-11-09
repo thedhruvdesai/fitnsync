@@ -60,7 +60,7 @@ export function weeklyEmailHtml(opts: { name: string; tier: string; s: WeekSumma
   return `<!doctype html><html><body style="margin:0;background:#0A0A0B;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#A8A49D">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#0A0A0B"><tr><td align="center" style="padding:32px 16px">
 <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
-<tr><td style="font-size:22px;font-weight:800;color:#F4F1EC;padding-bottom:28px">Liftk<span style="color:#E11D2E">ai</span></td></tr>
+<tr><td style="padding-bottom:28px"><img src="${site}/brand/liftkai-email-logo.png" width="170" alt="liftkai" style="display:block;border:0;font-size:22px;font-weight:800;color:#F4F1EC"></td></tr>
 <tr><td style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#E11D2E">Your week · ${esc(s.start)} → ${esc(s.end)}</td></tr>
 <tr><td style="font-size:34px;line-height:1.05;font-weight:800;color:#F4F1EC;padding:8px 0 6px">${esc(name || "Hey")}, you scored <span style="color:#E11D2E">${s.score}</span>/100.</td></tr>
 <tr><td style="font-size:15px;padding-bottom:18px">You logged ${s.daysLogged} of 7 days. Here's how the week stacked up.</td></tr>

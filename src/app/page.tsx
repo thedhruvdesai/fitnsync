@@ -318,7 +318,7 @@ export default async function Home() {
           </p>
           <div className="mt-8 flex flex-col gap-4 border-t border-white/5 pt-8 text-sm text-bone-mute md:flex-row md:justify-between">
             <p className="max-w-md text-xs">Liftkai provides general fitness and nutrition guidance and is not a substitute for medical advice. Liftkai Coach is an AI.</p>
-            <div className="flex gap-6"><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link><a href="mailto:hello@liftkai.fit">Contact</a></div>
+            <div className="flex gap-6"><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link><a href="mailto:liftkai.fit@gmail.com">Contact</a></div>
           </div>
         </footer>
       </main>

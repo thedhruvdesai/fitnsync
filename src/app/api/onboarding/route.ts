@@ -34,8 +34,9 @@ export async function POST(req: Request) {
     meals_per_day: num(b.meals_per_day, 2, 5)!,
     dislikes: String(b.dislikes ?? "").slice(0, 300),
     constraints: String(b.constraints ?? "").slice(0, 300),
+    likes: String(b.likes ?? "").slice(0, 300),
   };
-  const missing = Object.entries(intake).filter(([k, v]) => v === null && k !== "dislikes" && k !== "constraints");
+  const missing = Object.entries(intake).filter(([k, v]) => v === null && k !== "dislikes" && k !== "constraints" && k !== "likes");
   if (missing.length) return NextResponse.json({ error: `Check: ${missing.map(([k]) => k.replace("_", " ")).join(", ")}` }, { status: 400 });
 
   const plan = generatePlan(intake);
@@ -49,7 +50,9 @@ export async function POST(req: Request) {
     }
     if (old.adjustments?.length) plan.adjustments = old.adjustments;
   }
-  const { error } = await supabase.from("profiles").update({ ...intake, plan, onboarded: true }).eq("id", user.id);
+  // likes live inside the plan, not as a profile column
+  const { likes: _likes, ...columns } = intake;
+  const { error } = await supabase.from("profiles").update({ ...columns, plan, onboarded: true }).eq("id", user.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // starting weight goes into today's log

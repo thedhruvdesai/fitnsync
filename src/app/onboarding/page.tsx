@@ -15,7 +15,7 @@ export default async function OnboardingPage() {
   return (
     <>
       <Backdrop intensity={0.6} />
-      <IntakeForm initial={initial} customTraining={custom} />
+      <IntakeForm initial={{ ...initial, likes: (plan?.likes as string | undefined) ?? "" }} customTraining={custom} />
     </>
   );
 }

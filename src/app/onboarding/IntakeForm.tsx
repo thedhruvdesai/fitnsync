@@ -57,6 +57,36 @@ function Choice<T extends string | number>({ opts, value, onChange, cols = 1 }: 
   );
 }
 
+const LOVE_CHOICES: { food: string; tag: "vegan" | "veg" | "egg" | "fish" | "meat" }[] = [
+  { food: "chicken", tag: "meat" }, { food: "beef", tag: "meat" }, { food: "salmon", tag: "fish" }, { food: "tuna", tag: "fish" }, { food: "prawns", tag: "fish" },
+  { food: "eggs", tag: "egg" }, { food: "paneer", tag: "veg" }, { food: "yogurt", tag: "veg" }, { food: "cheese", tag: "veg" },
+  { food: "tofu", tag: "vegan" }, { food: "lentils", tag: "vegan" }, { food: "chickpeas", tag: "vegan" }, { food: "beans", tag: "vegan" },
+  { food: "rice", tag: "vegan" }, { food: "oats", tag: "vegan" }, { food: "pasta", tag: "vegan" }, { food: "potato", tag: "vegan" }, { food: "avocado", tag: "vegan" }, { food: "berries", tag: "vegan" },
+];
+const DIET_ALLOWS: Record<string, string[]> = { vegan: ["vegan"], vegetarian: ["vegan", "veg"], eggetarian: ["vegan", "veg", "egg"], pescatarian: ["vegan", "veg", "egg", "fish"], non_veg: ["vegan", "veg", "egg", "fish", "meat"] };
+
+/** Pick or type the foods you love; the meal plan is built around them. */
+function FoodsYouLove({ value, diet, onChange }: { value: string; diet?: string; onChange: (v: string) => void }) {
+  const list = value.split(",").map((x) => x.trim()).filter(Boolean);
+  const has = (w: string) => list.some((x) => x.toLowerCase() === w);
+  const toggle = (w: string) => onChange((has(w) ? list.filter((x) => x.toLowerCase() !== w) : [...list, w]).join(", "));
+  const allowed = DIET_ALLOWS[diet ?? "non_veg"] ?? DIET_ALLOWS.non_veg;
+  const choices = LOVE_CHOICES.filter((c) => allowed.includes(c.tag));
+  return (
+    <div>
+      <label className="label">Foods you love (your meals are built around these)</label>
+      <div className="flex flex-wrap gap-2">
+        {choices.map((c) => (
+          <button type="button" key={c.food} onClick={() => toggle(c.food)} aria-pressed={has(c.food)} className={`chip !py-1.5 text-sm capitalize ${has(c.food) ? "chip-on" : ""}`}>
+            {has(c.food) ? "✓ " : "+ "}{c.food}
+          </button>
+        ))}
+      </div>
+      <input className="input mt-3" aria-label="Foods you love" value={value} onChange={(e) => onChange(e.target.value)} placeholder="Add your own, e.g. dal, sushi, kimchi, sourdough" />
+    </div>
+  );
+}
+
 export default function IntakeForm({ initial, customTraining = null }: { initial: Partial<Intake>; customTraining?: { days: number; equipment: string } | null }) {
   const [keepTraining, setKeepTraining] = useState(true);
   const router = useRouter();
@@ -68,6 +98,7 @@ export default function IntakeForm({ initial, customTraining = null }: { initial
     training_days: 4,
     meals_per_day: 3,
     dislikes: "",
+    likes: "",
     constraints: "",
     ...Object.fromEntries(Object.entries(initial).filter(([, v]) => v !== null && v !== undefined)),
   });
@@ -250,6 +281,7 @@ export default function IntakeForm({ initial, customTraining = null }: { initial
                 ))}
               </div>
             </div>
+            <FoodsYouLove value={f.likes ?? ""} diet={f.diet} onChange={(v) => set("likes", v)} />
             <div>
               <label className="label">Foods you won&apos;t eat (comma separated)</label>
               <input className="input" aria-label="Foods you dislike" value={f.dislikes ?? ""} onChange={(e) => set("dislikes", e.target.value)} placeholder="mushroom, tofu" />

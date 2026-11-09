@@ -21,6 +21,8 @@ export interface Intake {
   meals_per_day: number;
   dislikes: string;
   constraints: string;
+  /** foods the person loves and eats often; meal plans are built around these (kept inside the plan, not a profile column) */
+  likes?: string;
 }
 
 export interface Targets {
@@ -77,6 +79,8 @@ export interface Plan {
   notes: string[];
   /** weekly calorie adjustments made from the user's weight trend */
   adjustments?: { date: string; from: number; to: number; reason: string }[];
+  /** foods the plan was built around */
+  likes?: string;
 }
 
 export interface LoggedMeal {

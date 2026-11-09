@@ -72,8 +72,25 @@ const SIGNATURE: Record<Intake["diet"], string[]> = {
   vegan: [],
 };
 
+/** How many of the person's favourite foods a meal contains. */
+function likeScore(m: { name: string; items: string[]; keywords: string[] }, likes: string[]) {
+  if (!likes.length) return 0;
+  const text = `${m.name} ${m.items.join(" ")} ${m.keywords.join(" ")}`.toLowerCase();
+  return likes.reduce((n, w) => n + (text.includes(w) ? 1 : 0), 0);
+}
+
+export function parseLikes(raw?: string) {
+  return (raw ?? "")
+    .toLowerCase()
+    .split(/[,\n]/)
+    .map((x) => x.trim().replace(/s$/, ""))
+    .filter((x) => x.length >= 3)
+    .slice(0, 20);
+}
+
 export function buildMealPlan(i: Intake, t: Targets): PlannedDay[] {
   const pool = mealsFor(i.diet, i.dislikes || "");
+  const likes = parseLikes(i.likes);
   const slots = slotsFor(i.meals_per_day);
   const share: Record<string, number> = { breakfast: 0.27, lunch: 0.33, dinner: 0.3, snack: 0.1 };
   const totalShare = slots.reduce((s, x) => s + share[x], 0);
@@ -89,7 +106,12 @@ export function buildMealPlan(i: Intake, t: Targets): PlannedDay[] {
       const signature = SIGNATURE[i.diet];
       const preferred = signature.length ? options.filter((m) => signature.includes(m.tag)) : [];
       const usePreferred = preferred.length > 0 && (d * 3 + k) % 4 !== 3;
-      const list = usePreferred ? preferred : options;
+      let list = usePreferred ? preferred : options;
+      // built around the foods they love: about 2 in 3 meals use one of their favourites when possible
+      if (likes.length) {
+        const loved = options.filter((m) => likeScore(m, likes) > 0).sort((a, b) => likeScore(b, likes) - likeScore(a, likes));
+        if (loved.length && (d + k) % 3 !== 2) list = loved;
+      }
       const pick = list[(d * 3 + k * 2) % list.length];
       return scaleMeal(pick, (t.kcal * share[slot]) / totalShare);
     });
@@ -237,8 +259,11 @@ export function generatePlan(i: Intake): Plan {
   notes.push(`Spread protein over ${i.meals_per_day} meals, roughly ${Math.round(targets.protein_g / Math.max(2, i.meals_per_day))} g each.`);
   if (i.constraints?.trim()) notes.push(`You noted: "${i.constraints.trim()}". Swap any exercise that aggravates it, and get it checked by a physio if pain persists.`);
 
+  if (i.likes?.trim()) notes.push(`Meals are built around foods you love: ${parseLikes(i.likes).join(", ")}.`);
+
   return {
     generated_at: new Date().toISOString(),
+    likes: i.likes?.trim() || undefined,
     targets,
     meals: buildMealPlan(i, targets),
     training: buildTraining(i),
@@ -247,7 +272,7 @@ export function generatePlan(i: Intake): Plan {
 }
 
 /** Intake fields straight from a profile row (used when rebalancing an existing plan). */
-export function intakeFromProfile(p: Partial<Record<keyof Intake, unknown>>): Intake {
+export function intakeFromProfile(p: Partial<Record<keyof Intake, unknown>> & { plan?: { likes?: string } | null }): Intake {
   return {
     full_name: String(p.full_name ?? ""),
     sex: (p.sex as Intake["sex"]) ?? "male",
@@ -264,5 +289,6 @@ export function intakeFromProfile(p: Partial<Record<keyof Intake, unknown>>): In
     meals_per_day: Number(p.meals_per_day) || 3,
     dislikes: String(p.dislikes ?? ""),
     constraints: String(p.constraints ?? ""),
+    likes: String(p.plan?.likes ?? p.likes ?? ""),
   };
 }

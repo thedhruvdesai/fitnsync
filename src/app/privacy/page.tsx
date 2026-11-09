@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import { LegalPage } from "@/components/LegalPage";
+
+export const metadata: Metadata = { title: "Privacy Policy · Liftkai", description: "How Liftkai collects, uses and protects your personal and health information." };
 
 export default function Privacy() {
   return (
     <LegalPage
-      title="Privacy"
+      title="Privacy Policy"
+      updated="9 November 2026"
       sections={[
         ["What we collect", "Your email, the details you give at intake (age, height, weight, goals, diet, training), and the food, training, weight, sleep and notes you log."],
         ["How we use it", "To build and adjust your plan, produce reports, send your weekly email and generate AI coach feedback. Your logs and any food photos you scan are sent to our AI provider (Google Gemini or Anthropic) only to generate estimates and feedback. Please avoid including people or personal details in food photos."],

@@ -15,12 +15,13 @@ const PROGRESS: Item = { href: "/app/progress", label: "Progress", icon: "M3 17l
 const BODY: Item = { href: "/app/body", label: "Body", icon: "M12 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-5 6h10m-5 0v5m0 0-3 5m3-5 3 5" };
 const REPORTS: Item = { href: "/app/reports", label: "Reports", icon: "M9 17v-6m4 6V7m4 10v-3M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2Z" };
 const COACH: Item = { href: "/app/coach", label: "Coach", icon: "M8 10h8M8 14h5m-9 6 3-3h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12Z" };
+const HELP: Item = { href: "/contact", label: "Help & contact", icon: "M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3m.1 4h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z" };
 const ACCOUNT: Item = { href: "/app/billing", label: "Plan & account", icon: "M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21a8 8 0 0 1 16 0" };
 
 /** Desktop shows everything; phones get 4 main tabs + More. */
 const DESKTOP = [TODAY, CALENDAR, PLAN, RECIPES, EXERCISES, PROGRESS, BODY, REPORTS, COACH];
 const TABS = [TODAY, CALENDAR, PLAN, EXERCISES];
-const MORE = [RECIPES, PROGRESS, BODY, REPORTS, COACH, ACCOUNT];
+const MORE = [RECIPES, PROGRESS, BODY, REPORTS, COACH, ACCOUNT, HELP];
 
 function Icon({ d, className = "h-5 w-5" }: { d: string; className?: string }) {
   return (
@@ -66,6 +67,9 @@ export function AppNav({ tier, name }: { tier: string; name?: string | null }) {
           ))}
         </nav>
         <div className="mt-auto">
+          <Link href="/contact" className="mb-3 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-bone-dim transition hover:bg-white/5 hover:text-bone">
+            <Icon d={HELP.icon} /> {HELP.label}
+          </Link>
           <Link href="/app/billing" className="block rounded-xl border border-white/10 p-3 text-sm hover:border-white/25">
             <div className="text-bone">{name || "Account"}</div>
             <div className="text-xs uppercase tracking-widest text-blood-400">{tier === "free" ? "Free · Upgrade" : tier}</div>

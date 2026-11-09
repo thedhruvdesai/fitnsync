@@ -6,6 +6,7 @@ import { PricingCards } from "@/components/PricingCards";
 import { currentRegion } from "@/lib/region.server";
 import { LocationBanner } from "@/components/LocationBanner";
 import { formatMoney } from "@/lib/regions";
+import { HOME_FAQ } from "@/lib/faq";
 
 const STEPS = [
   { n: "01", t: "Tell us about you", d: "Two minutes: body, goal, schedule, diet, equipment, injuries. No generic templates." },
@@ -14,13 +15,7 @@ const STEPS = [
   { n: "04", t: "Get coached", d: "Weekly reports in your inbox, and Elite members get a detailed review from Liftkai Coach." },
 ];
 
-const FAQ = [
-  { q: "Who writes the coach feedback?", a: "Liftkai Coach is an AI coach. It reads your logs, notes and targets each week and writes specific, honest feedback the way an experienced coach would. We tell you it's AI because you deserve to know." },
-  { q: "Does it work with my diet?", a: "Yes. Eat everything, or choose pescatarian, vegetarian, vegetarian with eggs or vegan, and exclude any foods you don't eat. Your meal plan, protein targets and quick-add foods follow your choices, and the AI food log recognises meals from any cuisine." },
-  { q: "How does the free trial work?", a: "Every plan starts with 7 days free. Cancel before day 7 and you pay nothing. Otherwise your plan starts automatically and renews monthly." },
-  { q: "Can I cancel anytime?", a: "Yes. Manage or cancel from your account in two clicks. You keep access until the end of your billing month." },
-  { q: "Is this medical advice?", a: "No. Liftkai gives general fitness and nutrition guidance. If you have a medical condition, are pregnant, or have a history of disordered eating, please speak with your GP or an Accredited Practising Dietitian first." },
-];
+
 
 const MARQUEE = ["Lift", "Eat", "Sleep", "Recover", "Repeat", "Level up"];
 
@@ -286,7 +281,7 @@ export default async function Home() {
         <section className="mx-auto max-w-3xl px-6 pb-28">
           <Reveal><h2 className="h-display text-5xl">Questions</h2></Reveal>
           <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
-            {FAQ.map((f) => (
+            {HOME_FAQ.map((f) => (
               <details key={f.q} className="group py-6">
                 <summary className="flex list-none items-center justify-between text-lg font-semibold md:text-xl">
                   {f.q}
@@ -295,6 +290,10 @@ export default async function Home() {
                 <p className="mt-3 text-bone-dim">{f.a}</p>
               </details>
             ))}
+          </div>
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <Link href="/faq" className="btn-ghost !px-6 !py-3">See all questions →</Link>
+            <Link href="/contact" className="text-sm text-bone-dim underline underline-offset-4 hover:text-bone">Still stuck? Ask us anything</Link>
           </div>
         </section>
 
@@ -318,7 +317,7 @@ export default async function Home() {
           </p>
           <div className="mt-8 flex flex-col gap-4 border-t border-white/5 pt-8 text-sm text-bone-mute md:flex-row md:justify-between">
             <p className="max-w-md text-xs">Liftkai provides general fitness and nutrition guidance and is not a substitute for medical advice. Liftkai Coach is an AI.</p>
-            <div className="flex gap-6"><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link><a href="mailto:liftkai.fit@gmail.com">Contact</a></div>
+            <div className="flex flex-wrap gap-x-6 gap-y-2"><Link href="/faq">FAQ</Link><Link href="/contact">Contact</Link><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link></div>
           </div>
         </footer>
       </main>
